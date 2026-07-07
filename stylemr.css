@@ -1,0 +1,16 @@
+   <body> {
+     margin: 0; 
+}
+   .header {
+     background-color: #F3E8DC;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 20px 50px ;
+      }
+     .logo {
+        width: 100px;
+        }
+        .header-links a {
+            color: #eb7507;
+       

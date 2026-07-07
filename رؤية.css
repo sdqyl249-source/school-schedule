@@ -1,0 +1,298 @@
+/* ================= 1. الإعدادات العامة والخطوط الاحترافية ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    direction: rtl;
+    background-color: #fcf8f2;
+    color: #4a3b32;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden; /* منع التقرير الجانبي */
+}
+
+/* ================= 2. شريط التنقل العلوي (الناف بار المحترف) ================= */
+.main-header {
+    background-color: #4a3b32;
+    padding: 12px 60px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 1000;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* تنسيق حاوية الشعار (اللوغو) */
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.site-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffe4c4;
+    transition: transform 0.3s ease;
+}
+
+.logo-container:hover .site-logo {
+    transform: rotate(5deg) scale(1.05);
+}
+
+.logo-text {
+    color: #ffe4c4;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* قائمة الروابط الرئيسية */
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 15px;
+    align-items: center;
+}
+
+.nav-links li > a {
+    color: #ffe4c4;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px; /* مسافة بين الإيموجي والنص */
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* تأثير تحويم ناعم وراقي */
+.nav-links li > a:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ================= 3. هندسة القوائم المنسدلة الذكية (Dropdown) ================= */
+.dropdown {
+    position: relative;
+}
+
+/* القائمة الفرعية الأولى */
+.dropdown-menu {
+    position: absolute;
+    top: 130%; /* مسافة مريحة لأسفل للنزول بسلاسة */
+    right: 0;
+    background-color: #ffe4c4;
+    border: 1px solid rgba(74, 59, 50, 0.2);
+    border-radius: 12px;
+    padding: 8px 0;
+    list-style: none;
+    min-width: 220px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    display: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 1100;
+}
+
+.dropdown-menu li a {
+    display: block;
+    color: #4a3b32;
+    padding: 11px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: right;
+    transition: all 0.2s ease;
+}
+
+.dropdown-menu li a:hover {
+    background-color: #4a3b32;
+    color: #ffe4c4;
+    padding-right: 25px; /* حركة ترحيبية خفيفة لليمين عند التحويم */
+}
+
+/* تفعيل الظهور مع تأثير حركة ناعم */
+.dropdown:hover > .dropdown-menu {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    top: 100%;
+}
+
+/* ================= 4. القوائم المتداخلة (الصفوف الجانبية) ================= */
+.sub-dropdown {
+    position: relative;
+}
+
+.submenu {
+    position: absolute;
+    top: 0;
+    right: 100%; /* تفتح بجانبها تماماً */
+    margin-right: 2px;
+    background-color: #ffe4c4;
+    border: 1px solid rgba(74, 59, 50, 0.2);
+    border-radius: 12px;
+    list-style: none;
+    min-width: 220px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    display: none;
+}
+
+.sub-dropdown:hover .submenu {
+    display: block;
+}
+
+/* ================= 5. حل مشكلة صندوق دخول الأعضاء (اليسار) ================= */
+.login-btn {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 230, 200, 0.4) !important;
+}
+
+.login-btn:hover {
+    background-color: #ffe4c4 !important;
+    color: #4a3b32 !important;
+}
+
+/* 🛠️ حل السحر هنا: جعل قائمة تسجيل الدخول تفتح محاذية لليسار لئلا تخرج من الشاشة */
+.nav-links li:last-child .dropdown-menu {
+    right: auto;
+    left: 0; 
+}
+
+.login-dropdown {
+    min-width: 280px;
+    padding: 20px;
+    border-radius: 16px;
+}
+
+.login-dropdown form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.login-dropdown input[type="tel"],
+.login-dropdown input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid rgba(74, 59, 50, 0.3);
+    border-radius: 8px;
+    background-color: #fffdfa;
+    color: #4a3b32;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.login-dropdown input:focus {
+    border-color: #4a3b32;
+    box-shadow: 0 0 0 3px rgba(74, 59, 50, 0.1);
+}
+
+.login-dropdown button[type="submit"] {
+    background-color: #4a3b32;
+    color: #ffe4c4;
+    border: none;
+    padding: 11px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.login-dropdown button[type="submit"]:hover {
+    background-color: #2e241f;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ================= 6. القسم الترحيبي البصري المطور ================= */
+.hero-section {
+    flex: 1;
+    background-image: url('رؤية.png'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(46, 36, 31, 0.7), rgba(74, 59, 50, 0.5));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-content {
+    text-align: center;
+    color: #ffe4c4;
+    padding: 40px;
+    max-width: 800px;
+}
+
+.hero-logo {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    margin-bottom: 25px;
+    object-fit: cover;
+    border: 3px solid #ffe4c4;
+    filter: drop-shadow(0px 8px 20px rgba(0,0,0,0.4));
+}
+
+.hero-title {
+    font-size: 40px;
+    font-weight: 800;
+    margin-bottom: 15px;
+    letter-spacing: 0.5px;
+    text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.6);
+}
+
+.hero-subtitle {
+    font-size: 20px;
+    font-weight: 400;
+    opacity: 0.9;
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* ================= 7. شريط الحقوق السفلي (Footer) ================= */
+.main-footer {
+    background-color: #4a3b32;
+    color: #ffe4c4;
+    text-align: center;
+    padding: 18px 0;
+    font-size: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin-top: auto; 
+    width: 100%;
+}
+
+.main-footer strong {
+    color: #ffffff;
+}
+
+/* ================= 8. حماية الصلاحيات ================= */
+.admin-only {
+    display: none;
+}

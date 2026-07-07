@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+<meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+/* الأساسيات */
+/* الشريط العلوي */
+.main-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 80px; /* ارتفاع الهيدر */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 2000; /* فوق كل العناصر */
+}
+.nav-links .nav-btn {
+    text-decoration: none;
+    background: rgba(79, 70, 229, 0.1);
+    color: #4f46e5;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+.nav-links .nav-btn:hover {
+    background: #4f46e5;
+    color: white;
+}
+body, table, th, td {
+    direction: rtl !important;
+    text-align: right !important;
+}
+/* العنوان */
+.page-title {
+  font-family: "Cairo", sans-serif;
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0;
+  color: #4f46e5;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: fadeSlideIn 1.2s ease forwards;
+}
+.page-title span {
+  font-weight: normal;
+  font-size: 20px;
+  color: #9333ea;
+}
+
+/* أنيميشن دخول */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* لضمان عدم التداخل مع باقي العناصر */
+body {
+  padding-top: 90px; /* يترك مسافة تحت الهيدر */
+}
+
+.sidebar-toggle:hover {
+  background: rgba(255,255,255,0.25);
+  transform: rotate(20deg) scale(1.1);
+}
+
+/* الصندوق الزجاجي للتنزيل */
+.download-box {
+  margin: 0px auto;
+  padding: 15px;
+  width: 300px; /* أصغر ليكون أنيق */
+  border-radius: 16px;
+  margin-bottom: 0px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.download-box:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.3);
+  animation: pulseBox 1.5s infinite alternate;
+}
+.download-box h3 {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 4px;
+  font-weight: bold;
+  color: #4f46e5;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.download-box label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 13px;
+  color: #222;
+}
+.download-box select {
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: rgba(255,255,255,0.7);
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+.download-box select:hover { animation: pulseSelect 1s infinite alternate; }
+.download-box select:focus {
+  border-color: #9333ea;
+  box-shadow: 0 0 6px rgba(147,51,234,0.5);
+}
+.download-box .download-btn {
+  display: block;              /* يجعل الزر يأخذ عرض مناسب */
+  margin: 15px auto;           /* يضعه في الوسط */
+  background: linear-gradient(135deg,#10b981,#059669); /* أخضر متدرج */
+  color: #fff;
+  font-weight: bold;
+  padding: 12px 28px;
+  border-radius: 50px;         /* شكل كبسولة أنيق */
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+  text-align: center;
+}
+
+.download-box .download-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  background: linear-gradient(135deg,#047857,#065f46);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+}
+
+/* أنيميشن النبض */
+@keyframes pulseBox {
+  from { transform: scale(1.01); }
+  to   { transform: scale(1.03); }
+}
+@keyframes pulseSelect {
+  from { transform: scale(1); }
+  to   { transform: scale(1.05); }
+}
+/* البطاقات */
+.card {
+flex: 0 0 500px; /* ضمان عرض ثابت 500px لكل بطاقة */
+    border-radius: 20px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+    margin: 10px; /* مسافة بسيطة */
+    padding: 20px;
+    transition: transform 0.3s ease;
+    max-width: 90vw;
+    overflow-x: auto; 
+-webkit-overflow-scrolling: touch; 
+overscroll-behavior-x: contain; 
+
+    border: 2px solid rgba(255,255,255,0.3);}
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.35);
+  animation: pulseCard 1s infinite alternate;
+}
+/* ألوان مميزة لكل صف */
+.card.الأول { background: linear-gradient(135deg, rgba(255,223,0,0.3), rgba(255,255,200,0.2)); }
+.card.الثاني { background: linear-gradient(135deg, rgba(186,85,211,0.3), rgba(230,200,255,0.2)); }
+.card.الثالث { background: linear-gradient(135deg, rgba(64,224,208,0.3), rgba(200,255,255,0.2)); }
+.card.الرابع { background: linear-gradient(135deg, rgba(255,105,180,0.3), rgba(255,200,220,0.2)); }
+.card.الخامس { background: linear-gradient(135deg, rgba(144,238,144,0.3), rgba(200,255,200,0.2)); }
+.card.السادس { background: linear-gradient(135deg, rgba(135,206,250,0.3), rgba(200,230,255,0.2)); }
+
+/* شارة الصف والشعبة */
+.badge {
+  display: inline-block;
+  background: linear-gradient(135deg,#4f46e5,#9333ea);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 3px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+/* الجدول */
+table {
+  direction: rtl !important; /* إجبار الجدول على الاتجاه الصحيح */
+  text-align: center;
+  border-collapse: collapse;
+  width: 100%;
+  border-spacing: 0;
+  font-size: 14px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top:  0px;
+
+}
+th {
+  direction: rtl !important;
+  background: rgba(79,70,229,0.85);
+  color: #fff;
+  padding: 20px;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+td {
+  direction: rtl !important;
+  background: rgba(255,255,255,0.6);
+  padding: 20px;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.4);
+  transition: background 0.3s ease;
+}
+/* تأثير على الخلية */
+td:hover {
+  background: rgba(255,255,255,0.95);
+  transform: scale(1.08);
+  z-index: 5;
+  position: relative;
+  animation: pulseCell 0.8s infinite alternate;
+}
+.info-txt {
+    display: block; /* تغيير من inline-block إلى block لضمان عدم التداخل */
+    direction: rtl;
+    text-align: center;
+    width: 100%;
+    min-height: 25px; /* مساحة كافية للخط */
+    line-height: 1.6; /* مسافة بين الأسطر لمنع التداخل */
+    font-family: "Cairo", sans-serif; /* تأكيد استخدام الخط */
+}
+.info-txt.teacher {
+  color: #9333ea;
+  transform: scale(1.05);
+  animation: textPulse 0.8s infinite alternate;
+}
+@media print {
+    .info-txt {
+        display: block !important;
+        border: none !important;
+    }
+.card {
+        page-break-after: always !important; /* فاصل صفحة بعد كل كلاس card */
+        break-after: page !important;
+    }
+  }
+/* الصندوق الجانبي */
+.sidebar {
+  position: fixed;
+  top: 80px;
+  right: -360px; /* الصندوق مخفي */
+  width: 320px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border-radius: 20px 0 0 20px;
+  box-shadow: -5px 0 25px rgba(0,0,0,0.2);
+  transition: right 0.4s ease, background 0.3s ease;
+  z-index: 1500;
+  padding: 20px;
+  overflow-y: auto;
+  text-align: center;
+}
+.container {
+    margin-top: 65px; 
+    padding: 10px;
+    display: flex;
+    /* قم بتغيير row-reverse إلى row */
+    flex-direction: row; 
+    /* تأكد من بقاء هذه الخصائص كما هي */
+    flex-wrap: wrap;
+    justify-content: flex-start; /* لتبدأ البطاقات من اليمين */
+    direction: rtl; /* هذا يضمن أن الترتيب الطبيعي يبدأ من اليمين */
+}
+@keyframes pulseCard { from { transform: scale(1); } to { transform: scale(1.02); } }
+@keyframes textPulse { from { opacity: 0.8; } to { opacity: 1; } }
+@keyframes pulseCell { from { background: rgba(255,255,255,0.6); } to { background: rgba(255,255,255,1); } }
+@keyframes spinGearSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes spinGearFast { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes slideIn { from { right: -360px; } to { right: 0; } }
+.sidebar.open + .sidebar-toggle {
+    right: 320px;
+    animation: slideIn 0.4s infinite ; /* يتحرك الزر لليسار عندما تفتح القائمة */
+}
+.sidebar h2 {
+  text-align: right;
+  direction: rtl;
+  font-size: 30px;
+  margin-bottom: 20px;
+  color: #4f46e5;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+
+
+}
+.sidebar label {
+  display: block;
+  margin-top: 12px;
+  font-weight: bold;
+  font-size: 14px;
+  color: #111;
+  direction: rtl;
+  text-align: right;
+}
+.sidebar select,
+.sidebar input {
+  width: 95%;
+  margin-top: 6px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  background: rgba(255,255,255,0.6);
+  transition: all 0.3s ease;
+}
+.sidebar input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 8px rgba(79,70,229,0.5);
+}
+
+.execute-btn {
+  background: linear-gradient(135deg,#4f46e5,#9333ea);
+  color: #fff;
+  font-weight: bold;
+  padding: 14px 28px;
+  border-radius: 50px;        /* شكل كبسولة أنيق */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 50px;
+  margin: 20px auto;          /* هذا يجعل الزر في الوسط */
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+  direction: rtl;
+  text-align: center;
+}
+.execute-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  background: linear-gradient(135deg,#4338ca,#7e22ce);
+}
+/* زر التبديل (لسان من جهة اليسار) */
+.sidebar-toggle {
+  position: fixed;
+  top: 12px;
+  right: 0%;
+  width: 55px;
+  height: 55px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.3s ease, background 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+.sidebar-toggle.open svg {
+  animation: spinGearSlow 4s linear infinite;
+}
+.sidebar-toggle.open:hover svg {
+  animation: spinGearFast 1s linear infinite;
+}
+.sidebar-toggle:hover {
+  background: linear-gradient(135deg,#4338ca,#7e22ce);
+  transform: scale(1.08);
+}/* هذا هو السطر الذي كان مفقوداً ويجعل الصندوق يفتح */
+.sidebar.open {
+    right: 0;
+}
+/* أنيميشن النبض */
+@keyframes pulseButton {
+  from { transform: scale(1); opacity: 0.9; }
+  to   { transform: scale(1.08); opacity: 1; }
+}
+
+/* أنيميشن الاهتزاز */
+@keyframes shakeButton {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+
+/* السهم المتحرك */
+.arrow {
+  transition: transform 0.4s ease, margin-left 0.4s ease;
+}
+.sidebar-toggle.open .arrow {
+  transform: rotate(90deg); /* للأسفل عند الفتح */
+  margin-left: 6px;
+}
+.sidebar-toggle.close .arrow {
+  transform: rotate(0deg); /* لليمين عند الإغلاق */
+  margin-left: 0;
+}
+#toastContainer {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
+}
+.toast {
+  min-width: 250px;
+  margin-top: 10px;
+  padding: 15px 20px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  animation: fadeInOut 3s forwards;
+}
+.toast.success { background: #16a34a; }
+.toast.error   { background: #dc2626; }
+.toast.warning { background: #f59e0b; }
+/* أنيميشن دخول من اليمين */
+@keyframes slideRightFadeIn {
+  0%   { opacity: 0; transform: translateX(100%); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* أنيميشن خروج لليمين */
+@keyframes slideRightFadeOut {
+  0%   { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(100%); }
+}
+
+/* تطبيق الأنيميشن على التوست */
+.toast {
+  min-width: 250px;
+  margin-top: 10px;
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  animation: slideRightFadeIn 0.6s ease forwards, 
+             slideRightFadeOut 0.6s ease forwards 2.4s;
+  /* يدخل خلال 0.6 ثانية ويخرج بعد 2.4 ثانية */
+}
+
+
+@keyframes fadeInOut {
+  0%   { opacity: 0; transform: translateX(20px); }
+  10%  { opacity: 1; transform: translateX(0); }
+  90%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(20px); }
+}
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header class="main-header" style="
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 20px 80px; 
+    background: #fff; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+    width: 100%; 
+    box-sizing: border-box;
+">
+
+    <!-- 1. جهة اليمين (العنوان) -->
+    <div class="header-right" style="flex: 1; display: flex; justify-content: flex-start;">
+        <h1 class="page-title" style="margin: 0; font-size: 1.2rem; color: #4f46e5; white-space: nowrap;">منصة رؤية <span>- جدول الحصص</span></h1>
+    </div>
+
+    <!-- 2. المنتصف (الشعار) -->
+    <div class="header-center" style="flex: 1; display: flex; justify-content: center;">
+        <img src="لوغو رؤية بدون خلفية.png" alt="شعار منصة رؤية" class="site-logo" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #4f46e5;">
+    </div>
+
+    <!-- 3. جهة اليسار (الروابط + زر الإعدادات) -->
+    <div class="header-left" style="flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 20px;">
+        <nav class="nav-links">
+            <a href="book.html" class="nav-btn" style="text-decoration: none; background: #4f46e5; color: white; padding: 8px 20px; border-radius: 20px; font-weight: bold;">الرئيسية</a>
+        </nav>
+        <button id="toggleSidebarBtn" class="sidebar-toggle" style="cursor: pointer; background: none; border: none; font-size: 24px;" onclick="document.querySelector('.sidebar').classList.toggle('open')">
+            ⚙️
+        </button>
+    </div>
+
+</header>
+<div id="toastContainer"></div>
+<!-- الجدول الكامل -->
+<!-- صندوق التنزيل -->
+<div id="downloadBox" class="download-box">
+  <h3>📥 خيارات التنزيل</h3>
+
+  <label for="downloadOption">اختر نوع التنزيل:</label>
+  <select id="downloadOption">
+    <option value="">-- اختر --</option>
+    <option value="all">📑 تنزيل الجميع</option>
+    <option value="class">📂 تنزيل صف محدد</option>
+    <option value="section">🏫 تنزيل شعبة محددة</option>
+  </select>
+
+  <!-- اختيار الصف -->
+  <div id="classSelectDiv" class="hidden">
+    <label for="classSelect">اختر الصف:</label>
+    <select id="classSelect" onchange="handleClassSelect()">
+      <option value="">-- اختر الصف --</option>
+      <option>الأول</option>
+      <option>الثاني</option>
+      <option>الثالث</option>
+      <option>الرابع</option>
+      <option>الخامس</option>
+      <option>السادس</option>
+    </select>
+  </div>
+
+  <!-- اختيار الشعبة -->
+  <div id="sectionSelectDiv" class="hidden">
+    <label for="sectionSelect">اختر الشعبة:</label>
+    <select id="sectionSelect">
+      <option value="">-- اختر الشعبة --</option>
+      <option>أ</option>
+      <option>ب</option>
+      <option>ج</option>
+      <option>د</option>
+      <option>هـ</option>
+    </select>
+  </div>
+
+  <button class="download-btn" onclick="downloadPDF()">⬇️ تنزيل</button>
+</div>
+
+<div class="container" id="schedule"></div>
+<!-- الحاوية التي تضم الصندوق والزر -->
+<!-- القائمة الجانبية -->
+   <div id="sidebar" class="sidebar">
+    <label>اختر الخدمة:</label>
+    <select id="serviceSelect" style="width:100%; padding:10px;">
+      <option value="addSection">➕ إضافة شعبة</option>
+      <option value="deleteSection">🗑️ حذف شعبة</option>
+      <option value="addLesson">➕ إضافة حصة</option>
+      <option value="deleteLesson">🗑️ حذف حصة</option>
+    </select>
+
+    <label>الصف:</label>
+    <select id="serviceClassSelect" style="width:100%; padding:10px; margin-top:10px;">
+      <option>الأول</option>
+      <option>الثاني</option>
+      <option>الثالث</option>
+      <option>الرابع</option>
+      <option>الخامس</option>
+      <option>السادس</option>
+    </select>
+
+    <label>الشعبة:</label>
+    <select id="serviceSectionSelect" style="width:100%; padding:10px; margin-top:10px;">
+      <option>أ</option>
+      <option>ب</option>
+      <option>ج</option>
+      <option>د</option>
+      <option>هـ</option>
+    </select>
+
+    <button onclick="executeService()" class="execute-btn">تنفيذ الخدمة</button>
+    </div>
+<!-- زر مرتبط باليسار كلسان -->
+<button id="toggleSidebarBtn" class="sidebar-toggle">
+    ⚙️
+</button>
+<script>
+const toggleBtn = document.getElementById("toggleSidebarBtn");
+const sidebar = document.getElementById("sidebar");
+
+toggleBtn.addEventListener("click", function() {
+    sidebar.classList.toggle("open");
+
+    if (sidebar.classList.contains("open")) {
+        // عند الفتح: عرض الترس
+        this.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="url(#gearGradient)">
+                <defs>
+                    <linearGradient id="gearGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#4f46e5"/>
+                        <stop offset="100%" stop-color="#9333ea"/>
+                    </linearGradient>
+                </defs>
+                <path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.65l-1.92-3.32a.5.5 0 0 0-.61-.21l-2.39.96a7.007 7.007 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 14.5 2h-5a.5.5 0 0 0-.49.42l-.36 2.54c-.59.24-1.14.55-1.63.94l-2.39-.96a.5.5 0 0 0-.61.21L2.11 9.43a.5.5 0 0 0 .12.65l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.5.5 0 0 0-.12.65l1.92 3.32c.14.24.42.34.68.24l2.39-.96c.49.39 1.04.7 1.63.94l.36 2.54c.04.27.25.46.49.46h5c.24 0 .45-.19.49-.42l.36-2.54c.59-.24 1.14-.55 1.63-.94l2.39.96c.26.1.54 0 .68-.24l1.92-3.32a.5.5 0 0 0-.12-.65l-2.03-1.58zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5S10.07 8.5 12 8.5s3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+            </svg>
+        `;
+        this.classList.add("open");
+        this.classList.remove("close");
+    } else {
+        // عند الإغلاق: عرض الـ X
+        this.textContent = "❌";
+        this.classList.remove("open");
+        this.classList.add("close");
+    }
+});
+        const days=["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس"];
+const subjects=["رياضيات","علوم","لغة عربية","إنكليزي","اجتماعيات","فن","تربية إسلامية","القرآن الكريم","القراءة العربية"];
+const teachers=["أ. أحمد","أ. علي","أ. سارة","أ. هدى","أ. محمد","أ. زينب","أ. خالد","أ. عمر كمال","أ. حيدر علي"];
+let classSections = [
+  {className:"الأول", section:"أ"},
+  {className:"الأول", section:"ب"},
+  {className:"الأول", section:"ج"},
+  {className:"الثاني", section:"أ"},
+  {className:"الثاني", section:"ب"},
+  {className:"الثاني", section:"ج"},
+  {className:"الثالث", section:"أ"},
+  {className:"الثالث", section:"ب"},
+  {className:"الثالث", section:"ج"},
+  {className:"الرابع", section:"أ"},
+  {className:"الرابع", section:"ب"},
+  {className:"الرابع", section:"ج"},
+  {className:"الخامس", section:"أ"},
+  {className:"الخامس", section:"ب"},
+  {className:"الخامس", section:"ج"},
+  {className:"السادس", section:"أ"},
+  {className:"السادس", section:"ب"},
+  {className:"السادس", section:"ج"}
+];
+
+let lessons = {};
+// 1. وظيفة الفتح والإغلاق
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("open");
+    document.body.classList.toggle("sidebar-open");
+}
+// 2. وظيفة التنفيذ
+function sortSections(){
+  const order = ["الأول","الثاني","الثالث","الرابع","الخامس","السادس"];
+  classSections.sort((a,b)=>{
+    const diff = order.indexOf(a.className) - order.indexOf(b.className);
+    if(diff !== 0) return diff;
+    return a.section.localeCompare(b.section,"ar");
+  });
+}
+function addSection(className, section){
+  const key = `${className}-${section}`;
+  if(!classSections.some(sec => sec.className === className && sec.section === section)){
+    classSections.push({className, section});
+    sortSections();
+    renderSchedule();
+    saveSchedule();
+    showToast("success", "✅ تمت إضافة الشعبة بنجاح!");
+  } else {
+    showToast("warning", "⚠️ هذه الشعبة موجودة بالفعل!");
+  }
+}
+function addLesson(className, section){
+  const key = `${className}-${section}`;
+  if(!lessons[key]) lessons[key] = [];
+  // إضافة حصة فارغة في بداية المصفوفة بدل النهاية
+  lessons[key].splice(0, 0, [{subject:"", teacher:""}]);
+  sortSections();
+  renderSchedule();
+  saveSchedule();
+}
+/* STREAMING_CHUNK:Refactoring executeService function... */
+function executeService() {
+    const service = document.getElementById("serviceSelect").value;
+    const className = document.getElementById("serviceClassSelect").value;
+    const section = document.getElementById("serviceSectionSelect").value;
+    const key = `${className}-${section}`;
+
+    // نستخدم switch للتنظيم بشكل أفضل
+    switch (service) {
+        case "addSection":
+            // addSection تقوم باستدعاء render و save و showToast بداخلها
+            addSection(className, section);
+            break;
+
+        case "deleteSection":
+            // التحقق من وجود الشعبة قبل الحذف
+            if (classSections.some(sec => `${sec.className}-${sec.section}` === key)) {
+                classSections = classSections.filter(sec => `${sec.className}-${sec.section}` !== key);
+                delete lessons[key];
+                renderSchedule();
+                saveSchedule();
+                showToast("success", `🗑️ تم حذف الشعبة: ${key}`);
+            } else {
+                showToast("warning", "⚠️ الشعبة غير موجودة!");
+            }
+            break;
+
+        case "addLesson":
+            addLesson(className, section);
+            showToast("success", `➕ تمت إضافة حصة جديدة في: ${key}`);
+            break;
+
+        case "deleteLesson":
+            // التحقق من وجود حصص للحذف
+            if (lessons[key] && lessons[key].length > 0) {
+                lessons[key].pop();
+                renderSchedule();
+                saveSchedule();
+                showToast("success", `🗑️ تم حذف آخر حصة من: ${key}`);
+            } else {
+                showToast("warning", `⚠️ لا توجد حصص لحذفها في: ${key}`);
+            }
+            break;
+
+        default:
+            showToast("error", "⚠️ خدمة غير معروفة!");
+    }
+}
+/* STREAMING_CHUNK:Refactoring renderSchedule function... */
+// 1. وظيفة الرسم (بدون إضافة مستمع أحداث بداخلها)
+function renderSchedule() {
+    const scheduleDiv = document.getElementById("schedule");
+    scheduleDiv.innerHTML = ""; 
+
+    classSections.forEach(sec => {
+        const key = `${sec.className}-${sec.section}`;
+        
+        // التأكد من وجود هيكل البيانات
+        if (!lessons[key]) {
+            lessons[key] = Array(4).fill(null).map(() => Array(5).fill({ subject: "", teacher: "" }));
+        }
+
+        const card = document.createElement("div");
+        card.className = `card ${sec.className}`;
+        card.innerHTML = `<div class="badge">الصف ${sec.className} - شعبة ${sec.section}</div>`;
+        
+        const table = document.createElement("table");
+        table.innerHTML = `<thead><tr><th>الحصة</th>${days.map(d => `<th>${d}</th>`).join('')}</tr></thead>`;
+        
+        const tbody = document.createElement("tbody");
+        for (let i = 0; i < 4; i++) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>الحصة ${i + 1}</td>`;
+            days.forEach((day, dayIndex) => {
+                const lessonData = (lessons[key][i] && lessons[key][i][dayIndex]) 
+                    ? lessons[key][i][dayIndex] 
+                    : { subject: "", teacher: "" };
+
+                const td = document.createElement("td");
+                td.innerHTML = `
+                    <div class="info-txt subject" contenteditable="true" data-key="${key}" data-row="${i}" data-day="${dayIndex}">${lessonData.subject || ""}</div>
+                    <div class="info-txt teacher" contenteditable="true" data-key="${key}" data-row="${i}" data-day="${dayIndex}">${lessonData.teacher || ""}</div>
+                `;
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        }
+        table.appendChild(tbody);
+        card.appendChild(table);
+        scheduleDiv.appendChild(card);
+    });
+}
+
+// 2. مستمع أحداث واحد (Event Delegation) على مستوى حاوية الجدول
+document.getElementById("schedule").addEventListener("input", (e) => {
+    if (!e.target.classList.contains("info-txt")) return;
+
+    const { key, row, day } = e.target.dataset;
+    const value = e.target.innerText;
+
+    // التأكد من وجود المصفوفة
+    if (!lessons[key]) lessons[key] = Array(4).fill(null).map(() => Array(5).fill({ subject: "", teacher: "" }));
+    if (!lessons[key][row]) lessons[key][row] = Array(5).fill({ subject: "", teacher: "" });
+    if (!lessons[key][row][day]) lessons[key][row][day] = { subject: "", teacher: "" };
+
+    // التحديث
+    if (e.target.classList.contains("subject")) {
+        lessons[key][row][day].subject = value;
+    } else {
+        lessons[key][row][day].teacher = value;
+    }
+    
+    saveSchedule();
+});
+    // إضافة مستمع الأحداث للحفظ
+// إضافة مستمع الأحداث للحفظ
+document.querySelectorAll(".info-txt").forEach(el => {
+    el.addEventListener("input", (e) => {
+        const { key, row, day } = e.target.dataset;
+        
+        // 1. التأكد من وجود المصفوفة الأساسية للصف
+        if (!lessons[key]) {
+            lessons[key] = Array(4).fill(null).map(() => Array(5).fill({ subject: "", teacher: "" }));
+        }
+
+        // 2. التأكد من وجود الصف (row) والخلية (day) قبل التعديل (تصحيح الخطأ)
+        if (!lessons[key][row]) {
+            lessons[key][row] = Array(5).fill({ subject: "", teacher: "" });
+        }
+        
+        // 3. التأكد من أن الخلية نفسها كائن وليس undefined
+        if (!lessons[key][row][day]) {
+            lessons[key][row][day] = { subject: "", teacher: "" };
+        }
+        
+        // 4. تنفيذ التعديل بأمان
+        if (e.target.classList.contains("subject")) {
+            lessons[key][row][day].subject = e.target.innerText;
+        } else {
+            lessons[key][row][day].teacher = e.target.innerText;
+        }
+        
+        saveSchedule();
+    });
+});
+function saveSchedule() {
+  localStorage.setItem("scheduleData", JSON.stringify(lessons));
+}
+    function loadSchedule() {
+        const data = localStorage.getItem("scheduleData");
+        lessons = data ? JSON.parse(data) : {};
+        renderSchedule();
+    }
+
+    
+function loadSchedule() {
+  try {
+    const data = localStorage.getItem("scheduleData");
+    if (data) {
+      lessons = JSON.parse(data);
+    } else {
+      lessons = {};
+    }
+  } catch(e) {
+    lessons = {};
+  }
+  renderSchedule();
+  saveSchedule();
+}
+function handleDownload(){
+  const option = document.getElementById("downloadOption").value;
+  let element;
+  if(option === "all"){
+    element = document.getElementById("schedule");
+  } else if(option === "class"){
+    const className = prompt("أدخل اسم الصف (الأول، الثاني، ...):");
+    element = document.querySelectorAll(`.card.${className}`);
+  } else if(option === "section"){
+    const sectionId = prompt("أدخل اسم الصف والشعبة مثل: الأول-أ");
+    element = document.getElementById(sectionId);
+  }
+  if(!element || (element.length===0)){
+    alert("⚠️ لم يتم العثور على العنصر المطلوب!");
+    return;
+  }
+  const opt = {
+    margin: 0.2,
+    filename: 'جدول-الحصص.pdf',
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: { scale: 3 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+  };
+  if (NodeList.prototype.isPrototypeOf(element)) {
+    element.forEach(el => {
+      html2pdf().set(opt).from(el).save();
+    });
+  } else {
+    html2pdf().set(opt).from(element).save();
+  }
+}
+function handleDownloadOption() {
+  const option = document.getElementById("downloadOption").value;
+  const classSelectDiv = document.getElementById("classSelectDiv");
+  const sectionSelectDiv = document.getElementById("sectionSelectDiv");
+
+  // أولاً: نقوم بإخفاء الجميع دائماً عند حدوث تغيير
+  classSelectDiv.classList.add("hidden");
+  sectionSelectDiv.classList.add("hidden");
+
+  // ثانياً: نقوم بإظهار العناصر المطلوبة بناءً على الاختيار
+  if (option === "class") {
+    classSelectDiv.classList.remove("hidden");
+  } else if (option === "section") {
+    classSelectDiv.classList.remove("hidden");
+    sectionSelectDiv.classList.remove("hidden");
+  }
+}
+function handleClassSelect(){
+  const option = document.getElementById("downloadOption").value;
+  if(option === "section"){
+    document.getElementById("sectionSelectDiv").classList.remove("hidden");
+  }
+}
+
+function downloadPDF() {
+    const option = document.getElementById("downloadOption").value;
+    let sourceElement;
+
+    if(option === "all"){
+        sourceElement = document.getElementById("schedule");
+    } else if(option === "class"){
+        const className = document.getElementById("classSelect").value;
+        sourceElement = document.querySelector(`.card.${className}`); 
+    } else if(option === "section"){
+        const className = document.getElementById("classSelect").value;
+        const section = document.getElementById("sectionSelect").value;
+        sourceElement = document.getElementById(`${className}-${section}`);
+    }
+
+    if (!sourceElement) {
+        showToast("error", "❌ يرجى اختيار عنصر صحيح للتنزيل!");
+        return;
+    }
+
+    // إنشاء نسخة نظيفة
+    const element = sourceElement.cloneNode(true);
+element.style.direction = "rtl"; 
+    element.style.textAlign = "right";
+    element.style.display = "block"; // لضمان ظهور العناصر بشكل صحيح
+const cells = element.querySelectorAll('td, th');
+    cells.forEach(cell => {
+        cell.style.direction = "rtl";
+        cell.style.textAlign = "right";
+    });
+        element.querySelectorAll('[contenteditable]').forEach(el => {
+        el.removeAttribute('contenteditable');
+    });
+
+    // إعدادات التنزيل الأساسية (بدون الـ pagebreak المعقد)
+    const opt = {
+        margin: 10,
+        filename: 'جدول-الحصص.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { 
+            scale: 2, 
+            letterRendering: true, 
+            useCORS: true,
+            windowWidth: document.body.scrollWidth 
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    };
+
+html2pdf().set(opt).from(element).save();
+}
+
+window.onload = loadSchedule;
+
+function showToast(type, message) {
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = "toast " + type;
+  toast.textContent = message;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+// أمثلة استخدام:
+// showToast("success", "✅ العملية تمت بنجاح!");
+// showToast("error", "❌ حدث خطأ أثناء التنفيذ!");
+// showToast("warning", "⚠️ يرجى التحقق من البيانات!");
+    // نستخدم هذا السطر لضمان عدم تشغيل الكود إلا بعد تحميل الصفحة بالكامل
+    window.addEventListener('DOMContentLoaded', (event) => {
+        const toggleBtn = document.getElementById("toggleSidebarBtn");
+        const sidebar = document.getElementById("sidebar");
+
+        if (toggleBtn && sidebar) {
+            console.log("تم العثور على العناصر بنجاح!");
+
+            toggleBtn.addEventListener("click", function() {
+                console.log("تم الضغط على الزر فعلياً!");
+                sidebar.classList.toggle("open");
+            });
+        } else {
+            console.error("فشل العثور على الزر أو القائمة!");
+        }
+    });
+</script>
+</body>
+</html>
