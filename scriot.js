@@ -1,12 +1,19 @@
-// 1. إعدادات الاتصال المباشر بقاعدة البيانات السحابية
+// 1. // 1. إعدادات الاتصال المباشر (تأكد أنها مطابقة لما حصلت عليه من لوحة تحكم Firebase)
 const firebaseConfig = {
-    databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com/" 
+    apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
+    authDomain: "roya-platform-26860.firebaseapp.com",
+    databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
+    projectId: "roya-platform-26860",
+    storageBucket: "roya-platform-26860.appspot.com", // تأكد من مطابقة هذا السطر مع إعداداتك
+    messagingSenderId: "897544406776",
+    appId: "1:897544406776:web:aa112013dea672fb141d0d"
 };
 
-// تهيئة Firebase بأمان
+// تهيئة Firebase (هذا هو الجزء الأهم للتأكد من عدم حدوث خطأ)
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
+const database = firebase.database();
 const database = firebase.database();
 
 // متغير عالمي لحفظ حالة صلاحيات العضو (Admin)
