@@ -515,14 +515,9 @@
     <footer class="main-footer">
         <p>جميع الحقوق محفوظة لدى منصة رؤية التعليمية &copy; 2026</p>
     </footer>
-<script src="scriot.js"></script>
     <script>
         // إعدادات الاتصال المباشر بقاعدة بيانات Firebase
-        const firebaseConfig = { databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com/" };
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const database = firebase.database();
         let isCurrentMemberAdmin = false;
-
         function setUIAzAdmin() {
             isCurrentMemberAdmin = true;
             const loginNavBtn = document.getElementById('login-nav-btn');
@@ -646,4 +641,6 @@
 }
    </script>
 </body>
+    <script src="scriot.js"></script>
+
 </html>
