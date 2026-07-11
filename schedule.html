@@ -2,69 +2,60 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>منصة رؤية - النظام المتكامل</title>
+    <title>منصة رؤية - النظام المدرسي المنظم</title>
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #f4f6f7; padding: 20px; }
-        .admin-box { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .accordion { background: #34495e; color: white; padding: 15px; width: 100%; text-align: right; border: none; border-radius: 8px; margin-top: 10px; cursor: pointer; font-weight: bold; }
-        .panel { display: none; background: white; padding: 15px; border: 1px solid #ddd; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-        select { width: 100%; border: none; background: #f9f9f9; padding: 5px; }
-        button { padding: 8px 15px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 5px; }
-        @media print { .admin-box, button, .accordion { display: none; } .panel { display: block !important; border: none; } }
+        :root { --primary: #2c3e50; --accent: #3498db; --success: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .admin-box { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 30px; border-top: 5px solid var(--primary); }
+        .accordion { background: white; color: var(--primary); padding: 15px 20px; width: 100%; text-align: right; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 8px; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; }
+        .panel { display: none; background: white; padding: 15px; border-radius: 0 0 8px 8px; border: 1px solid #eee; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8f9fa; padding: 10px; border: 1px solid #ddd; }
+        td { border: 1px solid #eee; padding: 8px; text-align: center; }
+        select { width: 90%; padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
+        .btn { padding: 8px 16px; border: none; border-radius: 5px; color: white; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="admin-box" id="adminPanel" style="display:none;">
-    <h3>إدارة الجداول</h3>
+    <h3>⚙️ لوحة تحكم الإدارة</h3>
     <select id="selG"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option><option>الخامس</option><option>السادس</option></select>
     <select id="selS"><option>أ</option><option>ب</option><option>ج</option></select>
-    <button onclick="addSpecificTable()" style="background:#27ae60;">➕ إنشاء جدول</button>
-    <button onclick="removeSpecificTable()" style="background:#e74c3c;">🗑️ حذف الجدول</button>
+    <button class="btn" style="background:var(--success)" onclick="addSpecificTable()">➕ إضافة جدول</button>
+    <button class="btn" style="background:var(--danger)" onclick="removeSpecificTable()">🗑️ حذف</button>
 </div>
 
-<button onclick="login()" id="loginBtn">دخول الإدارة</button>
-<button onclick="logout()" id="logoutBtn" style="display:none; background:#e74c3c;">خروج</button>
+<button class="btn" style="background:var(--primary)" onclick="login()" id="loginBtn">دخول الإدارة</button>
+<button class="btn" style="background:var(--danger)" onclick="logout()" id="logoutBtn" style="display:none;">خروج</button>
 
 <div id="app"></div>
 
 <script>
-    let state = JSON.parse(localStorage.getItem("schoolData")) || { 
-        lessons: {}, subjects: ["رياضيات"], teachers: ["أ.أحمد"] 
-    };
+    const allGrades = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس"];
+    const allSections = ["أ", "ب", "ج"];
+    
+    let state = JSON.parse(localStorage.getItem("schoolData")) || { lessons: {}, subjects: ["رياضيات"], teachers: ["أ.أحمد"] };
     let isMember = localStorage.getItem("userRole") === "member";
 
     function login() { if(prompt("كلمة المرور:")==="2026") { localStorage.setItem("userRole","member"); location.reload(); } }
     function logout() { localStorage.setItem("userRole","visitor"); location.reload(); }
-
-    function addItem(type) {
-        const val = document.getElementById("newItem").value;
-        if(!val) return;
-        state[type].push(val);
-        saveData();
-    }
 
     function addSpecificTable() {
         const key = document.getElementById("selG").value + "-" + document.getElementById("selS").value;
         if(!state.lessons[key]) {
             state.lessons[key] = Array(6).fill(null).map(() => Array(5).fill({sub:"", tea:""}));
             saveData();
-        } else { alert("هذا الجدول موجود مسبقاً!"); }
+        }
     }
 
     function removeSpecificTable() {
         const key = document.getElementById("selG").value + "-" + document.getElementById("selS").value;
-        if(state.lessons[key]) { delete state.lessons[key]; saveData(); }
+        delete state.lessons[key]; saveData();
     }
 
     function saveData() { localStorage.setItem("schoolData", JSON.stringify(state)); render(); }
-
-    function update(key, r, d, type, val) {
-        state.lessons[key][r][d][type] = val;
-        localStorage.setItem("schoolData", JSON.stringify(state));
-    }
+    function update(k, r, d, type, val) { state.lessons[k][r][d][type] = val; localStorage.setItem("schoolData", JSON.stringify(state)); }
 
     function render() {
         document.getElementById("adminPanel").style.display = isMember ? "block" : "none";
@@ -73,30 +64,34 @@
         
         const app = document.getElementById("app");
         app.innerHTML = "";
-        
-        Object.keys(state.lessons).forEach(key => {
-            const btn = document.createElement("button");
-            btn.className = "accordion";
-            btn.innerHTML = "📋 جدول: " + key;
-            btn.onclick = function() { this.nextElementSibling.style.display = (this.nextElementSibling.style.display === "block") ? "none" : "block"; };
-            app.appendChild(btn);
 
-            const panel = document.createElement("div");
-            panel.className = "panel";
-            let html = `<table><thead><tr><th>حصة</th><th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th></tr></thead><tbody>`;
-            
-            for(let i=0; i<6; i++) {
-                html += `<tr><td>${i+1}</td>`;
-                for(let d=0; d<5; d++) {
-                    html += `<td>${isMember ? 
-                        `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">-</option>${state.subjects.map(s => `<option value="${s}" ${state.lessons[key][i][d].sub==s?'selected':''}>${s}</option>`).join('')}</select>
-                         <select onchange="update('${key}',${i},${d},'tea',this.value)"><option value="">-</option>${state.teachers.map(t => `<option value="${t}" ${state.lessons[key][i][d].tea==t?'selected':''}>${t}</option>`).join('')}</select>`
-                        : (state.lessons[key][i][d].sub || "-")}</td>`;
+        // الترتيب المنطقي: الصف ثم الشعبة
+        allGrades.forEach(g => {
+            allSections.forEach(s => {
+                const key = `${g}-${s}`;
+                if (state.lessons[key]) {
+                    const btn = document.createElement("button");
+                    btn.className = "accordion";
+                    btn.innerHTML = `<span>📋 الصف ${g} - شعبة ${s}</span><span>▼</span>`;
+                    btn.onclick = function() { this.nextElementSibling.style.display = (this.nextElementSibling.style.display === "block") ? "none" : "block"; };
+                    app.appendChild(btn);
+
+                    const panel = document.createElement("div");
+                    panel.className = "panel";
+                    let html = `<table><thead><tr><th>حصة</th><th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th></tr></thead><tbody>`;
+                    for(let i=0; i<6; i++) {
+                        html += `<tr><td>${i+1}</td>`;
+                        for(let d=0; d<5; d++) {
+                            html += `<td>${isMember ? 
+                                `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">-</option>${state.subjects.map(s => `<option value="${s}" ${state.lessons[key][i][d].sub==s?'selected':''}>${s}</option>`).join('')}</select>
+                                 <select onchange="update('${key}',${i},${d},'tea',this.value)"><option value="">-</option>${state.teachers.map(t => `<option value="${t}" ${state.lessons[key][i][d].tea==t?'selected':''}>${t}</option>`).join('')}</select>`
+                                : (state.lessons[key][i][d].sub || "-")}</td>`;
+                        } html += `</tr>`;
+                    }
+                    panel.innerHTML = html + "</tbody></table>";
+                    app.appendChild(panel);
                 }
-                html += `</tr>`;
-            }
-            panel.innerHTML = html + "</tbody></table>";
-            app.appendChild(panel);
+            });
         });
     }
     render();
