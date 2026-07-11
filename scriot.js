@@ -4,7 +4,7 @@ const firebaseConfig = {
     authDomain: "roya-platform-26860.firebaseapp.com",
     databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
     projectId: "roya-platform-26860",
-    storageBucket: "roya-platform-26860.appspot.com", // تأكد من مطابقة هذا السطر مع إعداداتك
+    storageBucket: "roya-platform-26860.appspot.com",
     messagingSenderId: "897544406776",
     appId: "1:897544406776:web:aa112013dea672fb141d0d"
 };
@@ -16,7 +16,7 @@ if (!firebase.apps.length) {
 const database = firebase.database(); // ✅ تعريف مرة واحدة فقط
 
 // متغير عالمي لحفظ حالة صلاحيات العضو (Admin)
-let isCurrentMemberAdmin = false;
+let isCurrentMemberAdmin = false; // ✅ تعريف واحد فقط
 
 // تحويل الواجهة لنمط لوحة التحكم للعضو المصرح له
 function setUIAzAdmin() {
@@ -36,7 +36,7 @@ function setUIAzAdmin() {
 function checkSavedSession() {
     const sessionToken = localStorage.getItem('roya_session_active');
     if (sessionToken === "true") {
-        isCurrentMemberAdmin = true;
+        isCurrentMemberAdmin = true; // ✅ تحديث القيمة فقط
         setUIAzAdmin();
     }
     loadBooksFromFirebase();
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (String(userData.code) === String(codeInput)) {
                         alert('مرحباً بك! تم التحقق من الكود بنجاح وتفعيل صلاحيات التحكم.');
                         localStorage.setItem('roya_session_active', 'true');
-                        isCurrentMemberAdmin = true;
+                        isCurrentMemberAdmin = true; // ✅ تحديث القيمة فقط
                         setUIAzAdmin();
                         loadBooksFromFirebase();
                         loadNotificationsFromFirebase();
@@ -83,5 +83,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// باقي الدوال (loadBooksFromFirebase, addBookPrompt, deleteBook, loadNotificationsFromFirebase, addNotificationPrompt, deleteNotification)
-// تبقى كما هي بدون تغيير
+// باقي الدوال تبقى كما هي بدون تغيير
