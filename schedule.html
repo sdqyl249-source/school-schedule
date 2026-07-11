@@ -2,38 +2,35 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>منصة رؤية - الإدارة الموسعة</title>
+    <title>نظام إدارة الجداول المتكامل</title>
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #f8f9fa; padding: 20px; }
-        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .admin-box { background: #fff; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #ddd; }
-        .table-card { background: white; padding: 20px; margin-bottom: 30px; border-radius: 15px; border-right: 10px solid; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        body { font-family: 'Cairo', sans-serif; background: #f4f6f7; padding: 20px; }
+        .admin-box { background: white; padding: 20px; border-radius: 15px; border: 2px solid #3498db; margin-bottom: 20px; }
+        .tag { display: inline-block; background: #e74c3c; color: white; padding: 2px 8px; border-radius: 5px; cursor: pointer; margin: 2px; font-size: 12px; }
+        .table-card { background: white; padding: 20px; margin-bottom: 30px; border-radius: 15px; border-right: 10px solid #2c3e50; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-        th { background: #f2f2f2; }
-        select { width: 100%; border: none; background: #f9f9f9; padding: 5px; cursor: pointer; }
-        button { padding: 10px 15px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 5px; margin: 5px; }
-        @media print { .header, .admin-box, button { display: none; } .table-card { border-width: 5px; page-break-inside: avoid; } }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        select { width: 100%; border: none; padding: 5px; }
+        button { padding: 8px 15px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 5px; }
+        @media print { .admin-box, .header, button { display: none; } }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>نظام الإدارة المدرسية</h1>
-    <div>
-        <button id="loginBtn" onclick="login()">دخول</button>
-        <button id="logoutBtn" onclick="logout()" style="display:none; background:#e74c3c;">خروج</button>
-        <button onclick="window.print()" style="background:#27ae60;">🖨️ طباعة</button>
-    </div>
-</div>
-
 <div id="adminPanel" class="admin-box" style="display:none;">
-    <h3>إدارة البيانات الموسعة</h3>
-    <input type="text" id="newItem" placeholder="أدخل الاسم...">
-    <button onclick="addItem('subjects')">➕ مادة</button>
-    <button onclick="addItem('teachers')">➕ أستاذ</button>
-    <button onclick="addItem('grades')">➕ صف</button>
-    <button onclick="addItem('sections')">➕ شعبة</button>
+    <h3>⚙️ لوحة التحكم</h3>
+    <div>
+        المواد: <span id="subTags"></span> | <input type="text" id="newSub" placeholder="مادة جديدة"><button onclick="addToList('subjects', 'newSub')">إضافة</button>
+    </div>
+    <div style="margin-top:10px;">
+        الأساتذة: <span id="teaTags"></span> | <input type="text" id="newTea" placeholder="أستاذ جديد"><button onclick="addToList('teachers', 'newTea')">إضافة</button>
+    </div>
+    <div style="margin-top:20px; border-top:1px solid #ddd; padding-top:10px;">
+        <strong>إضافة هيكل الجدول:</strong>
+        <select id="selGrade"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option><option>الخامس</option><option>السادس</option></select>
+        <select id="selSec"><option>أ</option><option>ب</option><option>ج</option><option>د</option><option>هـ</option></select>
+        <button onclick="addStructure()">إضافة صف وشعبة للجدول</button>
+    </div>
 </div>
 
 <div id="app"></div>
@@ -42,60 +39,63 @@
     let state = JSON.parse(localStorage.getItem("schoolData")) || {
         grades: ["الأول", "الثاني"], sections: ["أ", "ب"], 
         subjects: ["رياضيات", "علوم"], teachers: ["أ.أحمد"],
-        lessons: {}, lessonCount: 6 // زدت عدد الحصص إلى 6
+        lessons: {}, lessonCount: 6
     };
     let isMember = localStorage.getItem("userRole") === "member";
 
-    function login() { if(prompt("كلمة المرور:")==="2026") { localStorage.setItem("userRole","member"); location.reload(); } }
-    function logout() { localStorage.setItem("userRole","visitor"); location.reload(); }
-    
-    function addItem(type) {
-        const val = document.getElementById("newItem").value;
-        if(!val) return alert("أدخل اسماً!");
-        state[type].push(val);
+    function addToList(type, inputId) {
+        const val = document.getElementById(inputId).value;
+        if(val) { state[type].push(val); saveData(); }
+    }
+
+    function removeFromList(type, index) {
+        state[type].splice(index, 1);
         saveData();
+    }
+
+    function addStructure() {
+        const g = document.getElementById("selGrade").value;
+        const s = document.getElementById("selSec").value;
+        const key = `${g}-${s}`;
+        if(!state.lessons[key]) {
+            state.lessons[key] = Array(state.lessonCount).fill(null).map(() => Array(5).fill({sub:"", tea:""}));
+            saveData();
+        }
     }
 
     function saveData() { localStorage.setItem("schoolData", JSON.stringify(state)); render(); }
 
-    function update(key, r, d, type, val) {
-        if (!state.lessons[key]) state.lessons[key] = Array(state.lessonCount).fill(null).map(() => Array(5).fill({sub:"", tea:""}));
-        state.lessons[key][r][d][type] = val;
-        localStorage.setItem("schoolData", JSON.stringify(state));
-    }
-
     function render() {
+        document.getElementById("adminPanel").style.display = isMember ? "block" : "none";
+        document.getElementById("subTags").innerHTML = state.subjects.map((s,i) => `<span class="tag" onclick="removeFromList('subjects', ${i})">${s} ×</span>`).join('');
+        document.getElementById("teaTags").innerHTML = state.teachers.map((t,i) => `<span class="tag" onclick="removeFromList('teachers', ${i})">${t} ×</span>`).join('');
+        
         const app = document.getElementById("app");
         app.innerHTML = "";
-        document.getElementById("adminPanel").style.display = isMember ? "block" : "none";
-        document.getElementById("loginBtn").style.display = isMember ? "none" : "block";
-        document.getElementById("logoutBtn").style.display = isMember ? "block" : "none";
-
-        state.grades.forEach(g => {
-            state.sections.forEach(s => {
-                const key = `${g}-${s}`;
-                if (!state.lessons[key]) state.lessons[key] = Array(state.lessonCount).fill(null).map(() => Array(5).fill({sub:"", tea:""}));
-                
-                const card = document.createElement("div");
-                card.className = "table-card";
-                card.style.borderRightColor = `hsl(${g.length * 50}, 70%, 50%)`;
-                
-                let tableHtml = `<h3>الصف ${g} - شعبة ${s}</h3><table><thead><tr><th>حصة</th><th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th></tr></thead><tbody>`;
-                
-                for(let i=0; i<state.lessonCount; i++) {
-                    tableHtml += `<tr><td>${i+1}</td>`;
-                    for(let d=0; d<5; d++) {
-                        tableHtml += `<td>${isMember ? 
-                            `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">-</option>${state.subjects.map(sub=>`<option value="${sub}" ${state.lessons[key][i][d].sub==sub?'selected':''}>${sub}</option>`).join('')}</select>
-                             <select onchange="update('${key}',${i},${d},'tea',this.value)"><option value="">-</option>${state.teachers.map(tea=>`<option value="${tea}" ${state.lessons[key][i][d].tea==tea?'selected':''}>${tea}</option>`).join('')}</select>`
-                            : `<div>${state.lessons[key][i][d].sub||"-"}</div><div style="font-size:10px; color:#aaa;">***</div>`}</td>`;
-                    }
-                    tableHtml += `</tr>`;
+        
+        Object.keys(state.lessons).forEach(key => {
+            const card = document.createElement("div");
+            card.className = "table-card";
+            card.innerHTML = `<h3>${key}</h3><table><thead><tr><th>حصة</th><th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th></tr></thead><tbody></tbody></table>`;
+            const tbody = card.querySelector("tbody");
+            
+            for(let i=0; i<state.lessonCount; i++) {
+                let row = `<tr><td>${i+1}</td>`;
+                for(let d=0; d<5; d++) {
+                    row += `<td>${isMember ? 
+                        `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">-</option>${state.subjects.map(s=>`<option value="${s}" ${state.lessons[key][i][d].sub==s?'selected':''}>${s}</option>`).join('')}</select>
+                         <select onchange="update('${key}',${i},${d},'tea',this.value)"><option value="">-</option>${state.teachers.map(t=>`<option value="${t}" ${state.lessons[key][i][d].tea==t?'selected':''}>${t}</option>`).join('')}</select>`
+                        : (state.lessons[key][i][d].sub || "-")}</td>`;
                 }
-                card.innerHTML = tableHtml + "</tbody></table>";
-                app.appendChild(card);
-            });
+                tbody.innerHTML += row + "</tr>";
+            }
+            app.appendChild(card);
         });
+    }
+
+    function update(key, r, d, type, val) {
+        state.lessons[key][r][d][type] = val;
+        localStorage.setItem("schoolData", JSON.stringify(state));
     }
     render();
 </script>
