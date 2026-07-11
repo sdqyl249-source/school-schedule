@@ -897,51 +897,40 @@ function downloadPDF() {
         sourceElement = document.getElementById("schedule");
     } else if(option === "class"){
         const className = document.getElementById("classSelect").value;
+        // البحث عن أول بطاقة تطابق اسم الصف
         sourceElement = document.querySelector(`.card.${className}`); 
     } else if(option === "section"){
+        // بما أن العناصر ليس لها IDs فريدة، سنستخدم البحث بالاسم داخل الكارد
         const className = document.getElementById("classSelect").value;
         const section = document.getElementById("sectionSelect").value;
-        sourceElement = document.getElementById(`${className}-${section}`);
+        // هذا الجزء سيبحث عن البطاقة التي تحتوي على نص الصف والشعبة
+        const cards = document.querySelectorAll(".card");
+        cards.forEach(card => {
+            if(card.innerText.includes(className) && card.innerText.includes(section)) {
+                sourceElement = card;
+            }
+        });
     }
 
     if (!sourceElement) {
-        showToast("error", "❌ يرجى اختيار عنصر صحيح للتنزيل!");
+        showToast("error", "❌ يرجى اختيار صف أو شعبة موجودة!");
         return;
     }
 
-    // إنشاء نسخة نظيفة
     const element = sourceElement.cloneNode(true);
-element.style.direction = "rtl"; 
-    element.style.textAlign = "right";
-    element.style.display = "block"; // لضمان ظهور العناصر بشكل صحيح
-const cells = element.querySelectorAll('td, th');
-    cells.forEach(cell => {
-        cell.style.direction = "rtl";
-        cell.style.textAlign = "right";
-    });
-        element.querySelectorAll('[contenteditable]').forEach(el => {
-        el.removeAttribute('contenteditable');
-    });
+    // تنسيق نسخة التنزيل
+    element.style.padding = "20px";
+    element.style.background = "#fff";
 
-    // إعدادات التنزيل الأساسية (بدون الـ pagebreak المعقد)
     const opt = {
         margin: 10,
         filename: 'جدول-الحصص.pdf',
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { 
-            scale: 2, 
-            letterRendering: true, 
-            useCORS: true,
-            windowWidth: document.body.scrollWidth 
-        },
+        html2canvas: { scale: 2 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
     };
 
-html2pdf().set(opt).from(element).save();
+    html2pdf().set(opt).from(element).save();
 }
-
-window.onload = loadSchedule;
-
 function showToast(type, message) {
   const container = document.getElementById("toastContainer");
   const toast = document.createElement("div");
