@@ -6,7 +6,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* التنسيقات الأساسية */
         body { font-family: 'Cairo', sans-serif; padding-top: 100px; background: #f3f4f6; }
         .main-header { position: fixed; top: 0; right: 0; width: 100%; height: 80px; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 2000; box-sizing: border-box; }
         .container { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; }
@@ -19,18 +18,19 @@
         .sidebar { position: fixed; top: 80px; right: -360px; width: 320px; height: 100vh; background: #fff; box-shadow: -5px 0 25px rgba(0,0,0,0.1); transition: 0.4s; z-index: 1500; padding: 20px; }
         .sidebar.open { right: 0; }
         .sidebar-toggle { cursor: pointer; font-size: 24px; border: none; background: none; }
-        .hidden { display: none !important; }
-        .toast { position: fixed; top: 20px; left: 20px; padding: 15px; background: #16a34a; color: white; border-radius: 8px; z-index: 9999; }
+        .hidden-teacher { color: #888; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header class="main-header">
     <h1>منصة رؤية <span>- الجدول</span></h1>
-    <button class="sidebar-toggle" onclick="toggleSidebar()">⚙️</button>
+    <div>
+        <button id="loginBtn" onclick="login()">دخول الأعضاء</button>
+        <button id="logoutBtn" onclick="logout()" style="display:none;">خروج</button>
+        <button class="sidebar-toggle" onclick="toggleSidebar()">⚙️</button>
+    </div>
 </header>
-
-<div id="toastContainer"></div>
 
 <div class="container" id="schedule"></div>
 
@@ -52,12 +52,31 @@
 
 <script>
     let lessons = JSON.parse(localStorage.getItem("scheduleData")) || {};
+    let isMember = localStorage.getItem("userRole") === "member";
     const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"];
     let classSections = [{className: "الأول", section: "أ"}, {className: "الثاني", section: "أ"}];
+
+    function login() {
+        const pass = prompt("أدخل كلمة المرور:");
+        if (pass === "2026") {
+            localStorage.setItem("userRole", "member");
+            location.reload();
+        } else alert("كلمة مرور خاطئة");
+    }
+
+    function logout() {
+        localStorage.setItem("userRole", "visitor");
+        location.reload();
+    }
 
     function toggleSidebar() { document.getElementById("sidebar").classList.toggle("open"); }
 
     function renderSchedule() {
+        if (isMember) {
+            document.getElementById("loginBtn").style.display = "none";
+            document.getElementById("logoutBtn").style.display = "inline-block";
+        }
+
         const container = document.getElementById("schedule");
         container.innerHTML = "";
         classSections.forEach(sec => {
@@ -73,8 +92,11 @@
                 let row = `<tr><td>${i+1}</td>`;
                 days.forEach((_, dIdx) => {
                     row += `<td>
-                        <div class="info-txt subject" contenteditable="true" data-key="${key}" data-row="${i}" data-day="${dIdx}">${lessons[key][i][dIdx].subject}</div>
-                        <div class="info-txt teacher" contenteditable="true" data-key="${key}" data-row="${i}" data-day="${dIdx}">${lessons[key][i][dIdx].teacher}</div>
+                        <div class="info-txt subject" contenteditable="${isMember}" data-key="${key}" data-row="${i}" data-day="${dIdx}">${lessons[key][i][dIdx].subject}</div>
+                        ${isMember ? 
+                            `<div class="info-txt teacher" contenteditable="true" data-key="${key}" data-row="${i}" data-day="${dIdx}">${lessons[key][i][dIdx].teacher}</div>` : 
+                            `<div class="hidden-teacher">********</div>`
+                        }
                     </td>`;
                 });
                 tbody.innerHTML += row + "</tr>";
@@ -83,9 +105,8 @@
         });
     }
 
-    // حفظ البيانات تلقائياً
     document.getElementById("schedule").addEventListener("input", (e) => {
-        if (!e.target.classList.contains("info-txt")) return;
+        if (!isMember || !e.target.classList.contains("info-txt")) return;
         const {key, row, day} = e.target.dataset;
         if(e.target.classList.contains("subject")) lessons[key][row][day].subject = e.target.innerText;
         else lessons[key][row][day].teacher = e.target.innerText;
@@ -93,9 +114,9 @@
     });
 
     function executeService() {
+        if(!isMember) return alert("يجب تسجيل الدخول كعضو!");
         const service = document.getElementById("serviceSelect").value;
         const key = `${document.getElementById("serviceClassSelect").value}-${document.getElementById("serviceSectionSelect").value}`;
-        
         if (service === "addLesson") {
             if(!lessons[key]) lessons[key] = Array(4).fill(null).map(() => Array(5).fill({subject: "", teacher: ""}));
             alert("تم التحديث");
