@@ -2,69 +2,64 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>منصة رؤية - الإدارة المتكاملة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <title>منصة رؤية - الجدول الذكي</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #f0f2f5; padding: 20px; }
-        .header { background: #2c3e50; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .admin-panel { background: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .table-wrapper { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
-        .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background: #34495e; color: white; }
-        .hidden-teacher { color: #aaa; font-style: italic; }
-        select { width: 100%; border: none; background: #f9f9f9; padding: 2px; }
-        button { padding: 8px 15px; cursor: pointer; border: none; border-radius: 5px; background: #3498db; color: white; }
-        .logout-btn { background: #e74c3c; }
+        :root { --main-color: #2c3e50; --accent-color: #3498db; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; padding: 10px; margin: 0; }
+        .header { background: var(--main-color); color: white; padding: 15px; border-radius: 10px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; }
+        .table-wrapper { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; margin-top: 20px; }
+        .card { background: white; padding: 10px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th, td { border: 1px solid #ddd; padding: 5px; text-align: center; white-space: nowrap; }
+        th { background: #eee; }
+        .hidden-teacher { color: #ccc; font-size: 10px; }
+        button { padding: 8px 12px; cursor: pointer; border: none; border-radius: 5px; background: var(--accent-color); color: white; }
+        .btn-pdf { background: #e67e22; }
+        
+        /* تحسينات الطباعة */
+        @media print {
+            .header, .admin-panel, button { display: none; }
+            .card { box-shadow: none; break-inside: avoid; }
+            body { background: white; }
+        }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h1>منصة رؤية التعليمية</h1>
+    <strong>جدول الحصص</strong>
     <div>
-        <button id="loginBtn" onclick="login()">دخول الإدارة</button>
-        <button id="logoutBtn" class="logout-btn" onclick="logout()" style="display:none;">خروج</button>
+        <button onclick="login()" id="loginBtn">دخول الإدارة</button>
+        <button onclick="logout()" id="logoutBtn" style="display:none; background:#e74c3c;">خروج</button>
+        <button class="btn-pdf" onclick="exportPDF()">📥 تصدير PDF</button>
     </div>
 </div>
 
-<div class="admin-panel" id="adminPanel" style="display:none;">
-    <h3>⚙️ لوحة تحكم الإدارة</h3>
-    <button onclick="addGrade()">إضافة صف</button>
-    <button onclick="addLesson()">إضافة حصة</button>
+<div id="adminPanel" style="display:none; padding:15px; background:#fff; margin-top:10px; border-radius:10px;">
+    <button onclick="addGrade()">➕ صف</button>
+    <button onclick="addLesson()">➕ حصة</button>
 </div>
 
 <div class="table-wrapper" id="app"></div>
 
 <script>
     let state = JSON.parse(localStorage.getItem("schoolData")) || {
-        grades: ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس"],
-        sections: ["أ", "ب", "ج"],
-        lessonCount: 4,
-        subjects: ["رياضيات", "فيزياء", "عربي", "إنجليزي"],
-        teachers: ["أ. أحمد", "أ. سارة", "أ. محمود"],
-        lessons: {}
+        grades: ["الأول", "الثاني", "الثالث"], sections: ["أ", "ب"], lessonCount: 4,
+        subjects: ["رياضيات", "علوم", "عربي"], teachers: ["أ.أحمد", "أ.سارة"], lessons: {}
     };
-
     let isMember = localStorage.getItem("userRole") === "member";
 
-    function login() {
-        const p = prompt("كلمة مرور الإدارة:");
-        if (p === "2026") { localStorage.setItem("userRole", "member"); location.reload(); }
-        else alert("خطأ!");
-    }
-
-    function logout() { localStorage.setItem("userRole", "visitor"); location.reload(); }
-
-    function addGrade() { 
-        const name = prompt("اسم الصف:"); 
-        if(name) state.grades.push(name); saveData(); 
-    }
-
+    function login() { if(prompt("كلمة المرور:")==="2026") { localStorage.setItem("userRole","member"); location.reload(); } }
+    function logout() { localStorage.setItem("userRole","visitor"); location.reload(); }
+    function addGrade() { const g = prompt("اسم الصف:"); if(g) { state.grades.push(g); saveData(); } }
     function addLesson() { state.lessonCount++; saveData(); }
-
     function saveData() { localStorage.setItem("schoolData", JSON.stringify(state)); render(); }
+    
+    function exportPDF() {
+        const element = document.getElementById('app');
+        html2pdf().from(element).save('الجدول_الدراسي.pdf');
+    }
 
     function update(key, r, d, type, val) {
         if (!state.lessons[key]) state.lessons[key] = Array(state.lessonCount).fill(null).map(() => Array(5).fill({sub:"", tea:""}));
@@ -75,7 +70,7 @@
     function render() {
         const app = document.getElementById("app");
         app.innerHTML = "";
-        if(isMember) document.getElementById("adminPanel").style.display = "block";
+        document.getElementById("adminPanel").style.display = isMember ? "block" : "none";
         document.getElementById("loginBtn").style.display = isMember ? "none" : "block";
         document.getElementById("logoutBtn").style.display = isMember ? "block" : "none";
 
@@ -86,25 +81,23 @@
                 
                 const card = document.createElement("div");
                 card.className = "card";
-                card.innerHTML = `<h3>الصف ${g} - شعبة ${s}</h3>`;
-                let table = `<table><thead><tr><th>حصة</th>${["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس"].map(d=>`<th>${d}</th>`).join('')}</tr></thead><tbody>`;
+                card.innerHTML = `<h4>${g} - ${s}</h4><table><thead><tr><th>حصة</th>${["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"].map(d=>`<th>${d}</th>`).join('')}</tr></thead><tbody></tbody></table>`;
                 
+                const tbody = card.querySelector("tbody");
                 for(let i=0; i<state.lessonCount; i++) {
-                    table += `<tr><td>${i+1}</td>`;
+                    let row = `<tr><td>${i+1}</td>`;
                     for(let d=0; d<5; d++) {
-                        table += `<td>${isMember ? 
-                            `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">مادة</option>${state.subjects.map(s=>`<option value="${s}" ${state.lessons[key][i][d].sub==s?'selected':''}>${s}</option>`)}</select>
-                             <select onchange="update('${key}',${i},${d},'tea',this.value)"><option value="">أستاذ</option>${state.teachers.map(t=>`<option value="${t}" ${state.lessons[key][i][d].tea==t?'selected':''}>${t}</option>`)}</select>`
-                            : `<div>${state.lessons[key][i][d].sub||"-"}</div><div class="hidden-teacher">********</div>`}</td>`;
+                        row += `<td>${isMember ? 
+                            `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">-</option>${state.subjects.map(s=>`<option value="${s}" ${state.lessons[key][i][d].sub==s?'selected':''}>${s}</option>`).join('')}</select>
+                             <select onchange="update('${key}',${i},${d},'tea',this.value)"><option value="">-</option>${state.teachers.map(t=>`<option value="${t}" ${state.lessons[key][i][d].tea==t?'selected':''}>${t}</option>`).join('')}</select>`
+                            : `<div>${state.lessons[key][i][d].sub||"-"}</div><div class="hidden-teacher">***</div>`}</td>`;
                     }
-                    table += `</tr>`;
+                    tbody.innerHTML += row + "</tr>";
                 }
-                card.innerHTML += table + "</tbody></table>";
                 app.appendChild(card);
             });
         });
     }
-
     render();
 </script>
 </body>
