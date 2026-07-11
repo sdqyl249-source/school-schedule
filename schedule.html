@@ -2,59 +2,44 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>منصة رؤية - النظام المدرسي</title>
+    <title>منصة رؤية - النظام المدرسي المتطور</title>
     <style>
-        :root {
-            --primary: #1e3799; /* أزرق داكن */
-            --secondary: #4a69bd; /* أزرق متوسط */
-            --accent: #60a3bc; /* أزرق فاتح */
-            --bg: #f1f2f6;
-            --white: #ffffff;
-        }
+        :root { --bg: #f4f7f6; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; }
         
-        .admin-panel { background: var(--white); padding: 25px; border-radius: 15px; border-right: 8px solid var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        /* ألوان مخصصة لكل شعبة */
+        .color-أ { --tab-color: #27ae60; } /* أخضر للشعبة أ */
+        .color-ب { --tab-color: #2980b9; } /* أزرق للشعبة ب */
+        .color-ج { --tab-color: #8e44ad; } /* بنفسجي للشعبة ج */
+
+        .admin-panel { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
         
-        button.accordion { 
-            background: var(--primary); 
-            color: white; 
-            padding: 18px; 
-            width: 100%; 
-            border: none; 
-            border-radius: 10px; 
-            margin-bottom: 10px; 
-            cursor: pointer; 
-            display: flex; 
-            justify-content: space-between; 
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        .accordion { 
+            background: var(--tab-color); color: white; padding: 18px; width: 100%; 
+            border: none; border-radius: 10px; margin-bottom: 8px; cursor: pointer;
+            display: flex; justify-content: space-between; transition: 0.3s;
         }
+        .accordion:hover { filter: brightness(1.2); transform: scale(1.01); }
         
-        .panel { background: white; padding: 20px; border: 1px solid var(--secondary); border-radius: 0 0 10px 10px; margin-bottom: 20px; }
+        .panel { background: white; padding: 15px; border: 2px solid var(--tab-color); border-radius: 0 0 10px 10px; margin-bottom: 20px; display: none; }
         
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th { background: var(--secondary); color: white; padding: 12px; }
-        td { border: 1px solid #dcdde1; padding: 10px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: var(--tab-color); color: white; padding: 10px; }
+        td { border: 1px solid #ddd; padding: 8px; text-align: center; }
         
-        /* ألوان الأزرار */
-        .btn-add { background: #78e08f; color: #2d3436; }
-        .btn-del { background: #ff7675; color: white; }
+        select { width: 100%; padding: 5px; border: none; background: #f9f9f9; }
+        .btn { padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; color: white; }
     </style>
 </head>
 <body>
 
 <div class="admin-panel" id="adminPanel" style="display:none;">
-    <h2 style="color: var(--primary);">إدارة الجداول المدرسية</h2>
     <select id="selG"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option><option>الخامس</option><option>السادس</option></select>
     <select id="selS"><option>أ</option><option>ب</option><option>ج</option></select>
-    <button class="btn-add" onclick="addSpecificTable()">➕ إضافة جدول</button>
-    <button class="btn-del" onclick="removeSpecificTable()">🗑️ حذف الجدول</button>
+    <button class="btn" style="background:#27ae60" onclick="addSpecificTable()">إنشاء جدول</button>
 </div>
 
-<button onclick="login()" id="loginBtn" style="background:var(--primary); color:white; padding:10px 20px; border-radius:5px;">دخول الإدارة</button>
-<button onclick="logout()" id="logoutBtn" class="btn-del" style="display:none;">خروج</button>
-
-<div id="app" style="margin-top:20px;"></div>
+<div id="app"></div>
 
 <script>
     const allGrades = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس"];
@@ -62,40 +47,42 @@
     let state = JSON.parse(localStorage.getItem("schoolData")) || { lessons: {}, subjects: ["رياضيات"], teachers: ["أ.أحمد"] };
     let isMember = localStorage.getItem("userRole") === "member";
 
-    function login() { if(prompt("كلمة المرور:")==="2026") { localStorage.setItem("userRole","member"); location.reload(); } }
-    function logout() { localStorage.setItem("userRole","visitor"); location.reload(); }
-    function addSpecificTable() { const key = document.getElementById("selG").value + "-" + document.getElementById("selS").value; if(!state.lessons[key]) { state.lessons[key] = Array(6).fill(null).map(() => Array(5).fill({sub:"", tea:""})); saveData(); } }
-    function removeSpecificTable() { const key = document.getElementById("selG").value + "-" + document.getElementById("selS").value; delete state.lessons[key]; saveData(); }
+    function addSpecificTable() { 
+        const key = document.getElementById("selG").value + "-" + document.getElementById("selS").value;
+        if(!state.lessons[key]) { state.lessons[key] = Array(6).fill(null).map(() => Array(5).fill({sub:"", tea:""})); saveData(); } 
+    }
+
     function saveData() { localStorage.setItem("schoolData", JSON.stringify(state)); render(); }
     function update(k, r, d, type, val) { state.lessons[k][r][d][type] = val; localStorage.setItem("schoolData", JSON.stringify(state)); }
 
     function render() {
-        document.getElementById("adminPanel").style.display = isMember ? "block" : "none";
-        document.getElementById("loginBtn").style.display = isMember ? "none" : "block";
-        document.getElementById("logoutBtn").style.display = isMember ? "block" : "none";
         const app = document.getElementById("app"); app.innerHTML = "";
         
         allGrades.forEach(g => {
             allSections.forEach(s => {
                 const key = `${g}-${s}`;
                 if (state.lessons[key]) {
+                    // إضافة كلاس اللون بناءً على الشعبة
+                    const sectionClass = `color-${s}`;
+                    
                     const btn = document.createElement("button");
-                    btn.className = "accordion";
-                    btn.innerHTML = `<span>📋 الصف ${g} - شعبة ${s}</span> <span>▼</span>`;
+                    btn.className = `accordion ${sectionClass}`;
+                    btn.innerHTML = `<span>📋 ${g} - شعبة ${s}</span> <span>▼</span>`;
                     btn.onclick = function() { this.nextElementSibling.style.display = (this.nextElementSibling.style.display === "block") ? "none" : "block"; };
                     app.appendChild(btn);
-                    const panel = document.createElement("div"); panel.className = "panel";
+
+                    const panel = document.createElement("div");
+                    panel.className = `panel ${sectionClass}`;
                     let html = `<table><thead><tr><th>حصة</th><th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th></tr></thead><tbody>`;
+                    
                     for(let i=0; i<6; i++) {
                         html += `<tr><td>${i+1}</td>`;
                         for(let d=0; d<5; d++) {
-                            html += `<td>${isMember ? 
-                                `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">مادة</option>${state.subjects.map(sub => `<option value="${sub}" ${state.lessons[key][i][d].sub==sub?'selected':''}>${sub}</option>`).join('')}</select>
-                                 <select onchange="update('${key}',${i},${d},'tea',this.value)"><option value="">أستاذ</option>${state.teachers.map(t => `<option value="${t}" ${state.lessons[key][i][d].tea==t?'selected':''}>${t}</option>`).join('')}</select>`
-                                : (state.lessons[key][i][d].sub || "-")}</td>`;
+                            html += `<td><select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">-</option>${state.subjects.map(sub => `<option value="${sub}" ${state.lessons[key][i][d].sub==sub?'selected':''}>${sub}</option>`).join('')}</select></td>`;
                         } html += `</tr>`;
                     }
-                    panel.innerHTML = html + "</tbody></table>"; app.appendChild(panel);
+                    panel.innerHTML = html + "</tbody></table>";
+                    app.appendChild(panel);
                 }
             });
         });
