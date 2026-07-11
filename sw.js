@@ -1,12 +1,12 @@
-const cacheName = "roya-platform-v1"; // اسم الكاش
+const cacheName = "roya-platform-v1"; 
 const assets = [
-  "/",
-  "/index.html",
-  "/schedule.html",
-  "/style.css",
-  "/scriot.js",
-  "/manifest.json",
-  "/icon-192.png",
+  "./",                // تأكد من استخدام ./ بدلاً من / لضمان دقة المسار
+  "./index.html",
+  "./schedule.html",
+  "./style.css",
+  "./scriot.js",
+  "./manifest.json",
+  "./icon-192.png",
 ];
 
 // تثبيت التطبيق وتخزين الملفات
