@@ -518,8 +518,9 @@
     <script>
         // إعدادات الاتصال المباشر بقاعدة بيانات Firebase
         let isCurrentMemberAdmin = false;
+   // إعدادات الاتصال المباشر بقاعدة بيانات Firebase
         function setUIAzAdmin() {
-            isCurrentMemberAdmin = true;
+            isCurrentMemberAdmin = true; // ✅ تحديث القيمة فقط، التعريف موجود في scriot.js
             const loginNavBtn = document.getElementById('login-nav-btn');
             if (loginNavBtn) { 
                 loginNavBtn.innerHTML = `👋 الإدارة | <span onclick="logoutCurrentMember(event)" style="background:red; color:white; padding:2px 6px; border-radius:3px; font-size:11px;">خروج</span>`;
@@ -529,6 +530,11 @@
             if(document.getElementById('admin-gallery-control')) document.getElementById('admin-gallery-control').style.display = 'block';
             if(document.getElementById('admin-th')) document.getElementById('admin-th').style.display = 'table-cell';
             loadHonorStudents(); loadGallery(); loadScheduleData();
+        }
+
+        function logoutCurrentMember(event) {
+            if (event) event.stopPropagation();
+            localStorage.removeItem('roya_session_active'); window.location.reload();
         }
 
         function logoutCurrentMember(event) {
@@ -641,6 +647,5 @@
 }
    </script>
 </body>
-    <script src="scriot.js"></script>
-
+<script src="scriot.js"></script>
 </html>
