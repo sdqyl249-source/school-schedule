@@ -12,43 +12,18 @@
 <meta name="theme-color" content="#4a90e2">
 
     <style>
-        /* التنسيقات العامة للموقع */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+      /* التنسيقات العامة */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background-color: #fcf9f5; color: #333; line-height: 1.6; }
+    img { max-width: 100%; height: auto; }
 
-        body {
-            background-color: #fcf9f5;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        /* شريط التبليغات العاجلة */
-        .ticker-wrap {
-            width: 100%;
-            background-color: #e74c3c;
-            color: #fff;
-            padding: 8px 10px;
-            overflow: hidden;
-            font-weight: bold;
-            font-size: 14px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .ticker-content {
-            display: inline-block;
-            white-space: nowrap;
-            padding-right: 100%;
-            animation: ticker 25s linear infinite;
-        }
-        .ticker-content:hover { animation-play-state: paused; }
-        @keyframes ticker {
-            0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(100%, 0, 0); }
-        }
-
+    /* شريط التبليغات (تم تنظيفه) */
+    .ticker-wrap { width: 100%; background-color: #e74c3c; color: #fff; padding: 8px 10px; overflow: hidden; font-weight: bold; font-size: 14px; }
+    .ticker-content { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; }
+    @keyframes ticker {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+    }
         /* شريط التنقل العلوي - Navbar */
         .main-header {
             background-color: #3e3835;
@@ -371,11 +346,10 @@
     }
 
     /* 3. تنسيقات الموبايل (الميديا كويري) */
-    @media (max-width: 768px) {
+   @media (max-width: 768px) {
         .mission-vision-container { margin-top: 0; }
         .navbar { padding: 10px; }
     }
-
     @media (max-width: 600px) {
         .hero-title { font-size: 24px !important; }
         .hero-subtitle { font-size: 14px !important; }
