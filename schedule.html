@@ -2,56 +2,61 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>منصة رؤية - الإدارة المدرسية</title>
+    <title>منصة رؤية - النظام المدرسي</title>
     <style>
         :root {
-            --primary: #2d3436;
-            --accent: #0984e3;
-            --bg: #f8f9fa;
-            --card-bg: #ffffff;
-            --text: #2d3436;
-            --border: #e1e8ed;
+            --primary: #1e3799; /* أزرق داكن */
+            --secondary: #4a69bd; /* أزرق متوسط */
+            --accent: #60a3bc; /* أزرق فاتح */
+            --bg: #f1f2f6;
+            --white: #ffffff;
         }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); padding: 30px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; }
         
-        /* لوحة الإدارة */
-        .admin-panel { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid var(--border); }
+        .admin-panel { background: var(--white); padding: 25px; border-radius: 15px; border-right: 8px solid var(--primary); box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin-bottom: 30px; }
         
-        /* تصميم الأزرار والمدخلات */
-        select, input { padding: 10px 15px; border: 1px solid #dfe6e9; border-radius: 8px; margin-left: 10px; }
-        button { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; }
-        .btn-main { background: var(--accent); color: white; }
-        .btn-del { background: #d63031; color: white; }
-        button:hover { opacity: 0.9; transform: translateY(-1px); }
-
-        /* الجداول (Accordion) */
-        .accordion { background: white; width: 100%; padding: 18px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; text-align: right; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .panel { display: none; background: white; padding: 20px; border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; margin-bottom: 20px; }
+        button.accordion { 
+            background: var(--primary); 
+            color: white; 
+            padding: 18px; 
+            width: 100%; 
+            border: none; 
+            border-radius: 10px; 
+            margin-bottom: 10px; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: space-between; 
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
         
-        /* الجدول الداخلي */
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f1f2f6; padding: 12px; border-bottom: 2px solid #dfe6e9; font-weight: 700; }
-        td { border-bottom: 1px solid #f1f2f6; padding: 12px; }
-        select { background: transparent; width: 100%; border: none; font-size: 14px; }
+        .panel { background: white; padding: 20px; border: 1px solid var(--secondary); border-radius: 0 0 10px 10px; margin-bottom: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background: var(--secondary); color: white; padding: 12px; }
+        td { border: 1px solid #dcdde1; padding: 10px; text-align: center; }
+        
+        /* ألوان الأزرار */
+        .btn-add { background: #78e08f; color: #2d3436; }
+        .btn-del { background: #ff7675; color: white; }
     </style>
 </head>
 <body>
 
 <div class="admin-panel" id="adminPanel" style="display:none;">
-    <h3 style="margin-top:0;">إدارة الجداول الدراسية</h3>
+    <h2 style="color: var(--primary);">إدارة الجداول المدرسية</h2>
     <select id="selG"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option><option>الخامس</option><option>السادس</option></select>
     <select id="selS"><option>أ</option><option>ب</option><option>ج</option></select>
-    <button class="btn-main" onclick="addSpecificTable()">إنشاء جدول</button>
-    <button class="btn-del" onclick="removeSpecificTable()">حذف الجدول</button>
+    <button class="btn-add" onclick="addSpecificTable()">➕ إضافة جدول</button>
+    <button class="btn-del" onclick="removeSpecificTable()">🗑️ حذف الجدول</button>
 </div>
 
-<button onclick="login()" id="loginBtn" class="btn-main">دخول الإدارة</button>
+<button onclick="login()" id="loginBtn" style="background:var(--primary); color:white; padding:10px 20px; border-radius:5px;">دخول الإدارة</button>
 <button onclick="logout()" id="logoutBtn" class="btn-del" style="display:none;">خروج</button>
 
-<div id="app" style="margin-top:30px;"></div>
+<div id="app" style="margin-top:20px;"></div>
 
 <script>
-    // [المنطق البرمجي كما هو سابقاً لضمان عمل الجداول بنفس كفاءة الترتيب]
     const allGrades = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس"];
     const allSections = ["أ", "ب", "ج"];
     let state = JSON.parse(localStorage.getItem("schoolData")) || { lessons: {}, subjects: ["رياضيات"], teachers: ["أ.أحمد"] };
@@ -69,6 +74,7 @@
         document.getElementById("loginBtn").style.display = isMember ? "none" : "block";
         document.getElementById("logoutBtn").style.display = isMember ? "block" : "none";
         const app = document.getElementById("app"); app.innerHTML = "";
+        
         allGrades.forEach(g => {
             allSections.forEach(s => {
                 const key = `${g}-${s}`;
@@ -84,7 +90,7 @@
                         html += `<tr><td>${i+1}</td>`;
                         for(let d=0; d<5; d++) {
                             html += `<td>${isMember ? 
-                                `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">مادة</option>${state.subjects.map(s => `<option value="${s}" ${state.lessons[key][i][d].sub==s?'selected':''}>${s}</option>`).join('')}</select>
+                                `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">مادة</option>${state.subjects.map(sub => `<option value="${sub}" ${state.lessons[key][i][d].sub==sub?'selected':''}>${sub}</option>`).join('')}</select>
                                  <select onchange="update('${key}',${i},${d},'tea',this.value)"><option value="">أستاذ</option>${state.teachers.map(t => `<option value="${t}" ${state.lessons[key][i][d].tea==t?'selected':''}>${t}</option>`).join('')}</select>`
                                 : (state.lessons[key][i][d].sub || "-")}</td>`;
                         } html += `</tr>`;
