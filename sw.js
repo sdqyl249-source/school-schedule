@@ -6,7 +6,7 @@ self.addEventListener("install", event => {
         "/index.html",
         "/schedule.html",
         "/style.css",
-        "/script.js"
+        "/scriot.js"
       ]);
     })
   );
