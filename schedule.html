@@ -2,71 +2,61 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>منصة رؤية - جداول الطباعة</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <title>منصة رؤية - الإدارة الموسعة</title>
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-        .header { background: #2c3e50; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; }
-        
-        /* تنسيق الجداول لتأخذ عرض الورقة */
-        .table-wrapper { display: flex; flex-direction: column; gap: 40px; margin-top: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; border: 3px solid; break-inside: avoid; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #999; padding: 10px; text-align: center; }
-        
-        /* تنسيق الطباعة لورق A4 */
-        @media print {
-            body { background: white; padding: 0; }
-            .card { border-width: 2px; margin-bottom: 20px; page-break-inside: avoid; }
-            .header, #adminPanel { display: none; }
-        }
-        select { width: 90%; border: none; background: transparent; }
+        body { font-family: 'Cairo', sans-serif; background: #f8f9fa; padding: 20px; }
+        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .admin-box { background: #fff; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #ddd; }
+        .table-card { background: white; padding: 20px; margin-bottom: 30px; border-radius: 15px; border-right: 10px solid; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+        th { background: #f2f2f2; }
+        select { width: 100%; border: none; background: #f9f9f9; padding: 5px; cursor: pointer; }
+        button { padding: 10px 15px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 5px; margin: 5px; }
+        @media print { .header, .admin-box, button { display: none; } .table-card { border-width: 5px; page-break-inside: avoid; } }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <strong>جدول الحصص المدرسي</strong>
+    <h1>نظام الإدارة المدرسية</h1>
     <div>
-        <button onclick="login()" id="loginBtn">دخول</button>
-        <button onclick="logout()" id="logoutBtn" style="display:none;">خروج</button>
-        <button onclick="window.print()" style="background:#e67e22;">🖨️ طباعة A4</button>
+        <button id="loginBtn" onclick="login()">دخول</button>
+        <button id="logoutBtn" onclick="logout()" style="display:none; background:#e74c3c;">خروج</button>
+        <button onclick="window.print()" style="background:#27ae60;">🖨️ طباعة</button>
     </div>
 </div>
 
-<div id="adminPanel" style="display:none; margin:15px 0;">
-    <button onclick="addGrade()">➕ إضافة صف</button>
+<div id="adminPanel" class="admin-box" style="display:none;">
+    <h3>إدارة البيانات الموسعة</h3>
+    <input type="text" id="newItem" placeholder="أدخل الاسم...">
+    <button onclick="addItem('subjects')">➕ مادة</button>
+    <button onclick="addItem('teachers')">➕ أستاذ</button>
+    <button onclick="addItem('grades')">➕ صف</button>
+    <button onclick="addItem('sections')">➕ شعبة</button>
 </div>
 
-<div class="table-wrapper" id="app"></div>
+<div id="app"></div>
 
 <script>
-    // جلب البيانات مع التأكد من وجود المصفوفات دائماً
     let state = JSON.parse(localStorage.getItem("schoolData")) || {
-        grades: ["الأول", "الثاني", "الثالث"], 
-        sections: ["أ", "ب"], 
-        lessonCount: 4, 
-        subjects: ["رياضيات", "علوم"], teachers: ["أ.أحمد"], 
-        lessons: {}
+        grades: ["الأول", "الثاني"], sections: ["أ", "ب"], 
+        subjects: ["رياضيات", "علوم"], teachers: ["أ.أحمد"],
+        lessons: {}, lessonCount: 6 // زدت عدد الحصص إلى 6
     };
-
     let isMember = localStorage.getItem("userRole") === "member";
 
-    function getUniqueColor(str) {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        return `hsl(${hash % 360}, 60%, 45%)`;
-    }
-
-    function addGrade() { 
-        const g = prompt("اسم الصف الجديد:"); 
-        if(g) { state.grades.push(g); saveData(); } 
+    function login() { if(prompt("كلمة المرور:")==="2026") { localStorage.setItem("userRole","member"); location.reload(); } }
+    function logout() { localStorage.setItem("userRole","visitor"); location.reload(); }
+    
+    function addItem(type) {
+        const val = document.getElementById("newItem").value;
+        if(!val) return alert("أدخل اسماً!");
+        state[type].push(val);
+        saveData();
     }
 
     function saveData() { localStorage.setItem("schoolData", JSON.stringify(state)); render(); }
-    function login() { if(prompt("كلمة المرور:")==="2026") { localStorage.setItem("userRole","member"); location.reload(); } }
-    function logout() { localStorage.setItem("userRole","visitor"); location.reload(); }
 
     function update(key, r, d, type, val) {
         if (!state.lessons[key]) state.lessons[key] = Array(state.lessonCount).fill(null).map(() => Array(5).fill({sub:"", tea:""}));
@@ -78,31 +68,31 @@
         const app = document.getElementById("app");
         app.innerHTML = "";
         document.getElementById("adminPanel").style.display = isMember ? "block" : "none";
-        
+        document.getElementById("loginBtn").style.display = isMember ? "none" : "block";
+        document.getElementById("logoutBtn").style.display = isMember ? "block" : "none";
+
         state.grades.forEach(g => {
             state.sections.forEach(s => {
                 const key = `${g}-${s}`;
-                const color = getUniqueColor(key);
-                
                 if (!state.lessons[key]) state.lessons[key] = Array(state.lessonCount).fill(null).map(() => Array(5).fill({sub:"", tea:""}));
                 
                 const card = document.createElement("div");
-                card.className = "card";
-                card.style.borderColor = color;
-                card.innerHTML = `<h3 style="color:${color}">الصف ${g} - شعبة ${s}</h3>
-                <table><thead><tr><th>حصة</th><th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th></tr></thead><tbody></tbody></table>`;
+                card.className = "table-card";
+                card.style.borderRightColor = `hsl(${g.length * 50}, 70%, 50%)`;
                 
-                const tbody = card.querySelector("tbody");
+                let tableHtml = `<h3>الصف ${g} - شعبة ${s}</h3><table><thead><tr><th>حصة</th><th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th></tr></thead><tbody>`;
+                
                 for(let i=0; i<state.lessonCount; i++) {
-                    let row = `<tr><td>${i+1}</td>`;
+                    tableHtml += `<tr><td>${i+1}</td>`;
                     for(let d=0; d<5; d++) {
-                        row += `<td>${isMember ? 
-                            `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="${state.lessons[key][i][d].sub}">${state.lessons[key][i][d].sub||"مادة"}</option>${state.subjects.map(sub=>`<option value="${sub}">${sub}</option>`).join('')}</select>
-                             <select onchange="update('${key}',${i},${d},'tea',this.value)"><option value="${state.lessons[key][i][d].tea}">${state.lessons[key][i][d].tea||"أستاذ"}</option>${state.teachers.map(tea=>`<option value="${tea}">${tea}</option>`).join('')}</select>`
-                            : `<div>${state.lessons[key][i][d].sub||"-"}</div><div style="color:#aaa; font-size:10px;">***</div>`}</td>`;
+                        tableHtml += `<td>${isMember ? 
+                            `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">-</option>${state.subjects.map(sub=>`<option value="${sub}" ${state.lessons[key][i][d].sub==sub?'selected':''}>${sub}</option>`).join('')}</select>
+                             <select onchange="update('${key}',${i},${d},'tea',this.value)"><option value="">-</option>${state.teachers.map(tea=>`<option value="${tea}" ${state.lessons[key][i][d].tea==tea?'selected':''}>${tea}</option>`).join('')}</select>`
+                            : `<div>${state.lessons[key][i][d].sub||"-"}</div><div style="font-size:10px; color:#aaa;">***</div>`}</td>`;
                     }
-                    tbody.innerHTML += row + "</tr>";
+                    tableHtml += `</tr>`;
                 }
+                card.innerHTML = tableHtml + "</tbody></table>";
                 app.appendChild(card);
             });
         });
