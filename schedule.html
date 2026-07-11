@@ -2,129 +2,110 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>منصة رؤية - جدول الحصص</title>
+    <title>منصة رؤية - الإدارة المتكاملة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: 'Cairo', sans-serif; padding-top: 100px; background: #f3f4f6; }
-        .main-header { position: fixed; top: 0; right: 0; width: 100%; height: 80px; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 2000; box-sizing: border-box; }
-        .container { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; }
-        .card { flex: 0 0 500px; margin: 15px; padding: 20px; background: white; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        .badge { display: inline-block; background: #4f46e5; color: white; padding: 5px 15px; border-radius: 10px; margin-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; text-align: center; }
-        th { background: #4f46e5; color: white; padding: 10px; }
-        td { border: 1px solid #ddd; padding: 10px; }
-        .info-txt { min-height: 20px; outline: none; }
-        .sidebar { position: fixed; top: 80px; right: -360px; width: 320px; height: 100vh; background: #fff; box-shadow: -5px 0 25px rgba(0,0,0,0.1); transition: 0.4s; z-index: 1500; padding: 20px; }
-        .sidebar.open { right: 0; }
-        .sidebar-toggle { cursor: pointer; font-size: 24px; border: none; background: none; }
-        .hidden-teacher { color: #888; font-weight: bold; }
+        body { font-family: 'Cairo', sans-serif; background: #f0f2f5; padding: 20px; }
+        .header { background: #2c3e50; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .admin-panel { background: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .table-wrapper { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background: #34495e; color: white; }
+        .hidden-teacher { color: #aaa; font-style: italic; }
+        select { width: 100%; border: none; background: #f9f9f9; padding: 2px; }
+        button { padding: 8px 15px; cursor: pointer; border: none; border-radius: 5px; background: #3498db; color: white; }
+        .logout-btn { background: #e74c3c; }
     </style>
 </head>
 <body>
 
-<header class="main-header">
-    <h1>منصة رؤية <span>- الجدول</span></h1>
+<div class="header">
+    <h1>منصة رؤية التعليمية</h1>
     <div>
-        <button id="loginBtn" onclick="login()">دخول الأعضاء</button>
-        <button id="logoutBtn" onclick="logout()" style="display:none;">خروج</button>
-        <button class="sidebar-toggle" onclick="toggleSidebar()">⚙️</button>
+        <button id="loginBtn" onclick="login()">دخول الإدارة</button>
+        <button id="logoutBtn" class="logout-btn" onclick="logout()" style="display:none;">خروج</button>
     </div>
-</header>
-
-<div class="container" id="schedule"></div>
-
-<div id="sidebar" class="sidebar">
-    <h3>إعدادات الجدول</h3>
-    <select id="serviceSelect">
-        <option value="addLesson">➕ إضافة حصة</option>
-        <option value="deleteLesson">🗑️ حذف حصة</option>
-    </select>
-    <br><br>
-    <select id="serviceClassSelect">
-        <option>الأول</option><option>الثاني</option><option>الثالث</option>
-    </select>
-    <select id="serviceSectionSelect">
-        <option>أ</option><option>ب</option>
-    </select>
-    <button onclick="executeService()" style="width:100%; padding:10px; margin-top:10px;">تنفيذ</button>
 </div>
 
+<div class="admin-panel" id="adminPanel" style="display:none;">
+    <h3>⚙️ لوحة تحكم الإدارة</h3>
+    <button onclick="addGrade()">إضافة صف</button>
+    <button onclick="addLesson()">إضافة حصة</button>
+</div>
+
+<div class="table-wrapper" id="app"></div>
+
 <script>
-    let lessons = JSON.parse(localStorage.getItem("scheduleData")) || {};
+    let state = JSON.parse(localStorage.getItem("schoolData")) || {
+        grades: ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس"],
+        sections: ["أ", "ب", "ج"],
+        lessonCount: 4,
+        subjects: ["رياضيات", "فيزياء", "عربي", "إنجليزي"],
+        teachers: ["أ. أحمد", "أ. سارة", "أ. محمود"],
+        lessons: {}
+    };
+
     let isMember = localStorage.getItem("userRole") === "member";
-    const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"];
-    let classSections = [{className: "الأول", section: "أ"}, {className: "الثاني", section: "أ"}];
 
     function login() {
-        const pass = prompt("أدخل كلمة المرور:");
-        if (pass === "2026") {
-            localStorage.setItem("userRole", "member");
-            location.reload();
-        } else alert("كلمة مرور خاطئة");
+        const p = prompt("كلمة مرور الإدارة:");
+        if (p === "2026") { localStorage.setItem("userRole", "member"); location.reload(); }
+        else alert("خطأ!");
     }
 
-    function logout() {
-        localStorage.setItem("userRole", "visitor");
-        location.reload();
+    function logout() { localStorage.setItem("userRole", "visitor"); location.reload(); }
+
+    function addGrade() { 
+        const name = prompt("اسم الصف:"); 
+        if(name) state.grades.push(name); saveData(); 
     }
 
-    function toggleSidebar() { document.getElementById("sidebar").classList.toggle("open"); }
+    function addLesson() { state.lessonCount++; saveData(); }
 
-    function renderSchedule() {
-        if (isMember) {
-            document.getElementById("loginBtn").style.display = "none";
-            document.getElementById("logoutBtn").style.display = "inline-block";
-        }
+    function saveData() { localStorage.setItem("schoolData", JSON.stringify(state)); render(); }
 
-        const container = document.getElementById("schedule");
-        container.innerHTML = "";
-        classSections.forEach(sec => {
-            const key = `${sec.className}-${sec.section}`;
-            if (!lessons[key]) lessons[key] = Array(4).fill(null).map(() => Array(5).fill({subject: "", teacher: ""}));
-            
-            const card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML = `<div class="badge">${sec.className} - ${sec.section}</div><table><thead><tr><th>حصة</th>${days.map(d=>`<th>${d}</th>`).join('')}</tr></thead><tbody></tbody></table>`;
-            
-            const tbody = card.querySelector("tbody");
-            for(let i=0; i<4; i++) {
-                let row = `<tr><td>${i+1}</td>`;
-                days.forEach((_, dIdx) => {
-                    row += `<td>
-                        <div class="info-txt subject" contenteditable="${isMember}" data-key="${key}" data-row="${i}" data-day="${dIdx}">${lessons[key][i][dIdx].subject}</div>
-                        ${isMember ? 
-                            `<div class="info-txt teacher" contenteditable="true" data-key="${key}" data-row="${i}" data-day="${dIdx}">${lessons[key][i][dIdx].teacher}</div>` : 
-                            `<div class="hidden-teacher">********</div>`
-                        }
-                    </td>`;
-                });
-                tbody.innerHTML += row + "</tr>";
-            }
-            container.appendChild(card);
+    function update(key, r, d, type, val) {
+        if (!state.lessons[key]) state.lessons[key] = Array(state.lessonCount).fill(null).map(() => Array(5).fill({sub:"", tea:""}));
+        state.lessons[key][r][d][type] = val;
+        saveData();
+    }
+
+    function render() {
+        const app = document.getElementById("app");
+        app.innerHTML = "";
+        if(isMember) document.getElementById("adminPanel").style.display = "block";
+        document.getElementById("loginBtn").style.display = isMember ? "none" : "block";
+        document.getElementById("logoutBtn").style.display = isMember ? "block" : "none";
+
+        state.grades.forEach(g => {
+            state.sections.forEach(s => {
+                const key = `${g}-${s}`;
+                if (!state.lessons[key]) state.lessons[key] = Array(state.lessonCount).fill(null).map(() => Array(5).fill({sub:"", tea:""}));
+                
+                const card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML = `<h3>الصف ${g} - شعبة ${s}</h3>`;
+                let table = `<table><thead><tr><th>حصة</th>${["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس"].map(d=>`<th>${d}</th>`).join('')}</tr></thead><tbody>`;
+                
+                for(let i=0; i<state.lessonCount; i++) {
+                    table += `<tr><td>${i+1}</td>`;
+                    for(let d=0; d<5; d++) {
+                        table += `<td>${isMember ? 
+                            `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">مادة</option>${state.subjects.map(s=>`<option value="${s}" ${state.lessons[key][i][d].sub==s?'selected':''}>${s}</option>`)}</select>
+                             <select onchange="update('${key}',${i},${d},'tea',this.value)"><option value="">أستاذ</option>${state.teachers.map(t=>`<option value="${t}" ${state.lessons[key][i][d].tea==t?'selected':''}>${t}</option>`)}</select>`
+                            : `<div>${state.lessons[key][i][d].sub||"-"}</div><div class="hidden-teacher">********</div>`}</td>`;
+                    }
+                    table += `</tr>`;
+                }
+                card.innerHTML += table + "</tbody></table>";
+                app.appendChild(card);
+            });
         });
     }
 
-    document.getElementById("schedule").addEventListener("input", (e) => {
-        if (!isMember || !e.target.classList.contains("info-txt")) return;
-        const {key, row, day} = e.target.dataset;
-        if(e.target.classList.contains("subject")) lessons[key][row][day].subject = e.target.innerText;
-        else lessons[key][row][day].teacher = e.target.innerText;
-        localStorage.setItem("scheduleData", JSON.stringify(lessons));
-    });
-
-    function executeService() {
-        if(!isMember) return alert("يجب تسجيل الدخول كعضو!");
-        const service = document.getElementById("serviceSelect").value;
-        const key = `${document.getElementById("serviceClassSelect").value}-${document.getElementById("serviceSectionSelect").value}`;
-        if (service === "addLesson") {
-            if(!lessons[key]) lessons[key] = Array(4).fill(null).map(() => Array(5).fill({subject: "", teacher: ""}));
-            alert("تم التحديث");
-        }
-        renderSchedule();
-    }
-
-    renderSchedule();
+    render();
 </script>
 </body>
 </html>
