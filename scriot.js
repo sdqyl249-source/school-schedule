@@ -10,8 +10,13 @@ const firebaseConfig = {
 };
 
 // تهيئة Firebase
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+// بدلاً من السطر القديم، استخدم هذا الكود:
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+} else {
+    firebase.app(); // إذا كان موجوداً، استخدمه كما هو
+}
+const database = firebase.database();const database = firebase.database();
 // ... كود تهيئة Firebase (initialize) ...
 
 // هذا الجزء يوضع مرة واحدة في بداية الملف لجلب البيانات فور تحميل الصفحة
