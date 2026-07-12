@@ -21,7 +21,7 @@ const database = firebase.database();
 database.ref('lessons_schedule').on('value', (snapshot) => {
     const data = snapshot.val();
     if (data) {
-        state.lessons = data; // تأكد من وضع البيانات في المكان الصحيح داخل الـ state
+        state.lessons = data; 
         render(); 
     }
 });
@@ -29,11 +29,10 @@ database.ref('lessons_schedule').on('value', (snapshot) => {
 // اجعل التحديث مركزياً
 function update(key, r, d, type, val) { 
     state.lessons[key][r][d][type] = val; 
-    saveData(); // هي ستتولى الحفظ والرسم
+    saveData(); 
 }
 
 function saveData() { 
-    // لكي يتم الحفظ في نفس المسار
     database.ref('lessons_schedule').set(state.lessons);
     render(); 
 }
@@ -50,7 +49,6 @@ function setUIAzAdmin() {
         loginNavBtn.style.color = '#4a3b32';
     }
     
-    // إظهار عناصر لوحة التحكم
     const adminElements = ['admin-main-dashboard', 'admin-gallery-control', 'admin-th'];
     adminElements.forEach(id => {
         const el = document.getElementById(id);
