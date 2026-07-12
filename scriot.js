@@ -15,7 +15,7 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
-const database = firebase.database();
+const database = firebase.database(); // ✅ تعريف واحد فقط
 
 // جلب البيانات فور تحميل الصفحة
 database.ref('lessons_schedule').on('value', (snapshot) => {
