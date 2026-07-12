@@ -15,30 +15,25 @@ const database = firebase.database();
 
 // 3. جلب البيانات وعرضها في الجدول
 // تم تعديل المسار إلى 'school_data/lessons' كما هو موجود في قاعدة بياناتك
+// احذف الكود القديم الخاص بالجدول وضع هذا مكانه
 database.ref('school_data/lessons').on('value', (snapshot) => {
     const data = snapshot.val();
     const tableBody = document.getElementById('table-body-id');
     
     if (tableBody) {
-        tableBody.innerHTML = ''; // تفريغ الجدول أولاً
+        tableBody.innerHTML = ''; // مسح المحتوى القديم للجدول
         
-        if (data) {
-            Object.keys(data).forEach(key => {
-                const lesson = data[key];
-                // تأكد أن أسماء الحقول (subject, teacher, time) مطابقة لما هو مخزن فعلياً
+        if (data && Array.isArray(data)) {
+            data.forEach((row) => {
+                // ملاحظة: تأكد من ترتيب الأعمدة (0، 1، 2) 
+                // إذا كان الجدول يظهر بيانات خاطئة، غير الأرقام أدناه
                 tableBody.innerHTML += `
                     <tr>
-                        <td>${lesson.subject || '-'}</td>
-                        <td>${lesson.teacher || '-'}</td>
-                        <td>${lesson.time || '-'}</td>
+                        <td>${row[0] || ''}</td>
+                        <td>${row[1] || ''}</td>
+                        <td>${row[2] || ''}</td>
                     </tr>`;
             });
-        } else {
-            console.log("لا توجد دروس في قاعدة البيانات حالياً.");
         }
-    } else {
-        console.error("خطأ: لم يتم العثور على العنصر الذي يحمل المعرف 'table-body-id' في صفحة الـ HTML.");
     }
-}, (error) => {
-    console.error("حدث خطأ أثناء جلب البيانات:", error);
 });
