@@ -46,9 +46,22 @@
     <button class="btn" id="loginBtn" style="background:#3498db" onclick="login()">دخول الإدارة</button>
     <button class="btn" id="logoutBtn" style="background:#e74c3c; display:none;" onclick="logout()">خروج</button>
     <!-- زر التحكم الجماعي -->
+        <button class="btn" style="background:#f39c12" onclick="syncToFirebase()">🔄 مزامنة السحابة</button>
     <button class="btn" style="background:#8e44ad" onclick="toggleAll()">📂 توسيع/طي جميع الجداول</button>
 </div>
 
+
+
+<script>
+function syncToFirebase() {
+    const data = JSON.parse(localStorage.getItem("schoolData"));
+    if (!data) { alert("لا توجد بيانات محلية!"); return; }
+    
+    database.ref('school_data').set(data)
+        .then(() => alert("✅ تم رفع البيانات إلى السحابة بنجاح! الآن ستظهر في الأجهزة الأخرى"))
+        .catch(err => alert("❌ فشل الرفع: " + err.message));
+}
+</script>
 <div class="admin-panel" id="adminPanel" style="display:none;">
     <select id="selG"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option><option>الخامس</option><option>السادس</option></select>
     <select id="selS"><option>أ</option><option>ب</option><option>ج</option></select>
