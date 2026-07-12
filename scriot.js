@@ -15,11 +15,11 @@ const database = firebase.database();
 // ... كود تهيئة Firebase (initialize) ...
 
 // هذا الجزء يوضع مرة واحدة في بداية الملف لجلب البيانات فور تحميل الصفحة
-database.ref('schoolData').on('value', (snapshot) => {
+database.ref('lessons_schedule').on('value', (snapshot) => {
     const data = snapshot.val();
     if (data) {
-        state = data;
-        render(); // تحديث الجدول فوراً عند جلب البيانات
+        state.lessons = data; // تأكد من وضع البيانات في المكان الصحيح داخل الـ state
+        render(); 
     }
 });
 // اجعل التحديث مركزياً
@@ -29,8 +29,9 @@ function update(key, r, d, type, val) {
 }
 
 function saveData() { 
-    database.ref('schoolData').set(state);
-    // لا حاجة لاستدعاء render() هنا إذا كنت ستستدعيها عند تغير القيمة في Firebase
+    // لكي يتم الحفظ في نفس المسار
+    database.ref('lessons_schedule').set(state.lessons);
+    render(); 
 }
 let isCurrentMemberAdmin = false;
 
