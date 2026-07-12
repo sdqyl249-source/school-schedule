@@ -5,21 +5,7 @@
     <title>منصة رؤية - النظام المدرسي المتكامل</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
-
-        @media print {
-            @page { size: A4 landscape; margin: 10mm; }
-            .admin-panel, .nav-btns, .accordion { display: none !important; }
-            .panel { display: block !important; border: none !important; page-break-after: always; }
-            table { width: 100% !important; }
-        }
-
-        .nav-btns {
-            display: flex;
-            flex-direction: row-reverse;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
+        .nav-btns { display: flex; flex-direction: row-reverse; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .admin-panel { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .accordion { background: #2c3e50; color: white; padding: 15px; width: 100%; border: none; border-radius: 8px; margin-bottom: 5px; cursor: pointer; text-align: right; font-weight: bold; }
         .panel { background: white; padding: 15px; border: 1px solid #ddd; margin-bottom: 20px; display: none; overflow-x: auto; }
@@ -27,41 +13,18 @@
         th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
         select { width: 100%; border: none; background: #f9f9f9; padding: 5px; cursor: pointer; }
         .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 5px; }
-
-        /* تحسين العرض على الهاتف */
-        @media (max-width: 768px) {
-        table { font-size: 12px; }
-        th, td { padding: 4px; }
-        .accordion { font-size: 14px; padding: 10px; }
-        .btn { font-size: 14px; padding: 8px; }
-        body { padding: 10px; }
-    }
     </style>
 </head>
 <body>
 
 <div class="nav-btns">
     <button class="btn" style="background:#34495e" onclick="window.location.href='index.html'">🏠 الرئيسية</button>
-    <button class="btn" style="background:#27ae60" onclick="window.print()">🖨️ طباعة PDF</button>
+    <button class="btn" style="background:#27ae60" onclick="window.print()">🖨️ طباعة</button>
     <button class="btn" id="loginBtn" style="background:#3498db" onclick="login()">دخول الإدارة</button>
     <button class="btn" id="logoutBtn" style="background:#e74c3c; display:none;" onclick="logout()">خروج</button>
-    <!-- زر التحكم الجماعي -->
-        <button class="btn" style="background:#f39c12" onclick="syncToFirebase()">🔄 مزامنة السحابة</button>
-    <button class="btn" style="background:#8e44ad" onclick="toggleAll()">📂 توسيع/طي جميع الجداول</button>
+    <button class="btn" style="background:#f39c12" onclick="syncToFirebase()">🔄 مزامنة السحابة</button>
 </div>
 
-
-
-<script>
-function syncToFirebase() {
-    const data = JSON.parse(localStorage.getItem("schoolData"));
-    if (!data) { alert("لا توجد بيانات محلية!"); return; }
-    
-    database.ref('school_data').set(data)
-        .then(() => alert("✅ تم رفع البيانات إلى السحابة بنجاح! الآن ستظهر في الأجهزة الأخرى"))
-        .catch(err => alert("❌ فشل الرفع: " + err.message));
-}
-</script>
 <div class="admin-panel" id="adminPanel" style="display:none;">
     <select id="selG"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option><option>الخامس</option><option>السادس</option></select>
     <select id="selS"><option>أ</option><option>ب</option><option>ج</option></select>
@@ -70,28 +33,53 @@ function syncToFirebase() {
 
 <div id="app"></div>
 
+<!-- مكتبات Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+
 <script>
+    // 1. إعدادات Firebase (ضع بياناتك هنا)
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+        projectId: "YOUR_PROJECT_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // 2. المتغيرات العامة
     const allGrades = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس"];
     const allSections = ["أ", "ب", "ج"];
-    let state = JSON.parse(localStorage.getItem("schoolData")) || { 
-        lessons: {}, subjects: ["رياضيات", "علوم"], teachers: ["أ.أحمد", "أ.محمد"] 
-    };
+    let state = JSON.parse(localStorage.getItem("schoolData")) || { lessons: {}, subjects: ["رياضيات", "علوم"], teachers: ["أ.أحمد", "أ.محمد"] };
     let isMember = localStorage.getItem("userRole") === "member";
+
+    // 3. جلب البيانات من Firebase عند التحميل
+    database.ref('school_data').on('value', (snapshot) => {
+        if(snapshot.exists()) {
+            state = snapshot.val();
+            localStorage.setItem("schoolData", JSON.stringify(state));
+            render();
+        }
+    });
 
     function login() { if(prompt("كلمة المرور:")==="2026") { localStorage.setItem("userRole","member"); location.reload(); } }
     function logout() { localStorage.setItem("userRole","visitor"); location.reload(); }
+
+    function saveData() { 
+        localStorage.setItem("schoolData", JSON.stringify(state)); 
+        database.ref('school_data').set(state); // حفظ تلقائي في السحابة
+        render(); 
+    }
+
+    function syncToFirebase() { database.ref('school_data').set(state).then(() => alert("✅ تمت المزامنة")); }
 
     function addSpecificTable() { 
         const key = document.getElementById("selG").value + "-" + document.getElementById("selS").value;
         if(!state.lessons[key]) { state.lessons[key] = Array(6).fill(null).map(() => Array(5).fill({sub:"", tea:""})); saveData(); } 
     }
 
-    function saveData() { localStorage.setItem("schoolData", JSON.stringify(state)); render(); }
-    function update(key, r, d, type, val) { 
-        state.lessons[key][r][d][type] = val; 
-        localStorage.setItem("schoolData", JSON.stringify(state)); 
-    }
-    
+    function update(key, r, d, type, val) { state.lessons[key][r][d][type] = val; saveData(); }
+
     function render() {
         document.getElementById("adminPanel").style.display = isMember ? "block" : "none";
         document.getElementById("loginBtn").style.display = isMember ? "none" : "block";
@@ -126,24 +114,7 @@ function syncToFirebase() {
             });
         });
     }
-
-    // دالة التحكم الجماعي
-    function toggleAll() {
-        document.querySelectorAll(".panel").forEach(panel => {
-            panel.style.display = (panel.style.display === "block") ? "none" : "block";
-        });
-    }
-
     render();
 </script>
-
-<!-- إضافة مكتبات Firebase قبل ملف scriot.js -->
-<!-- إضافة مكتبات Firebase قبل ملف scriot.js -->
-<!-- أولاً: مكتبات Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
-
-<!-- ثانياً: ملفك الخاص بالجدول -->
-<script src="schedule_only.js"></script>
 </body>
 </html>
