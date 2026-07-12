@@ -1,86 +1,55 @@
-alert("تم تحميل scriot.js بنجاح");
-database.ref('lessons_schedule').once('value').then(snapshot => {
-    alert("تم الاتصال بـ Firebase بنجاح. عدد العناصر: " + (snapshot.numChildren()));
-}).catch(err => {
-    alert("خطأ في الاتصال: " + err.message);
-});
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
+<script>
+    // 1. التهيئة المركزية (تُنفذ مرة واحدة فقط)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
+        authDomain: "roya-platform-26860.firebaseapp.com",
+        databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
+        projectId: "roya-platform-26860",
+        storageBucket: "roya-platform-26860.firebasestorage.app",
+        messagingSenderId: "897544406776",
+        appId: "1:897544406776:web:aa112013dea672fb141d0d"
+    };
 
-// تهيئة آمنة لـ Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-const database = firebase.database();
-let state = { lessons: {} };
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const database = firebase.database();
 
-// 2. دالة الرسم (Render) - تم إصلاحها لتعرض البيانات في الجدول
-function render() {
-    const tableBody = document.getElementById('table-body-id'); // تأكد أن الـ ID في HTML هو نفس هذا
-    if (!tableBody) return;
+    // 2. دوال الإدارة والتحكم (موحدة)
+    function setUIAzAdmin() {
+        const loginNavBtn = document.getElementById('login-nav-btn');
+        if (loginNavBtn) { 
+            loginNavBtn.innerHTML = `👋 الإدارة | <span onclick="logoutCurrentMember(event)" style="color:red; cursor:pointer;">خروج</span>`;
+        }
+        if(document.getElementById('admin-main-dashboard')) document.getElementById('admin-main-dashboard').style.display = 'block';
+        if(document.getElementById('admin-gallery-control')) document.getElementById('admin-gallery-control').style.display = 'block';
+    }
 
-    tableBody.innerHTML = ''; 
+    function logoutCurrentMember(event) {
+        if (event) event.stopPropagation();
+        localStorage.removeItem('roya_session_active'); 
+        window.location.reload();
+    }
 
-    if (state.lessons) {
-        Object.keys(state.lessons).forEach(key => {
-            const lesson = state.lessons[key];
-            tableBody.innerHTML += `<tr>
-                <td>${lesson.subject || ''}</td>
-                <td>${lesson.teacher || ''}</td>
-                <td>${lesson.time || ''}</td>
-            </tr>`;
+    // 3. التحقق من حالة الدخول عند التحميل
+    document.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('roya_session_active') === "true") {
+            setUIAzAdmin();
+        }
+
+        // استدعاء دوال تحميل البيانات (تأكد من تعريفها لاحقاً في الكود)
+        if(typeof loadTickerText === 'function') loadTickerText();
+        if(typeof loadHonorStudents === 'function') loadHonorStudents();
+        if(typeof loadGallery === 'function') loadGallery();
+        if(typeof loadScheduleData === 'function') loadScheduleData();
+    });
+
+    // 4. تسجيل الـ Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('✅ Service Worker مسجل'))
+                .catch(err => console.error('❌ خطأ:', err));
         });
     }
-}
-
-// 3. جلب البيانات لحظياً
-database.ref('lessons_schedule').on('value', (snapshot) => {
-    const data = snapshot.val();
-    state.lessons = data || {}; 
-    render();
-});
-
-// 4. دالة الحفظ
-function saveData() {
-    database.ref('lessons_schedule').set(state.lessons);
-}
-
-// 5. العمليات الرئيسية عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', () => {
-    // التحقق من الجلسة
-    if (localStorage.getItem('roya_session_active') === "true") {
-        setUIAzAdmin();
-    }
-
-    // معالجة إرسال الجدول (إضافة حصة جديدة)
-    const scheduleForm = document.getElementById('schedule-upload-form');
-    if (scheduleForm) {
-        scheduleForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const subject = document.getElementById('sched-subject').value.trim();
-            const teacher = document.getElementById('sched-teacher').value.trim();
-            const time = document.getElementById('sched-time').value.trim();
-            
-            database.ref('lessons_schedule').push({ subject, teacher, time }).then(() => {
-                alert('تم حفظ الحصة بنجاح!');
-                document.getElementById('scheduleModal').style.display = 'none';
-                scheduleForm.reset();
-            });
-        });
-    }
-});
-
-// دوال الواجهة (الإدارة)
-function setUIAzAdmin() {
-    const loginNavBtn = document.getElementById('login-nav-btn');
-    if (loginNavBtn) {
-        loginNavBtn.innerHTML = `👋 الإدارة | <span onclick="localStorage.removeItem('roya_session_active'); window.location.reload();" style="background:red; color:white; padding:2px 6px; border-radius:3px; cursor:pointer;">خروج</span>`;
-    }
-}
+</script>
