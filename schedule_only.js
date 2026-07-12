@@ -1,34 +1,15 @@
-// تأكد من تهيئة Firebase مرة واحدة فقط في بداية الملف
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID"
-};
+console.log("تم تحميل ملف schedule_only.js");
 
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+const tableBody = document.getElementById('table-body-id');
+if (!tableBody) {
+    console.error("خطأ: لم يتم العثور على العنصر الذي يحمل ID: table-body-id في صفحة الـ HTML");
+} else {
+    console.log("تم العثور على عنصر الجدول بنجاح!");
 }
 
-const database = firebase.database();
-
-// دالة عرض الجدول الموحدة
-database.ref('school_data/lessons').on('value', (snapshot) => {
-    const data = snapshot.val();
-    const tableBody = document.getElementById('table-body-id');
-    
-    if (tableBody) {
-        tableBody.innerHTML = ''; // تنظيف الجدول
-        
-        if (data && Array.isArray(data)) {
-            data.forEach((row) => {
-                // نستخدم الترتيب الذي اكتشفناه (0, 1, 2)
-                tableBody.innerHTML += `
-                    <tr>
-                        <td>${row[0] || ''}</td>
-                        <td>${row[1] || ''}</td>
-                        <td>${row[2] || ''}</td>
-                    </tr>`;
-            });
-        }
-    }
-});
+// اختبار Firebase
+if (typeof firebase === 'undefined') {
+    console.error("خطأ: مكتبة Firebase غير محملة!");
+} else {
+    console.log("مكتبة Firebase محملة وجاهزة.");
+}
