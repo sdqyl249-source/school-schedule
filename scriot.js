@@ -1,4 +1,6 @@
-alert("تم التحميل");// إعدادات Firebase (يجب وضع بيانات مشروعك الخاصة من لوحة تحكم Firebase)
+alert("تم التحميل");
+
+// إعدادات Firebase (ضع بيانات مشروعك الخاصة من لوحة تحكم Firebase)
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -14,11 +16,8 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 const database = firebase.database();
-const database = firebase.database();
-const database = firebase.database();
-// ... كود تهيئة Firebase (initialize) ...
 
-// هذا الجزء يوضع مرة واحدة في بداية الملف لجلب البيانات فور تحميل الصفحة
+// جلب البيانات فور تحميل الصفحة
 database.ref('lessons_schedule').on('value', (snapshot) => {
     const data = snapshot.val();
     if (data) {
@@ -26,6 +25,7 @@ database.ref('lessons_schedule').on('value', (snapshot) => {
         render(); 
     }
 });
+
 // اجعل التحديث مركزياً
 function update(key, r, d, type, val) { 
     state.lessons[key][r][d][type] = val; 
@@ -37,9 +37,10 @@ function saveData() {
     database.ref('lessons_schedule').set(state.lessons);
     render(); 
 }
+
 let isCurrentMemberAdmin = false;
 
-// 2. دوال الإدارة والواجهة
+// دوال الإدارة والواجهة
 function setUIAzAdmin() {
     isCurrentMemberAdmin = true;
     const loginNavBtn = document.getElementById('login-nav-btn');
@@ -67,7 +68,7 @@ function logoutCurrentMember(event) {
     window.location.reload();
 }
 
-// 3. دوال النوافذ المنبثقة (Modals)
+// دوال النوافذ المنبثقة (Modals)
 function openLoginModal() { document.getElementById('loginModal').style.display = 'flex'; }
 function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; document.getElementById('direct-login-form').reset(); }
 function openGalleryModal() { document.getElementById('galleryModal').style.display = 'flex'; }
@@ -75,7 +76,7 @@ function closeGalleryModal() { document.getElementById('galleryModal').style.dis
 function openScheduleModal() { document.getElementById('scheduleModal').style.display = 'flex'; }
 function closeScheduleModal() { document.getElementById('scheduleModal').style.display = 'none'; document.getElementById('schedule-upload-form').reset(); }
 
-// 4. العمليات الرئيسية عند تحميل الصفحة
+// العمليات الرئيسية عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('roya_session_active') === "true") {
         setUIAzAdmin();
@@ -83,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     loadTickerText();
 
-    // معالجة تسجيل الدخول المباشر
+    // تسجيل الدخول المباشر
     const directLoginForm = document.getElementById('direct-login-form');
     if (directLoginForm) {
         directLoginForm.addEventListener('submit', function(e) {
