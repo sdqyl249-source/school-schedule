@@ -4,31 +4,30 @@
     <meta charset="UTF-8">
     <title>منصة رؤية - النظام المدرسي المتكامل</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; font-size: 16px; }
-        .nav-btns { display: flex; flex-direction: row-reverse; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .admin-panel { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .accordion { background: #2c3e50; color: white; padding: 15px; width: 100%; border: none; border-radius: 8px; margin-bottom: 5px; cursor: pointer; text-align: right; font-weight: bold; font-size: 18px; }
-        .panel { background: white; padding: 15px; border: 1px solid #ddd; margin-bottom: 20px; display: none; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 16px; }
-        th, td { border: 1px solid #ccc; padding: 12px; text-align: center; }
-        select, input { width: 100%; border: 1px solid #ddd; background: #fff; padding: 8px; margin-top: 5px; border-radius: 4px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 5px; font-size: 16px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; padding: 20px; }
+        .nav-btns { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .admin-panel { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
+        .accordion { background: #2c3e50; color: white; padding: 15px; width: 100%; border: none; border-radius: 8px; margin-bottom: 5px; cursor: pointer; text-align: right; font-size: 18px; font-weight: bold; }
+        .panel { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 16px; }
+        th { background-color: #34495e; color: white; padding: 15px; border: 1px solid #bdc3c7; }
+        td { padding: 10px; border: 1px solid #bdc3c7; text-align: center; }
+        select, input { width: 95%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; margin-top: 5px; font-size: 14px; }
+        .btn { padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; margin: 5px; }
     </style>
 </head>
 <body>
 
 <div class="nav-btns">
-    <button class="btn" style="background:#34495e" onclick="window.location.href='index.html'">🏠 الرئيسية</button>
-    <button class="btn" style="background:#27ae60" onclick="window.print()">🖨️ طباعة</button>
-    <button class="btn" id="loginBtn" style="background:#3498db" onclick="login()">دخول الإدارة</button>
+    <button class="btn" style="background:#3498db" onclick="login()">دخول الإدارة</button>
     <button class="btn" id="logoutBtn" style="background:#e74c3c; display:none;" onclick="logout()">خروج</button>
-    <button class="btn" style="background:#f39c12" onclick="syncToFirebase()">🔄 مزامنة السحابة</button>
+    <button class="btn" style="background:#27ae60" onclick="window.print()">🖨️ طباعة الجدول</button>
 </div>
 
 <div class="admin-panel" id="adminPanel" style="display:none;">
-    <select id="selG" style="width:auto;"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option><option>الخامس</option><option>السادس</option></select>
-    <select id="selS" style="width:auto;"><option>أ</option><option>ب</option><option>ج</option></select>
-    <button class="btn" style="background:#27ae60" onclick="addSpecificTable()">➕ إنشاء جدول</button>
+    <select id="selG" style="width:150px;"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option><option>الخامس</option><option>السادس</option></select>
+    <select id="selS" style="width:150px;"><option>أ</option><option>ب</option><option>ج</option></select>
+    <button class="btn" style="background:#f39c12" onclick="addSpecificTable()">➕ إنشاء جدول جديد</button>
 </div>
 
 <div id="app"></div>
@@ -39,88 +38,66 @@
 <script>
     const firebaseConfig = {
         apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
-        authDomain: "roya-platform-26860.firebaseapp.com",
         databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
-        projectId: "roya-platform-26860",
-        storageBucket: "roya-platform-26860.firebasestorage.app",
-        messagingSenderId: "897544406776",
-        appId: "1:897544406776:web:aa112013dea672fb141d0d",
-        measurementId: "G-Y88LCNKED2"
+        projectId: "roya-platform-26860"
     };
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    const allGrades = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس"];
-    const allSections = ["أ", "ب", "ج"];
-    
-    // تم تحديث المواد هنا
-    let state = JSON.parse(localStorage.getItem("schoolData")) || { 
+    let state = { 
         lessons: {}, 
         subjects: ["رياضيات", "علوم", "اللغة العربية", "إنجليزي", "الاسلامية", "فنية", "رياضة", "الاجتماعيات"] 
     };
     let isMember = localStorage.getItem("userRole") === "member";
 
-    database.ref('school_data').on('value', (snapshot) => {
-        if(snapshot.exists()) {
-            state = snapshot.val();
-            localStorage.setItem("schoolData", JSON.stringify(state));
-            render();
-        }
-    });
-
     function login() { if(prompt("كلمة المرور:")==="2026") { localStorage.setItem("userRole","member"); location.reload(); } }
     function logout() { localStorage.setItem("userRole","visitor"); location.reload(); }
 
-    function saveData() { 
-        localStorage.setItem("schoolData", JSON.stringify(state)); 
-        database.ref('school_data').set(state);
-        render(); 
-    }
-
-    function syncToFirebase() { database.ref('school_data').set(state).then(() => alert("✅ تمت المزامنة")); }
+    database.ref('school_data').on('value', (snapshot) => {
+        if(snapshot.exists()) { state = snapshot.val(); render(); }
+    });
 
     function addSpecificTable() { 
         const key = document.getElementById("selG").value + "-" + document.getElementById("selS").value;
-        if(!state.lessons[key]) { state.lessons[key] = Array(6).fill(null).map(() => Array(5).fill({sub:"", tea:""})); saveData(); } 
+        if(!state.lessons[key]) { 
+            state.lessons[key] = Array(4).fill(null).map(() => Array(5).fill({sub:"", tea:""})); 
+            database.ref('school_data').set(state);
+        } 
     }
 
-    function update(key, r, d, type, val) { state.lessons[key][r][d][type] = val; saveData(); }
+    function update(key, r, d, type, val) { 
+        state.lessons[key][r][d][type] = val; 
+        database.ref('school_data').set(state); 
+    }
 
     function render() {
         document.getElementById("adminPanel").style.display = isMember ? "block" : "none";
-        document.getElementById("loginBtn").style.display = isMember ? "none" : "block";
         document.getElementById("logoutBtn").style.display = isMember ? "block" : "none";
-        
         const app = document.getElementById("app"); app.innerHTML = "";
-        allGrades.forEach(g => {
-            allSections.forEach(s => {
-                const key = `${g}-${s}`;
-                if (state.lessons[key]) {
-                    const btn = document.createElement("button");
-                    btn.className = "accordion";
-                    btn.innerHTML = `📋 الصف ${g} - شعبة ${s}`;
-                    btn.onclick = function() { this.nextElementSibling.style.display = (this.nextElementSibling.style.display === "block") ? "none" : "block"; };
-                    app.appendChild(btn);
+        
+        for (let key in state.lessons) {
+            const btn = document.createElement("button");
+            btn.className = "accordion";
+            btn.innerHTML = `📋 جدول الصف ${key}`;
+            btn.onclick = function() { this.nextElementSibling.style.display = (this.nextElementSibling.style.display === "block") ? "none" : "block"; };
+            app.appendChild(btn);
 
-                    const panel = document.createElement("div");
-                    panel.className = "panel";
-                    let html = `<table><thead><tr><th>حصة</th><th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th></tr></thead><tbody>`;
-                    for(let i=0; i<6; i++) {
-                        html += `<tr><td>${i+1}</td>`;
-                        for(let d=0; d<5; d++) {
-                            html += `<td>${isMember ? 
-                                `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">مادة</option>${state.subjects.map(sub=>`<option value="${sub}" ${state.lessons[key][i][d].sub==sub?'selected':''}>${sub}</option>`).join('')}</select>
-                                 <input type="text" placeholder="اسم الأستاذ" value="${state.lessons[key][i][d].tea || ''}" onchange="update('${key}',${i},${d},'tea',this.value)">`
-                                : (state.lessons[key][i][d].sub || "-")}</td>`;
-                        } html += `</tr>`;
-                    }
-                    panel.innerHTML = html + "</tbody></table>";
-                    app.appendChild(panel);
-                }
-            });
-        });
+            const panel = document.createElement("div");
+            panel.className = "panel";
+            let html = `<table><thead><tr><th>حصة</th><th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th></tr></thead><tbody>`;
+            for(let i=0; i<4; i++) {
+                html += `<tr><td>${i+1}</td>`;
+                for(let d=0; d<5; d++) {
+                    html += `<td>${isMember ? 
+                        `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">مادة</option>${state.subjects.map(sub=>`<option value="${sub}" ${state.lessons[key][i][d].sub==sub?'selected':''}>${sub}</option>`).join('')}</select>
+                         <input type="text" placeholder="اسم الأستاذ" value="${state.lessons[key][i][d].tea || ''}" onchange="update('${key}',${i},${d},'tea',this.value)">`
+                        : (state.lessons[key][i][d].sub || "-")}</td>`;
+                } html += `</tr>`;
+            }
+            panel.innerHTML = html + "</tbody></table>";
+            app.appendChild(panel);
+        }
     }
-    render();
 </script>
 </body>
 </html>
