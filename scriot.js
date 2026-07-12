@@ -14,10 +14,6 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 const database = firebase.database();
-
-} else {
-    firebase.app(); // إذا كان موجوداً، استخدمه كما هو
-}
 const database = firebase.database();const database = firebase.database();
 // ... كود تهيئة Firebase (initialize) ...
 
