@@ -1,4 +1,4 @@
-// إعدادات Firebase (يجب وضع بيانات مشروعك الخاصة من لوحة تحكم Firebase)
+alert("تم التحميل");// إعدادات Firebase (يجب وضع بيانات مشروعك الخاصة من لوحة تحكم Firebase)
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
