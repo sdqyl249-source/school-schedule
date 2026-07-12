@@ -5,7 +5,7 @@
     <title>منصة رؤية - النظام المدرسي المتكامل</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
-        
+
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             .admin-panel, .nav-btns, .accordion { display: none !important; }
@@ -13,30 +13,41 @@
             table { width: 100% !important; }
         }
 
-.nav-btns {
-    display: flex;
-    flex-direction: row-reverse; /* لعكس الترتيب إذا أردت */
-    gap: 10px;
-    margin-bottom: 20px;
-}
+        .nav-btns {
+            display: flex;
+            flex-direction: row-reverse;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
         .admin-panel { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .accordion { background: #2c3e50; color: white; padding: 15px; width: 100%; border: none; border-radius: 8px; margin-bottom: 5px; cursor: pointer; text-align: right; font-weight: bold; }
-        .panel { background: white; padding: 15px; border: 1px solid #ddd; margin-bottom: 20px; display: none; }
+        .panel { background: white; padding: 15px; border: 1px solid #ddd; margin-bottom: 20px; display: none; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
         select { width: 100%; border: none; background: #f9f9f9; padding: 5px; cursor: pointer; }
         .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 5px; }
+
+        /* تحسين العرض على الهاتف */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            table { font-size: 12px; }
+            th, td { padding: 4px; }
+            .accordion { font-size: 14px; padding: 10px; }
+            .btn { font-size: 14px; padding: 8px; }
+            .panel { overflow-x: scroll; }
+        }
     </style>
 </head>
 <body>
 
 <div class="nav-btns">
-    <!-- هذا الزر سينقلك الآن إلى صفحة index.html -->
     <button class="btn" style="background:#34495e" onclick="window.location.href='index.html'">🏠 الرئيسية</button>
-    
     <button class="btn" style="background:#27ae60" onclick="window.print()">🖨️ طباعة PDF</button>
     <button class="btn" id="loginBtn" style="background:#3498db" onclick="login()">دخول الإدارة</button>
     <button class="btn" id="logoutBtn" style="background:#e74c3c; display:none;" onclick="logout()">خروج</button>
+    <!-- زر التحكم الجماعي -->
+    <button class="btn" style="background:#8e44ad" onclick="toggleAll()">📂 توسيع/طي جميع الجداول</button>
 </div>
 
 <div class="admin-panel" id="adminPanel" style="display:none;">
@@ -64,11 +75,10 @@
     }
 
     function saveData() { localStorage.setItem("schoolData", JSON.stringify(state)); render(); }
-// هذا هو مكان الدالة الحالية في ملفك
-function update(key, r, d, type, val) { 
-    state.lessons[key][r][d][type] = val; 
-    localStorage.setItem("schoolData", JSON.stringify(state)); 
-}
+    function update(key, r, d, type, val) { 
+        state.lessons[key][r][d][type] = val; 
+        localStorage.setItem("schoolData", JSON.stringify(state)); 
+    }
     
     function render() {
         document.getElementById("adminPanel").style.display = isMember ? "block" : "none";
@@ -104,8 +114,21 @@ function update(key, r, d, type, val) {
             });
         });
     }
+
+    // دالة التحكم الجماعي
+    function toggleAll() {
+        document.querySelectorAll(".panel").forEach(panel => {
+            panel.style.display = (panel.style.display === "block") ? "none" : "block";
+        });
+    }
+
     render();
 </script>
-    <script src="scriot.js"></script>
+
+<!-- إضافة مكتبات Firebase قبل ملف scriot.js -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script src="scriot.js"></script>
 </body>
 </html>
