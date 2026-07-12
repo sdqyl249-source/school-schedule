@@ -1,18 +1,16 @@
-// 1. إعدادات الاتصال بـ Firebase
+// إعدادات Firebase (يجب وضع بيانات مشروعك الخاصة من لوحة تحكم Firebase)
 const firebaseConfig = {
-    apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
-    authDomain: "roya-platform-26860.firebaseapp.com",
-    databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
-    projectId: "roya-platform-26860",
-    storageBucket: "roya-platform-26860.appspot.com",
-    messagingSenderId: "897544406776",
-    appId: "1:897544406776:web:aa112013dea672fb141d0d"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 // تهيئة Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 let isCurrentMemberAdmin = false;
 
