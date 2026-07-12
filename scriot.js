@@ -1,4 +1,4 @@
-alert("بدء تحميل الملف");
+alert("تم تحميل scriot.js بنجاح");
 database.ref('lessons_schedule').once('value').then(snapshot => {
     alert("تم الاتصال بـ Firebase بنجاح. عدد العناصر: " + (snapshot.numChildren()));
 }).catch(err => {
