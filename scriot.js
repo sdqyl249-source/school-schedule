@@ -12,6 +12,26 @@ const firebaseConfig = {
 // تهيئة Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+// ... كود تهيئة Firebase (initialize) ...
+
+// هذا الجزء يوضع مرة واحدة في بداية الملف لجلب البيانات فور تحميل الصفحة
+database.ref('schoolData').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+        state = data;
+        render(); // تحديث الجدول فوراً عند جلب البيانات
+    }
+});
+// اجعل التحديث مركزياً
+function update(key, r, d, type, val) { 
+    state.lessons[key][r][d][type] = val; 
+    saveData(); // هي ستتولى الحفظ والرسم
+}
+
+function saveData() { 
+    database.ref('schoolData').set(state);
+    // لا حاجة لاستدعاء render() هنا إذا كنت ستستدعيها عند تغير القيمة في Firebase
+}
 let isCurrentMemberAdmin = false;
 
 // 2. دوال الإدارة والواجهة
