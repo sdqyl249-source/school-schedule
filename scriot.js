@@ -1,4 +1,9 @@
-// 1. إعدادات Firebase (استبدل بالبيانات الخاصة بك)
+alert("بدء تحميل الملف");
+database.ref('lessons_schedule').once('value').then(snapshot => {
+    alert("تم الاتصال بـ Firebase بنجاح. عدد العناصر: " + (snapshot.numChildren()));
+}).catch(err => {
+    alert("خطأ في الاتصال: " + err.message);
+});
 const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
     authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
