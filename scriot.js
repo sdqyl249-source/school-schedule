@@ -9,10 +9,6 @@
         messagingSenderId: "897544406776",
         appId: "1:897544406776:web:aa112013dea672fb141d0d"
     };
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
     const database = firebase.database();
 
     // 2. دوال الإدارة والتحكم (موحدة)
