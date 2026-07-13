@@ -12,14 +12,15 @@ const database = firebase.database();
 
 // 2. التحقق عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
+    // تحديث حالة الأزرار والحقول فوراً
+    updateUIState(); 
+
     if (localStorage.getItem('roya_session_active') === "true") {
         setUIAzAdmin();
-        // تفعيل أزرار الأستاذ فوراً
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
     }
-    renderNews(); // عرض التبليغ
+    renderNews(); 
     
-    // استدعاء الدوال الأصلية
     if(typeof loadTickerText === 'function') loadTickerText();
     if(typeof loadHonorStudents === 'function') loadHonorStudents();
     if(typeof loadGallery === 'function') loadGallery();
