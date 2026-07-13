@@ -2,136 +2,91 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة رؤية التعليمية المتكاملة</title>
-    <!-- استدعاء Firebase SDK للوظائف البرمجية -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-
+    <title>منصة رؤية التعليمية - نظام الشعب</title>
     <style>
-        /* التنسيقات العامة */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
-        .header { background: #ffffff; padding: 20px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .logo { font-size: 32px; font-weight: bold; color: #1a237e; }
-        .container { max-width: 1100px; margin: 20px auto; padding: 20px; }
-        
-        /* شريط التبليغات العاجلة */
-        .ticker { background: #d32f2f; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; }
-        
-        /* البطاقات الإحصائية */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        
-        /* لوحة الإدارة */
-        .admin-panel { background: #e8eaf6; padding: 20px; border-radius: 10px; border: 2px dashed #1a237e; margin-bottom: 20px; display: block; }
-        .btn { padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; background: #1a237e; color: white; font-weight: bold; margin: 5px; }
-        
-        /* الشعب والاشتراكات */
-        .class-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .btn-sub { background: #4caf50; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px; }
-        
-        /* الاقتراحات */
-        .feedback { background: white; padding: 20px; border-radius: 10px; margin-top: 20px; }
-        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; }
+        .header { background: #1a237e; color: white; padding: 20px; text-align: center; }
+        .ticker { background: #d32f2f; color: white; padding: 10px; text-align: center; font-weight: bold; }
+        .nav-bar { background: #fff; padding: 10px; text-align: center; border-bottom: 1px solid #ddd; }
+        .container { max-width: 900px; margin: 20px auto; padding: 20px; }
+        .class-box { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn { padding: 10px 20px; cursor: pointer; border-radius: 5px; border: none; background: #1a237e; color: white; margin: 5px; }
+        .post-area { border: 1px solid #ccc; padding: 15px; border-radius: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div class="logo">👁️ منصة رؤية التعليمية</div>
+    <div style="font-size: 30px;">👁️ منصة رؤية التعليمية</div>
+</div>
+
+<div class="ticker">📢 تنويه عاجل: يرجى متابعة التحديثات داخل الشعب الدراسية الخاصة بكم.</div>
+
+<div class="nav-bar">
+    <button class="btn" onclick="alert('تسجيل الدخول')">تسجيل دخول</button>
+    <button class="btn" onclick="alert('تسجيل خروج')">تسجيل خروج</button>
 </div>
 
 <div class="container">
-    <!-- 2. التبليغات العاجلة -->
-    <div class="ticker">📢 تنويه: تبدأ امتحانات نصف السنة يوم الأحد القادم، يرجى متابعة جداول الشعب الخاصة بكم.</div>
-
-    <!-- 1. شريط الملخص الرقمي -->
-    <div class="stats-grid">
-        <div class="stat-card"><h3>إجمالي الطلبة</h3><p id="totalStudents">150</p></div>
-        <div class="stat-card"><h3>دروس اليوم</h3><p id="todayClasses">6</p></div>
-        <div class="stat-card"><h3>التبليغات</h3><p id="activeAlerts">4</p></div>
-        <div class="stat-card"><h3>الشعب</h3><p id="totalClasses">8</p></div>
+    <!-- أدوات الأعضاء -->
+    <div class="class-box">
+        <h3>⚙️ أدوات الأعضاء</h3>
+        <button class="btn" onclick="publishAlert()">📢 نشر تبليغ عام</button>
+        <button class="btn" onclick="alert('رفع ملزمة PDF')">📁 رفع ملزمة</button>
     </div>
 
-    <!-- 4. لوحة الإجراءات السريعة (تظهر للأعضاء فقط) -->
-    <div class="admin-panel" id="adminPanel">
-        <h3>⚙️ أدوات الإدارة والأعضاء</h3>
-        <button class="btn" onclick="publishAlert()">📢 نشر تبليغ عاجل</button>
-        <button class="btn" onclick="document.getElementById('fileInput').click()">📁 رفع ملزمة PDF</button>
-        <input type="file" id="fileInput" style="display:none" onchange="uploadMaterial(this.files[0])">
-    </div>
+    <!-- الشعب الدراسية (صفين، كل صف يحتوي على 3 شعب) -->
+    <div id="classesList">
+        <!-- الصف الأول -->
+        <h3>الصف الأول</h3>
+        <div class="class-box">
+            <h4>شعبة (1-أ) - الرمز: A101</h4>
+            <div class="post-area" id="post-1a">
+                <p>مساحة التفاعل: أرسل ملفات، صور، أو فيديوهات</p>
+                <input type="file" onchange="shareContent('1-أ', this.files[0])">
+            </div>
+        </div>
+        <div class="class-box">
+            <h4>شعبة (1-ب) - الرمز: B102</h4>
+            <button class="btn" onclick="joinClass('1-ب')">دخول الشعبة</button>
+        </div>
+        <div class="class-box">
+            <h4>شعبة (1-ج) - الرمز: C103</h4>
+            <button class="btn" onclick="joinClass('1-ج')">دخول الشعبة</button>
+        </div>
 
-    <!-- 3 & 5. الجداول والشعب -->
-    <div class="class-grid">
-        <div class="card">
-            <h3>📅 حصص اليوم</h3>
-            <p>الرياضيات (شعبة أ) - 08:30 ص</p>
-            <button class="btn" style="width:100%">عرض الجدول الكامل</button>
+        <!-- الصف الثاني -->
+        <h3>الصف الثاني</h3>
+        <div class="class-box">
+            <h4>شعبة (2-أ) - الرمز: A201</h4>
+            <button class="btn" onclick="joinClass('2-أ')">دخول الشعبة</button>
         </div>
-        <div class="card">
-            <h3>⭐ نجوم الأسبوع</h3>
-            <p>الطالب: محمد علي - متميز في النشاط الأكاديمي</p>
+        <div class="class-box">
+            <h4>شعبة (2-ب) - الرمز: B202</h4>
+            <button class="btn" onclick="joinClass('2-ب')">دخول الشعبة</button>
         </div>
-        <div class="card">
-            <h3>📚 الشعب الدراسية</h3>
-            <p>شعبة الرياضيات (أ)</p>
-            <button class="btn-sub" onclick="subscribeToClass('math_a')">اشترك ليصلك إشعار</button>
+        <div class="class-box">
+            <h4>شعبة (2-ج) - الرمز: C203</h4>
+            <button class="btn" onclick="joinClass('2-ج')">دخول الشعبة</button>
         </div>
-    </div>
-
-    <!-- 6. صندوق الاقتراحات -->
-    <div class="feedback">
-        <h3>📩 صندوق الاقتراحات</h3>
-        <input type="text" id="senderName" placeholder="اسمك (اختياري)">
-        <textarea id="feedbackMsg" placeholder="رسالتك..."></textarea>
-        <button class="btn" style="width:100%" onclick="sendFeedback()">إرسال</button>
     </div>
 </div>
 
 <script>
-    // إعداد Firebase (استبدل البيانات ببيانات مشروعك الخاصة)
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        databaseURL: "https://your-project.firebaseio.com",
-        storageBucket: "your-project.appspot.com"
-    };
-    firebase.initializeApp(firebaseConfig);
-
-    // وظيفة الاشتراك في الشعبة (مع إشعار)
-    function subscribeToClass(className) {
-        alert("تم الاشتراك في " + className + ". ستصلك إشعارات عند التحديث.");
-        // هنا يتم تسجيل الاشتراك في قاعدة بيانات Firebase
-    }
-
-    // وظيفة رفع الملفات للأعضاء
-    function uploadMaterial(file) {
-        if (!file) return;
-        if (file.type !== "application/pdf") {
-            alert("يجب أن يكون الملف بصيغة PDF فقط.");
-            return;
-        }
-        alert("جارٍ رفع الملف: " + file.name + " إلى المكتبة الرقمية...");
-        // هنا يتم رفع الملف إلى Firebase Storage
-    }
-
-    // وظيفة إرسال الاقتراح
-    function sendFeedback() {
-        const msg = document.getElementById('feedbackMsg').value;
-        if(msg) {
-            alert("تم إرسال اقتراحك للإدارة، شكراً لك!");
-        } else {
-            alert("يرجى كتابة رسالة أولاً.");
-        }
-    }
-
-    // وظيفة نشر التبليغ
     function publishAlert() {
-        const newAlert = prompt("أدخل نص التبليغ العاجل:");
-        if(newAlert) {
-            document.querySelector('.ticker').innerText = "📢 " + newAlert;
+        const text = prompt("أدخل نص التبليغ:");
+        if(text) alert("تم نشر التبليغ لجميع الطلبة: " + text);
+    }
+
+    function shareContent(className, file) {
+        if(file) {
+            alert("تم إرسال الملف إلى شعبة " + className + ". سيصل إشعار لجميع الطلبة في الشعبة!");
+            // هنا سيتم الربط مع Firebase Storage و Cloud Messaging
         }
+    }
+
+    function joinClass(className) {
+        alert("أهلاً بك في شعبة " + className + ". تم تفعيل الإشعارات الخاصة بهذه الشعبة.");
     }
 </script>
 
