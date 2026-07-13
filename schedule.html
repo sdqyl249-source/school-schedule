@@ -3,49 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>منصة رؤية - التطبيق المدرسي</title>
+    <title>منصة رؤية - النظام المدرسي</title>
     <style>
-        :root {
-            --primary: #5e72e4;
-            --bg: #f4f7f6;
-            --card-shadow: 0 4px 10px rgba(0,0,0,0.08);
-        }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); padding: 15px; margin: 0; }
+        :root { --primary: #5e72e4; --bg: #f4f7f6; --text: #32325d; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 15px; margin: 0; color: var(--text); }
         
-        .header { background: white; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 20px; box-shadow: var(--card-shadow); }
+        .header { background: white; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .accordion { background: var(--primary); color: white; padding: 15px; width: 100%; border: none; border-radius: 15px; margin-bottom: 10px; cursor: pointer; text-align: right; font-weight: bold; font-size: 16px; }
         
-        .admin-panel { background: white; padding: 15px; border-radius: 20px; margin-bottom: 20px; box-shadow: var(--card-shadow); text-align: center; }
+        .lesson-card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-right: 5px solid var(--primary); }
+        .lesson-info { font-weight: bold; margin-bottom: 5px; color: var(--primary); }
         
-        .accordion { 
-            background: var(--primary); color: white; padding: 15px; width: 100%; border: none; 
-            border-radius: 15px; margin-bottom: 10px; cursor: pointer; text-align: right; 
-            font-weight: bold; font-size: 16px; display: flex; justify-content: space-between;
-        }
-
-        .lesson-card { 
-            background: white; border-radius: 15px; padding: 15px; margin-bottom: 10px; 
-            box-shadow: var(--card-shadow); display: flex; flex-direction: column; gap: 10px;
-        }
-
-        .lesson-info { display: flex; justify-content: space-between; align-items: center; }
-        
-        select, input { padding: 8px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; width: 48%; }
-        
-        .btn { padding: 10px 20px; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; }
+        select, input { padding: 8px; border: 1px solid #ddd; border-radius: 10px; width: 48%; font-size: 14px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h2>منصة رؤية</h2>
+    <h2>منصة رؤية التعليمية</h2>
     <button class="btn" style="background:#5e72e4" onclick="login()">دخول الإدارة</button>
-    <button class="btn" id="logoutBtn" style="background:#e74c3c; display:none;" onclick="logout()">خروج</button>
-</div>
-
-<div class="admin-panel" id="adminPanel" style="display:none;">
-    <select id="selG"><option>الأول</option><option>الثاني</option><option>الثالث</option></select>
-    <select id="selS"><option>أ</option><option>ب</option></select>
-    <button class="btn" style="background:#2dce89" onclick="addSpecificTable()">➕ إنشاء</button>
 </div>
 
 <div id="app"></div>
@@ -62,71 +39,70 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    let state = { lessons: {}, subjects: ["رياضيات", "علوم", "عربي", "إنجليزي"] };
+    // --- منطقة التحكم في الهيكل (تعدل من هنا فقط) ---
+    const config = {
+        days: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"],
+        grades: ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس"],
+        sections: ["أ", "ب", "ج"],
+        lessonCount: 4
+    };
+    // ----------------------------------------------
+
+    let state = { lessons: {} };
     let isMember = localStorage.getItem("userRole") === "member";
 
     function login() { if(prompt("كلمة المرور:")==="2026") { localStorage.setItem("userRole","member"); location.reload(); } }
-    function logout() { localStorage.setItem("userRole","visitor"); location.reload(); }
 
     database.ref('school_data').on('value', (snapshot) => {
         if(snapshot.exists()) { state = snapshot.val(); render(); }
     });
 
-    function addSpecificTable() { 
-        const key = document.getElementById("selG").value + "-" + document.getElementById("selS").value;
-        if(!state.lessons[key]) { 
-            state.lessons[key] = Array(4).fill(null).map(() => Array(5).fill({sub:"", tea:""})); 
-            database.ref('school_data').set(state);
-        } 
-    }
-
-    function update(key, r, d, type, val) { 
-        state.lessons[key][r][d][type] = val; 
-        database.ref('school_data').set(state); 
+    function update(key, dayIdx, lessonIdx, type, val) {
+        if(!state.lessons[key]) state.lessons[key] = {};
+        if(!state.lessons[key][dayIdx]) state.lessons[key][dayIdx] = [];
+        if(!state.lessons[key][dayIdx][lessonIdx]) state.lessons[key][dayIdx][lessonIdx] = {sub:"", tea:""};
+        
+        state.lessons[key][dayIdx][lessonIdx][type] = val;
+        database.ref('school_data').set(state);
     }
 
     function render() {
-        document.getElementById("adminPanel").style.display = isMember ? "block" : "none";
-        document.getElementById("logoutBtn").style.display = isMember ? "block" : "none";
         const app = document.getElementById("app"); app.innerHTML = "";
         
-        for (let key in state.lessons) {
-            const btn = document.createElement("button");
-            btn.className = "accordion";
-            btn.innerHTML = `📋 جدول الصف ${key} <span>▼</span>`;
-            btn.onclick = function() { 
-                const panel = this.nextElementSibling;
-                panel.style.display = (panel.style.display === "block") ? "none" : "block"; 
-            };
-            app.appendChild(btn);
+        config.grades.forEach(grade => {
+            config.sections.forEach(sec => {
+                const key = `${grade}-${sec}`;
+                
+                const btn = document.createElement("button");
+                btn.className = "accordion";
+                btn.innerText = `📋 صف ${grade} - شعبة ${sec}`;
+                btn.onclick = function() { 
+                    const p = this.nextElementSibling;
+                    p.style.display = (p.style.display === "block") ? "none" : "block"; 
+                };
+                app.appendChild(btn);
 
-            const container = document.createElement("div");
-            container.style.display = "none";
-            
-            // تحويل كل حصة إلى بطاقة
-            for(let i=0; i<4; i++) {
-                for(let d=0; d<5; d++) {
-                    const div = document.createElement("div");
-                    div.className = "lesson-card";
-                    div.innerHTML = `
-                        <div class="lesson-info">
-                            <strong>الحصة ${i+1} - اليوم ${d+1}</strong>
-                        </div>
-                        ${isMember ? 
-                            `<div style="display:flex; gap:5px;">
-                                <select onchange="update('${key}',${i},${d},'sub',this.value)">
-                                    <option value="">المادة</option>
-                                    ${state.subjects.map(s=>`<option value="${s}" ${state.lessons[key][i][d].sub==s?'selected':''}>${s}</option>`).join('')}
-                                </select>
-                                <input type="text" placeholder="اسم الأستاذ" value="${state.lessons[key][i][d].tea || ''}" onchange="update('${key}',${i},${d},'tea',this.value)">
-                            </div>`
-                            : `<div>المادة: ${state.lessons[key][i][d].sub || "غير محدد"} | الأستاذ: ${state.lessons[key][i][d].tea || "-"}</div>`
-                        }`;
-                    container.appendChild(div);
-                }
-            }
-            app.appendChild(container);
-        }
+                const container = document.createElement("div");
+                container.style.display = "none";
+                
+                config.days.forEach((dayName, dayIdx) => {
+                    for(let i=0; i<config.lessonCount; i++) {
+                        const data = (state.lessons[key] && state.lessons[key][dayIdx] && state.lessons[key][dayIdx][i]) ? state.lessons[key][dayIdx][i] : {sub:"", tea:""};
+                        const div = document.createElement("div");
+                        div.className = "lesson-card";
+                        div.innerHTML = `
+                            <div class="lesson-info">${dayName} - الحصة ${i+1}</div>
+                            ${isMember ? 
+                                `<input type="text" placeholder="المادة" value="${data.sub}" onchange="update('${key}',${dayIdx},${i},'sub',this.value)">
+                                 <input type="text" placeholder="الأستاذ" value="${data.tea}" onchange="update('${key}',${dayIdx},${i},'tea',this.value)">`
+                                : `<div>المادة: ${data.sub || "-"} | الأستاذ: ${data.tea || "-"}</div>`
+                            }`;
+                        container.appendChild(div);
+                    }
+                });
+                app.appendChild(container);
+            });
+        });
     }
 </script>
 </body>
