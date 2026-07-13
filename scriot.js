@@ -38,6 +38,7 @@ function toggleAuth() {
 }
 
 // 4. نظام التبليغات (الدالة الموحدة والمطورة)
+// 1. إرسال التبليغ إلى Firebase
 function addNews() {
     const newsText = prompt("أدخل التبليغ الجديد:");
     if (!newsText) return;
@@ -48,22 +49,29 @@ function addNews() {
         time: new Date().toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' })
     };
     
-    localStorage.setItem("newsData", JSON.stringify(newsData));
-    renderNews();
+    // التخزين في Firebase
+    database.ref('news').set(newsData)
+        .then(() => alert("تم تحديث التبليغ للجميع!"))
+        .catch(err => alert("خطأ في الاتصال: " + err));
 }
 
+// 2. جلب التبليغ لحظياً من Firebase (تلقائي)
 function renderNews() {
-    const news = JSON.parse(localStorage.getItem("newsData"));
     const display = document.getElementById("news-display");
-    if (display && news) {
-        display.innerHTML = `
-            <div style="padding: 10px; background: #eef2f3; border-radius: 5px; border-right: 4px solid #1a237e;">
-                ${news.text} <br>
-                <small style="color: #666;">${news.date} | ${news.time}</small>
-            </div>`;
-    }
+    if (!display) return;
+    
+    // الاستماع لأي تغيير في قاعدة البيانات
+    database.ref('news').on('value', (snapshot) => {
+        const news = snapshot.val();
+        if (news) {
+            display.innerHTML = `
+                <div style="padding: 15px; background: #e3f2fd; border-radius: 10px; border-right: 5px solid var(--main-blue);">
+                    <p style="font-size: 1.1em; color: #1a237e;">${news.text}</p>
+                    <small style="color: #666;">${news.date} | ${news.time}</small>
+                </div>`;
+        }
+    });
 }
-
 // 5. نظام الشكاوي (الدالة الموحدة)
 function sendComplaint() {
     const input = document.getElementById("compText");
