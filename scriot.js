@@ -151,3 +151,18 @@ function logoutCurrentMember(event) {
     localStorage.setItem('isAdmin', "false");
     window.location.reload();
 }
+// 7. الدالة المفقودة التي تسبب الخطأ
+function updateUIState() {
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+    const authBtn = document.getElementById("authBtn");
+    
+    // تحديث نص زر تسجيل الدخول
+    if (authBtn) {
+        authBtn.innerText = isAdmin ? "🔓 تسجيل الخروج" : "🔐 تسجيل الدخول";
+    }
+    
+    // تحديث ظهور العناصر المخصصة للإدارة
+    document.querySelectorAll('.admin-only').forEach(el => {
+        el.style.display = isAdmin ? 'block' : 'none';
+    });
+}
