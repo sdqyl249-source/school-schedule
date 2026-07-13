@@ -11,10 +11,10 @@
         .btn { padding: 10px 15px; border: none; border-radius: 10px; cursor: pointer; color: white; font-weight: bold; font-size: 13px; }
         .admin-panel { background: white; padding: 15px; border-radius: 20px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .accordion { background: var(--primary); color: white; padding: 15px; width: 100%; border: none; border-radius: 15px; margin-bottom: 10px; cursor: pointer; font-weight: bold; text-align: right; }
-        .day-card { background: white; border-radius: 20px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .day-title { font-weight: bold; color: var(--primary); margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .lesson-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; font-size: 13px; }
-        select, input { padding: 5px; border: 1px solid #ddd; border-radius: 5px; width: 45%; }
+        .full-day-card { background: white; border-radius: 20px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { border: 1px solid #eee; padding: 8px; text-align: center; }
+        select, input { padding: 4px; border: 1px solid #ddd; border-radius: 5px; width: 90%; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -42,7 +42,7 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    const config = { days: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"], lessonCount: 4 };
+    const config = { days: ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس"], subjects: ["رياضيات", "علوم", "عربي", "إنجليزي", "رياضة"] };
     let state = { lessons: {} };
     let isMember = localStorage.getItem("userRole") === "member";
 
@@ -53,7 +53,7 @@
 
     function addTable() {
         const key = document.getElementById("selG").value + "-" + document.getElementById("selS").value;
-        if(!state.lessons[key]) { state.lessons[key] = Array(5).fill(null).map(() => Array(config.lessonCount).fill({sub:"", tea:""})); database.ref('school_data').set(state); }
+        if(!state.lessons[key]) { state.lessons[key] = Array(4).fill(null).map(() => Array(5).fill({sub:"", tea:""})); database.ref('school_data').set(state); }
     }
 
     function deleteTable() {
@@ -61,10 +61,7 @@
         if(state.lessons[key]) { delete state.lessons[key]; database.ref('school_data').set(state); }
     }
 
-    function update(key, dayIdx, lessonIdx, type, val) {
-        state.lessons[key][dayIdx][lessonIdx][type] = val;
-        database.ref('school_data').set(state);
-    }
+    function update(key, r, d, type, val) { state.lessons[key][r][d][type] = val; database.ref('school_data').set(state); }
 
     function render() {
         document.getElementById("adminPanel").style.display = isMember ? "block" : "none";
@@ -79,25 +76,22 @@
             app.appendChild(btn);
 
             const container = document.createElement("div");
+            container.className = "full-day-card";
             container.style.display = "none";
             
-            state.lessons[key].forEach((dayLessons, dayIdx) => {
-                const dayDiv = document.createElement("div");
-                dayDiv.className = "day-card";
-                dayDiv.innerHTML = `<div class="day-title">${config.days[dayIdx]}</div>`;
-                
-                dayLessons.forEach((l, i) => {
-                    const row = document.createElement("div");
-                    row.className = "lesson-row";
-                    row.innerHTML = `<span>حصة ${i+1}</span>
-                        ${isMember ? 
-                            `<input type="text" placeholder="المادة" value="${l.sub}" onchange="update('${key}',${dayIdx},${i},'sub',this.value)">
-                             <input type="text" placeholder="الأستاذ" value="${l.tea}" onchange="update('${key}',${dayIdx},${i},'tea',this.value)">`
-                            : `<span>${l.sub || "-"} | ${l.tea || "-"}</span>`}`;
-                    dayDiv.appendChild(row);
-                });
-                container.appendChild(dayDiv);
-            });
+            let html = `<table><tr><th>حصة</th>${config.days.map(d=>`<th>${d}</th>`).join('')}</tr>`;
+            for(let i=0; i<4; i++) {
+                html += `<tr><td>${i+1}</td>`;
+                for(let d=0; d<5; d++) {
+                    const l = state.lessons[key][i][d];
+                    html += `<td>${isMember ? 
+                        `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">-</option>${config.subjects.map(s=>`<option value="${s}" ${l.sub==s?'selected':''}>${s}</option>`).join('')}</select>
+                         <input type="text" placeholder="أستاذ" value="${l.tea}" onchange="update('${key}',${i},${d},'tea',this.value)">`
+                        : `${l.sub || "-"}<br>${l.tea || "-"}`}</td>`;
+                }
+                html += `</tr>`;
+            }
+            container.innerHTML = html + "</table>";
             app.appendChild(container);
         }
     }
