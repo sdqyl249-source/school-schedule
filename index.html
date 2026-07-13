@@ -33,7 +33,12 @@
         .menu-item { padding: 20px; cursor: pointer; transition: 0.3s; border-right: 4px solid transparent; }
         .menu-item:hover { background: #1b263b; border-right: 4px solid var(--accent); }
         .sidebar-footer { margin-top: auto; padding: 20px; background: #1b263b; cursor: pointer; text-align: center; font-weight: bold; }
-        
+        .sidebar {
+    width: 280px; /* العرض الأصلي */
+    transition: 0.3s; /* لجعل الحركة ناعمة */
+    overflow: hidden; /* لمنع خروج العناصر عند الإغلاق */
+    white-space: nowrap; /* لمنع تكسر النصوص أثناء الإغلاق */
+}
         /* Content */
         .content { flex: 1; padding: 30px; overflow-y: auto; }
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
@@ -45,15 +50,27 @@
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="sidebar-header">👁️ منصة رؤية</div>
-        <div class="menu-item" onclick="show('home')">🏠 الرئيسية</div>
-        <div class="menu-item" onclick="show('classes')">🏫 الشعب الدراسية</div>
-        <div class="menu-item" onclick="show('schedule')">📅 جدول الدروس</div>
-        <div class="menu-item" onclick="show('honor')">🏆 لوحة الشرف</div>
-        <div class="menu-item" onclick="show('complaints')">📩 الشكاوي</div>
-        <div class="sidebar-footer" id="authBtn" onclick="toggleAuth()">🔐 تسجيل الدخول</div>
+<div class="sidebar" id="mySidebar">
+    <!-- الرأس مع زر الإغلاق -->
+    <div class="sidebar-header">
+        👁️ منصة رؤية
+        <span onclick="toggleSidebar()" style="cursor:pointer; float:left; padding:0 10px; font-size: 18px;">✕</span>
     </div>
+
+    <!-- عناصر القائمة -->
+    <div class="menu-item" onclick="show('home')">🏠 الرئيسية</div>
+    <div class="menu-item" onclick="show('classes')">🏫 الشعب الدراسية</div>
+    
+    <a href="schedule.html" style="text-decoration: none; color: white;">
+        <div class="menu-item">📅 جدول الدروس</div>
+    </a>
+    
+    <div class="menu-item" onclick="show('honor')">🏆 لوحة الشرف</div>
+    <div class="menu-item" onclick="show('complaints')">📩 الشكاوي</div>
+
+    <!-- التذييل -->
+    <div class="sidebar-footer" id="authBtn" onclick="toggleAuth()">🔐 تسجيل الدخول</div>
+</div>
 
     <div class="content">
         <!-- الرئيسية -->
