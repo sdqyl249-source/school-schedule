@@ -166,3 +166,11 @@ function updateUIState() {
         el.style.display = isAdmin ? 'block' : 'none';
     });
 }
+function toggleSidebar() {
+    const sidebar = document.getElementById("mySidebar");
+    if (sidebar.style.width === "0px") {
+        sidebar.style.width = "280px";
+    } else {
+        sidebar.style.width = "0px";
+    }
+}
