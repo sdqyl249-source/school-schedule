@@ -84,53 +84,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        let isAdmin = false;
-
-        function show(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        function toggleAuth() {
-            isAdmin = !isAdmin;
-            document.getElementById('authBtn').innerText = isAdmin ? "🔓 تسجيل الخروج" : "🔐 تسجيل الدخول";
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'block' : 'none');
-            document.getElementById('stuName').disabled = !isAdmin;
-        }
-
-        function addNews() {
-            const newsText = prompt("اكتب التبليغ الجديد:");
-            if(newsText) {
-                const date = new Date().toLocaleString('ar-IQ');
-                localStorage.setItem("news", JSON.stringify({text: newsText, date: date}));
-                renderNews();
-            }
-        }
-
-        function renderNews() {
-            const news = JSON.parse(localStorage.getItem("news"));
-            if(news) document.getElementById("news-display").innerHTML = `${news.text} <br><small style="color:gray">${news.date}</small>`;
-        }
-
-        function sendComplaint() {
-            let comps = JSON.parse(localStorage.getItem("complaints") || "[]");
-            comps.push({text: document.getElementById("compText").value, date: new Date().toLocaleString('ar-IQ')});
-            localStorage.setItem("complaints", JSON.stringify(comps));
-            alert("تم الإرسال!");
-        }
-
-        function viewComplaints() {
-            let comps = JSON.parse(localStorage.getItem("complaints") || "[]");
-            document.getElementById("list-content").innerHTML = comps.map(c => `<p style="border-bottom:1px solid #ccc">${c.text} (${c.date})</p>`).join('');
-        }
-
-        function downloadCert() {
-            html2pdf().from(document.getElementById('cert')).save('شهادة_تقدير.pdf');
-        }
-
-        window.onload = renderNews;
-    </script>
 </body>
 </html>
