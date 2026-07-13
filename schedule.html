@@ -3,33 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة رؤية - التطبيق المتكامل</title>
+    <title>منصة رؤية - التصميم المصغر</title>
     <style>
         :root { --primary: #5e72e4; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 15px; margin: 0; }
-        .nav-btns { display: flex; gap: 5px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
-        .btn { padding: 10px 15px; border: none; border-radius: 10px; cursor: pointer; color: white; font-weight: bold; font-size: 13px; }
-        .admin-panel { background: white; padding: 15px; border-radius: 20px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .accordion { background: var(--primary); color: white; padding: 15px; width: 100%; border: none; border-radius: 15px; margin-bottom: 10px; cursor: pointer; font-weight: bold; text-align: right; }
-        .full-day-card { background: white; border-radius: 20px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th, td { border: 1px solid #eee; padding: 8px; text-align: center; }
-        select, input { padding: 4px; border: 1px solid #ddd; border-radius: 5px; width: 90%; margin-top: 2px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 10px; margin: 0; }
+        .nav-btns { display: flex; gap: 5px; margin-bottom: 10px; justify-content: center; }
+        .btn { padding: 6px 12px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; font-size: 11px; }
+        .admin-panel { background: white; padding: 10px; border-radius: 15px; margin-bottom: 10px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .accordion { background: #34495e; color: white; padding: 10px; width: 100%; border: none; border-radius: 10px; margin-bottom: 5px; cursor: pointer; font-weight: bold; text-align: right; font-size: 13px; }
+        .full-day-card { background: white; padding: 10px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-right: 6px solid; border-radius: 5px; overflow-x: auto; display: none; }
+        table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        th, td { border: 1px solid #eee; padding: 4px; text-align: center; }
+        select, input { padding: 2px; border: 1px solid #ddd; border-radius: 3px; width: 95%; font-size: 10px; }
     </style>
 </head>
 <body>
 
 <div class="nav-btns">
-    <button class="btn" style="background:#5e72e4" onclick="login()">دخول الإدارة</button>
+    <button class="btn" style="background:#5e72e4" onclick="login()">دخول</button>
     <button class="btn" id="logoutBtn" style="background:#e74c3c; display:none;" onclick="logout()">خروج</button>
     <button class="btn" style="background:#27ae60" onclick="window.print()">🖨️ طباعة</button>
 </div>
 
 <div class="admin-panel" id="adminPanel" style="display:none;">
-    <select id="selG"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option></select>
-    <select id="selS"><option>أ</option><option>ب</option></select>
-    <button class="btn" style="background:#2dce89" onclick="addTable()">➕ إضافة</button>
-    <button class="btn" style="background:#e67e22" onclick="deleteTable()">🗑️ حذف</button>
+    <select id="selG" style="width:auto;"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option></select>
+    <select id="selS" style="width:auto;"><option>أ</option><option>ب</option></select>
+    <button class="btn" style="background:#2dce89" onclick="addTable()">➕</button>
+    <button class="btn" style="background:#e67e22" onclick="deleteTable()">🗑️</button>
 </div>
 
 <div id="app"></div>
@@ -68,6 +68,10 @@
         document.getElementById("logoutBtn").style.display = isMember ? "block" : "none";
         const app = document.getElementById("app"); app.innerHTML = "";
         
+        // مصفوفة ألوان لتمييز الشعب
+        const colors = ["#e74c3c", "#f1c40f", "#2ecc71", "#9b59b6", "#3498db", "#e67e22"];
+        let colorIdx = 0;
+
         for (let key in state.lessons) {
             const btn = document.createElement("button");
             btn.className = "accordion";
@@ -77,7 +81,8 @@
 
             const container = document.createElement("div");
             container.className = "full-day-card";
-            container.style.display = "none";
+            container.style.borderColor = colors[colorIdx % colors.length];
+            colorIdx++;
             
             let html = `<table><tr><th>حصة</th>${config.days.map(d=>`<th>${d}</th>`).join('')}</tr>`;
             for(let i=0; i<4; i++) {
