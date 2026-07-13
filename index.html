@@ -3,100 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة رؤية - النظام المتكامل</title>
-    <!-- استدعاء المكتبات -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
+    <title>منصة رؤية التعليمية</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { display: flex; height: 100vh; background-color: #f4f7f6; overflow: hidden; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; }
 
-        /* القائمة الجانبية (Sidebar) */
-        .sidebar { width: 280px; background-color: #1a237e; color: white; padding: 25px; display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
-        .sidebar-logo { text-align: center; margin-bottom: 40px; font-weight: bold; font-size: 26px; border-bottom: 1px solid #3949ab; padding-bottom: 20px; }
-        .nav-item { padding: 18px; cursor: pointer; border-radius: 12px; margin-bottom: 15px; transition: 0.3s; font-size: 16px; display: flex; align-items: center; gap: 10px; }
-        .nav-item:hover { background-color: #3949ab; }
-        .active { background-color: #3949ab; border-right: 4px solid #fff; }
+        /* شريط التبليغات */
+        .ticker { background: #d32f2f; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; overflow: hidden; white-space: nowrap; }
 
-        /* المنطقة الرئيسية */
-        .main-content { flex: 1; padding: 30px; overflow-y: auto; background-color: #fcf9f5; }
-        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        /* البطاقات الإحصائية */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
-        /* الجدول الاحترافي */
-        .table-container { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background-color: #1a237e; color: white; padding: 15px; text-align: center; font-size: 15px; }
-        td { padding: 15px; border-bottom: 1px solid #eee; text-align: center; font-size: 14px; color: #333; }
-        tr:hover { background-color: #f9f9f9; }
+        /* لوحة الإدارة */
+        .admin-panel { background: #e8eaf6; padding: 20px; border-radius: 10px; border: 2px dashed #1a237e; margin-bottom: 20px; display: none; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; background: #1a237e; color: white; margin: 5px; }
+
+        /* الشعب والنجوم */
+        .grid-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
         
-        /* الأزرار والأدوات */
-        .btn-add { background-color: #2196f3; color: white; padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.3s; }
-        .btn-add:hover { background-color: #1976d2; }
-        .btn-action { padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; margin: 0 3px; background: white; transition: 0.2s; }
-        .btn-action:hover { background: #f0f0f0; }
-        .btn-report { background-color: #7b1fa2; color: white; border: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        /* تنسيق الاقتراحات */
+        input, textarea { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-    <!-- القائمة الجانبية -->
-    <div class="sidebar">
-        <div class="sidebar-logo">منصة رؤية</div>
-        <div class="nav-item active">📋 قائمة الطلبة</div>
-        <div class="nav-item">📅 الجدول الدراسي</div>
-        <div class="nav-item">💰 المبيعات والمكتبة</div>
-        <div class="nav-item">⚙️ إعدادات النظام</div>
+<div class="container">
+    <!-- 2. التبليغات العاجلة -->
+    <div class="ticker">📢 تنبيه: موعد امتحانات نصف السنة اقترب، يرجى متابعة جداول الشعب الخاصة بكم.</div>
+
+    <!-- 1. الملخص الرقمي -->
+    <div class="stats-grid">
+        <div class="stat-card"><h3>الطلبة</h3><p>150</p></div>
+        <div class="stat-card"><h3>دروس اليوم</h3><p>6</p></div>
+        <div class="stat-card"><h3>التبليغات</h3><p>4</p></div>
+        <div class="stat-card"><h3>الشعب</h3><p>8</p></div>
     </div>
 
-    <!-- المحتوى الرئيسي -->
-    <div class="main-content">
-        <div class="header-bar">
-            <h2>سجل بيانات الطلبة</h2>
-            <button class="btn-add">+ إضافة طالب جديد</button>
-        </div>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>تسلسل</th>
-                        <th>الاسم الكامل</th>
-                        <th>رقم الملف</th>
-                        <th>العمر</th>
-                        <th>الجنس</th>
-                        <th>رقم الهاتف</th>
-                        <th>العنوان</th>
-                        <th>تقرير</th>
-                        <th>إجراءات</th>
-                    </tr>
-                </thead>
-                <tbody id="data-body">
-                    <!-- سيتم ملء البيانات ديناميكياً -->
-                    <tr>
-                        <td>1</td>
-                        <td>محمد علي حسن</td>
-                        <td>101</td>
-                        <td>15</td>
-                        <td>ذكر</td>
-                        <td>07701234567</td>
-                        <td>بغداد / المنصور</td>
-                        <td><button class="btn-report">تقرير</button></td>
-                        <td>
-                            <button class="btn-action">👁️</button>
-                            <button class="btn-action">✏️</button>
-                            <button class="btn-action">🗑️</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    <!-- 4. لوحة الإجراءات (تظهر للأعضاء فقط) -->
+    <div class="admin-panel" id="adminPanel">
+        <h3>⚙️ أدوات الإدارة</h3>
+        <button class="btn" onclick="alert('فتح نافذة نشر تبليغ')">نشر تبليغ</button>
+        <button class="btn" onclick="alert('رفع ملف PDF')">رفع ملازم (PDF)</button>
     </div>
 
-    <script>
-        // هنا يمكن ربط Firebase أو إضافة الوظائف التفاعلية
-        console.log("منصة رؤية - النظام يعمل بكفاءة");
-    </script>
+    <div class="grid-layout">
+        <!-- 3 & 5. الجداول والنجوم -->
+        <div>
+            <div class="card">
+                <h3>📅 حصص اليوم</h3>
+                <p>الرياضيات (شعبة أ) - 08:30 ص</p>
+                <button class="btn">عرض الجدول الكامل</button>
+            </div>
+            <div class="card">
+                <h3>⭐ نجوم الأسبوع</h3>
+                <p>الطالب: محمد علي - متميز في النشاط الأكاديمي</p>
+            </div>
+        </div>
+
+        <!-- 6. صندوق الاقتراحات -->
+        <div class="card">
+            <h3>📩 تواصل معنا</h3>
+            <input type="text" placeholder="اسمك (اختياري)">
+            <textarea placeholder="رسالتك..."></textarea>
+            <button class="btn" style="width:100%">إرسال</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // لمحاكاة تسجيل دخول العضو:
+    // في الواقع، هذا سيتحقق من حالة المصادقة في Firebase
+    const isAdmin = true; // قم بتغييرها إلى false لاختبار إخفاء اللوحة
+    if(isAdmin) {
+        document.getElementById('adminPanel').style.display = 'block';
+    }
+</script>
+
 </body>
 </html>
