@@ -10,47 +10,34 @@ const firebaseConfig = {
 };
 const database = firebase.database();
 
-// 2. التحقق من حالة الدخول عند تحميل الصفحة
+// 2. التحقق عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
-    // التحقق من حالة الجلسة الخاصة بك
     if (localStorage.getItem('roya_session_active') === "true") {
         setUIAzAdmin();
+        // تفعيل أزرار الأستاذ فوراً
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
     }
+    renderNews(); // عرض التبليغ
     
-    // تفعيل عرض التبليغات
-    renderNews();
-    
-    // استدعاء الدوال الأصلية الخاصة بك
+    // استدعاء الدوال الأصلية
     if(typeof loadTickerText === 'function') loadTickerText();
     if(typeof loadHonorStudents === 'function') loadHonorStudents();
     if(typeof loadGallery === 'function') loadGallery();
     if(typeof loadScheduleData === 'function') loadScheduleData();
 });
 
-// 3. نظام الصلاحيات (دمج الدوال الجديدة)
-function updateUIState() {
-    const isAdmin = localStorage.getItem("isAdmin") === "true";
-    const authBtn = document.getElementById("authBtn");
-    
-    if (authBtn) authBtn.innerText = isAdmin ? "🔓 تسجيل الخروج" : "🔐 تسجيل الدخول";
-    
-    document.querySelectorAll('.admin-only').forEach(el => {
-        el.style.display = isAdmin ? 'block' : 'none';
-    });
-    
-    const stuNameField = document.getElementById('stuName');
-    if (stuNameField) stuNameField.disabled = !isAdmin;
-}
-
+// 3. نظام الصلاحيات (الدالة الموحدة)
 function toggleAuth() {
     let isAdmin = localStorage.getItem("isAdmin") === "true";
-    localStorage.setItem("isAdmin", !isAdmin);
-    localStorage.setItem("roya_session_active", !isAdmin ? "true" : "false");
-    updateUIState();
-    location.reload();
+    let newState = !isAdmin;
+    localStorage.setItem("isAdmin", newState);
+    localStorage.setItem("roya_session_active", newState ? "true" : "false");
+    
+    alert(newState ? "تم تفعيل وضع الإدارة" : "تم الخروج من وضع الإدارة");
+    location.reload(); 
 }
 
-// 4. نظام التبليغات (باستخدام localStorage كما طلبت)
+// 4. نظام التبليغات (الدالة الموحدة والمطورة)
 function addNews() {
     const newsText = prompt("أدخل التبليغ الجديد:");
     if (!newsText) return;
@@ -77,15 +64,15 @@ function renderNews() {
     }
 }
 
-// 5. نظام الشكاوي
+// 5. نظام الشكاوي (الدالة الموحدة)
 function sendComplaint() {
     const input = document.getElementById("compText");
     if (!input || !input.value) return alert("الرجاء كتابة الشكوى");
     
     let complaints = JSON.parse(localStorage.getItem("complaints") || "[]");
     complaints.push({
-        content: input.value,
-        timestamp: new Date().toLocaleString('ar-IQ')
+        text: input.value,
+        date: new Date().toLocaleString('ar-IQ')
     });
     
     localStorage.setItem("complaints", JSON.stringify(complaints));
@@ -93,14 +80,33 @@ function sendComplaint() {
     alert("تم إرسال شكواك للإدارة.");
 }
 
-// 6. الدوال الأصلية الخاصة بمنصتك
+function viewComplaints() {
+    let comps = JSON.parse(localStorage.getItem("complaints") || "[]");
+    const list = document.getElementById("list-content");
+    if (list) {
+        list.innerHTML = comps.map(c => `<p style="border-bottom:1px solid #ccc; padding:5px;">${c.text} <br><small style="color:gray">${c.date}</small></p>`).join('');
+    }
+}
+
+// 6. دوال إضافية
+function show(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function downloadCert() {
+    if(typeof html2pdf !== 'undefined') {
+        html2pdf().from(document.getElementById('cert')).save('شهادة_تقدير.pdf');
+    } else {
+        alert("مكتبة PDF غير محملة");
+    }
+}
+
 function setUIAzAdmin() {
     const loginNavBtn = document.getElementById('login-nav-btn');
     if (loginNavBtn) { 
         loginNavBtn.innerHTML = `👋 الإدارة | <span onclick="logoutCurrentMember(event)" style="color:red; cursor:pointer;">خروج</span>`;
     }
-    if(document.getElementById('admin-main-dashboard')) document.getElementById('admin-main-dashboard').style.display = 'block';
-    if(document.getElementById('admin-gallery-control')) document.getElementById('admin-gallery-control').style.display = 'block';
 }
 
 function logoutCurrentMember(event) {
@@ -108,11 +114,4 @@ function logoutCurrentMember(event) {
     localStorage.removeItem('roya_session_active'); 
     localStorage.setItem('isAdmin', "false");
     window.location.reload();
-}
-
-// Service Worker
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js');
-    });
 }
