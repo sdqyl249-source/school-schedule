@@ -2,81 +2,66 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>منصة رؤية التعليمية</title>
+    <title>منصة رؤية - تصميم احترافي</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { display: flex; height: 100vh; background-color: #f4f7f6; transition: 0.3s; }
+        :root { --primary: #1a237e; --secondary: #3949ab; --accent: #ff4081; --bg: #eef2f3; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; transition: all 0.3s ease; }
+        body { display: flex; height: 100vh; background-color: var(--bg); overflow: hidden; }
 
-        /* القائمة الجانبية */
-        .sidebar { width: 260px; background-color: #1a237e; color: white; display: flex; flex-direction: column; position: relative; transition: 0.3s; }
-        .sidebar.closed { width: 0; overflow: hidden; }
-        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid #303f9f; }
-        .sidebar-nav { flex: 1; padding: 10px; }
-        .nav-item { padding: 15px; cursor: pointer; border-bottom: 1px solid #303f9f; }
-        .sidebar-footer { padding: 20px; border-top: 1px solid #303f9f; cursor: pointer; background: #303f9f; text-align: center; }
+        /* Sidebar Modern */
+        .sidebar { width: 260px; background: linear-gradient(180deg, var(--primary), #0d47a1); color: white; display: flex; flex-direction: column; box-shadow: 5px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-header { padding: 30px 20px; font-size: 24px; font-weight: bold; text-align: center; }
+        .nav-item { padding: 18px 25px; cursor: pointer; border-left: 4px solid transparent; }
+        .nav-item:hover { background: rgba(255,255,255,0.1); border-left: 4px solid var(--accent); transform: translateX(5px); }
+        .sidebar-footer { margin-top: auto; padding: 20px; background: rgba(0,0,0,0.2); text-align: center; cursor: pointer; }
+
+        /* Main Content Animation */
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; animation: fadeIn 0.8s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* المحتوى */
-        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
-        .section { display: none; }
-        .active { display: block; }
-        .card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .admin-only { display: none; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        h3 { color: var(--primary); margin-bottom: 15px; }
+
+        /* Button Pro */
+        .btn { padding: 12px 25px; border: none; border-radius: 50px; cursor: pointer; color: white; font-weight: bold; background: var(--secondary); }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <button onclick="toggleSidebar()" style="float:left; cursor:pointer;">X</button>
-            <h2>👁️ رؤية</h2>
-        </div>
+    <div class="sidebar">
+        <div class="sidebar-header">👁️ منصة رؤية</div>
         <div class="sidebar-nav">
-            <div class="nav-item" onclick="showSection('home')">🏠 الرئيسية</div>
-            <div class="nav-item" onclick="showSection('classes')">🏫 الشعب الدراسية</div>
-            <div class="nav-item" onclick="showSection('schedule')">📅 جدول الدروس</div>
-            <div class="nav-item" onclick="showSection('honor')">🏆 لوحة الشرف</div>
+            <div class="nav-item" onclick="show('home')">🏠 الرئيسية</div>
+            <div class="nav-item" onclick="show('classes')">🏫 الشعب الدراسية</div>
+            <div class="nav-item" onclick="show('schedule')">📅 الجدول</div>
         </div>
-        <div class="sidebar-footer" onclick="toggleAuth()" id="authBtn">🔐 تسجيل الدخول</div>
+        <div class="sidebar-footer" id="authBtn" onclick="toggleAuth()">🔐 تسجيل الدخول</div>
     </div>
 
     <div class="main-content">
-        <button onclick="toggleSidebar()">☰ القائمة</button>
-        
-        <div id="home" class="section active">
-            <div class="card"><h3>📢 آخر الأخبار</h3><p>• تنبيه: غداً عطلة رسمية.</p></div>
-        </div>
-
-        <div id="schedule" class="section">
+        <div id="home" class="page">
             <div class="card">
-                <h3>📅 جدول الدروس</h3>
-                <table width="100%" border="1" cellpadding="10" style="border-collapse: collapse;">
-                    <tr><th>اليوم</th><th>المادة</th><th>الوقت</th></tr>
-                    <tr><td>الأحد</td><td>اقتصاد قياسي</td><td>9:00 - 11:00</td></tr>
-                </table>
+                <h3>مرحباً بك في لوحة التحكم</h3>
+                <p>هذا التصميم يعتمد على تجربة مستخدم (UX) انسيابية.</p>
             </div>
         </div>
-
-        <!-- الأقسام الأخرى (الشعب، الشرف) تبقى كما هي -->
-        <div id="classes" class="section">...</div>
-        <div id="honor" class="section">...</div>
+        <!-- يمكنك إضافة باقي الأقسام هنا -->
     </div>
 
     <script>
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('closed');
+        function show(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
         }
 
-        function showSection(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        let isAdmin = false;
         function toggleAuth() {
-            isAdmin = !isAdmin;
-            document.getElementById('authBtn').innerText = isAdmin ? "🔓 تسجيل الخروج" : "🔐 تسجيل الدخول";
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'block' : 'none');
+            const btn = document.getElementById('authBtn');
+            btn.style.background = btn.style.background === 'rgb(255, 64, 129)' ? '' : '#ff4081';
+            btn.innerText = btn.innerText === '🔐 تسجيل الدخول' ? '🔓 تسجيل الخروج' : '🔐 تسجيل الدخول';
         }
     </script>
 </body>
