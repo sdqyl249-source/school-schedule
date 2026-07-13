@@ -2,76 +2,121 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>منصة رؤية التعليمية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة رؤية التعليمية المتكاملة</title>
+    <!-- مكتبة توليد ملفات PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; display: flex; }
-        .sidebar { width: 250px; background: #1a237e; color: white; height: 100vh; padding: 20px; position: fixed; }
-        .main { margin-right: 250px; padding: 20px; width: 100%; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { display: flex; height: 100vh; background-color: #f4f7f6; overflow: hidden; }
+
+        /* القائمة الجانبية */
+        .sidebar { width: 260px; background-color: #1a237e; color: white; padding: 20px; display: flex; flex-direction: column; }
+        .sidebar h2 { margin-bottom: 30px; text-align: center; border-bottom: 1px solid #303f9f; padding-bottom: 10px; }
+        .nav-item { padding: 15px; color: #cfd8dc; cursor: pointer; transition: 0.3s; border-radius: 5px; margin-bottom: 5px; }
+        .nav-item:hover { background: #303f9f; color: white; }
+        
+        /* المحتوى */
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
+        .section { display: none; }
+        .active { display: block; }
         .card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .btn { padding: 10px 20px; border: none; cursor: pointer; border-radius: 4px; color: white; }
-        .btn-admin { display: none; background: #d32f2f; } /* يظهر للأعضاء فقط */
-        .hidden { display: none; }
+        .admin-only { display: none; } /* مخفي افتراضياً للزوار */
+        
+        /* أزرار */
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; margin-top: 10px; }
+        .btn-blue { background: #2196f3; }
+        .btn-green { background: #4caf50; }
+        .btn-red { background: #d32f2f; }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <h2>👁️ رؤية</h2>
-    <div onclick="showSection('home')">🏠 الرئيسية</div><br>
-    <div onclick="showSection('honor')">🏆 لوحة الشرف</div><br>
-    <div onclick="showSection('complaint')">📩 الشكاوي</div>
-</div>
+    <div class="sidebar">
+        <h2>👁️ منصة رؤية</h2>
+        <div class="nav-item" onclick="showSection('home')">🏠 الرئيسية</div>
+        <div class="nav-item" onclick="showSection('classes')">🏫 الشعب الدراسية</div>
+        <div class="nav-item" onclick="showSection('honor')">🏆 لوحة الشرف</div>
+        <div class="nav-item" onclick="showSection('complaints')">📩 صندوق الشكاوي</div>
+        <div class="nav-item" onclick="toggleAuth()" id="authLink">🔐 تسجيل الدخول</div>
+    </div>
 
-<div class="main">
-    <!-- الرئيسية وآخر الأخبار -->
-    <div id="home" class="section">
-        <div class="card">
-            <h3>📢 آخر الأخبار</h3>
-            <ul><li>تنبيه: تحديث جدول الامتحانات النهائي يوم الخميس.</li></ul>
+    <div class="main-content">
+        <!-- الرئيسية والأخبار -->
+        <div id="home" class="section active">
+            <div class="card">
+                <h3>📢 آخر الأخبار والتبليغات</h3>
+                <p>• تذكير: الامتحانات النهائية ستبدأ الأسبوع القادم.</p>
+                <p>• تم تحديث المكتبة الرقمية بملزمات جديدة.</p>
+            </div>
+        </div>
+
+        <!-- الشعب الدراسية -->
+        <div id="classes" class="section">
+            <div class="card">
+                <h3>قائمة الشعب</h3>
+                <table width="100%" border="1" cellpadding="10" style="border-collapse: collapse; margin-top: 10px;">
+                    <tr><th>الصف</th><th>الشعبة</th><th class="admin-only">رمز الشعبة</th><th>إجراء</th></tr>
+                    <tr>
+                        <td>الأول</td><td>(أ)</td>
+                        <td class="admin-only">A101</td>
+                        <td><button class="btn btn-green admin-only" onclick="alert('تم نشر التبليغ')">نشر تبليغ</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- لوحة الشرف -->
+        <div id="honor" class="section">
+            <div class="card">
+                <h3>لوحة الشرف</h3>
+                <div id="certCard" style="border: 2px solid #1a237e; padding: 20px; width: 350px; text-align: center; margin-bottom: 10px;">
+                    <h2>شهادة تقدير</h2>
+                    <input type="text" id="stuName" placeholder="اسم الطالب" style="width: 90%; margin: 10px 0;" disabled>
+                    <p>لحصوله على أعلى الدرجات.</p>
+                </div>
+                <button class="btn btn-blue" onclick="downloadPDF()">تحميل PDF للزوار</button>
+                <button class="btn btn-red admin-only" onclick="saveCert()">حفظ التعديلات (للأساتذة)</button>
+            </div>
+        </div>
+
+        <!-- الشكاوي -->
+        <div id="complaints" class="section">
+            <div class="card">
+                <h3>صندوق الشكاوي والمقترحات</h3>
+                <textarea style="width: 100%; height: 80px;" placeholder="اكتب شكواك هنا..."></textarea><br>
+                <button class="btn btn-blue" onclick="alert('تم إرسال شكواك للإدارة')">إرسال</button>
+            </div>
         </div>
     </div>
 
-    <!-- لوحة الشرف -->
-    <div id="honor" class="section hidden">
-        <div id="cert" class="card" style="border: 2px solid #1a237e; width: 400px; text-align: center;">
-            <h2>شهادة تقدير</h2>
-            <p>يُشهد بأن الطالب: <input type="text" id="stuName" placeholder="اسم الطالب"></p>
-            <button class="btn" style="background:#1a237e" onclick="downloadCert()">تحميل PDF</button>
-        </div>
-    </div>
+    <script>
+        let isAdmin = false;
 
-    <!-- صندوق الشكاوي -->
-    <div id="complaint" class="section hidden">
-        <textarea id="compText" placeholder="اكتب شكوتك هنا..."></textarea>
-        <button class="btn" style="background:green" onclick="sendComplaint()">إرسال</button>
-    </div>
-</div>
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
 
-<script>
-    // تبديل الأقسام
-    function showSection(id) {
-        document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-    }
+        function toggleAuth() {
+            isAdmin = !isAdmin;
+            document.getElementById('authLink').innerText = isAdmin ? "🔓 تسجيل الخروج" : "🔐 تسجيل الدخول";
+            // إظهار/إخفاء أدوات الأساتذة
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = isAdmin ? 'table-cell' : 'none';
+                if(el.tagName === 'BUTTON') el.style.display = isAdmin ? 'inline-block' : 'none';
+            });
+            document.getElementById('stuName').disabled = !isAdmin;
+            alert(isAdmin ? "تم الدخول بصلاحية أستاذ" : "تم تسجيل الخروج");
+        }
 
-    // توليد PDF
-    function downloadCert() {
-        const element = document.getElementById('cert');
-        html2pdf().from(element).save('شهادة.pdf');
-    }
+        function downloadPDF() {
+            html2pdf().from(document.getElementById('certCard')).save('شهادة_تقدير.pdf');
+        }
 
-    // إرسال الشكوى
-    function sendComplaint() {
-        alert("تم إرسال الشكوى للإدارة بنجاح!");
-    }
-
-    // منطق تسجيل الدخول البسيط (محاكاة)
-    const isAdmin = false; // قم بتغييرها لـ true لتجربة صلاحيات الأستاذ
-    if(isAdmin) {
-        document.querySelectorAll('.btn-admin').forEach(b => b.style.display = 'inline-block');
-    }
-</script>
-
+        function saveCert() {
+            alert("تم حفظ بيانات الشهادة في قاعدة البيانات بنجاح!");
+        }
+    </script>
 </body>
 </html>
