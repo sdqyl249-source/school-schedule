@@ -77,25 +77,43 @@ function sendComplaint() {
     const input = document.getElementById("compText");
     if (!input || !input.value) return alert("الرجاء كتابة الشكوى");
     
-    let complaints = JSON.parse(localStorage.getItem("complaints") || "[]");
-    complaints.push({
-        text: input.value,
-        date: new Date().toLocaleString('ar-IQ')
-    });
-    
-    localStorage.setItem("complaints", JSON.stringify(complaints));
-    input.value = "";
-    alert("تم إرسال شكواك للإدارة.");
+    // إضافة الشكوى إلى قاعدة البيانات
+    database.ref('complaints').push({
+        content: input.value,
+        timestamp: new Date().toLocaleString('ar-IQ'),
+        status: 'جديدة' // إضافة حالة للشكوى
+    }).then(() => {
+        alert("تم إرسال شكواك للإدارة بنجاح!");
+        input.value = "";
+    }).catch(err => alert("حدث خطأ أثناء الإرسال: " + err));
 }
 
 function viewComplaints() {
-    let comps = JSON.parse(localStorage.getItem("complaints") || "[]");
-    const list = document.getElementById("list-content");
-    if (list) {
-        list.innerHTML = comps.map(c => `<p style="border-bottom:1px solid #ccc; padding:5px;">${c.text} <br><small style="color:gray">${c.date}</small></p>`).join('');
-    }
-}
+    const listContent = document.getElementById("list-content");
+    if (!listContent) return;
 
+    listContent.innerHTML = "جاري تحميل الشكاوى...";
+
+    database.ref('complaints').once('value').then((snapshot) => {
+        const complaints = snapshot.val();
+        if (!complaints) {
+            listContent.innerHTML = "<p>لا توجد شكاوى حالياً.</p>";
+            return;
+        }
+
+        // تحويل البيانات من Firebase إلى مصفوفة لعرضها
+        let html = "";
+        Object.keys(complaints).forEach(key => {
+            const c = complaints[key];
+            html += `
+                <div style="padding: 15px; border-bottom: 2px solid #eee; margin-bottom: 10px; background: #fff;">
+                    <p style="font-size: 1em;">${c.content}</p>
+                    <small style="color: #666;">تاريخ الإرسال: ${c.timestamp}</small>
+                </div>`;
+        });
+        listContent.innerHTML = html;
+    });
+}
 // 6. دوال إضافية
 function show(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
