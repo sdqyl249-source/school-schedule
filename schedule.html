@@ -2,33 +2,47 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>منصة رؤية - النظام المدرسي المتكامل</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; padding: 20px; }
-        .nav-btns { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-        .admin-panel { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
-        .accordion { background: #2c3e50; color: white; padding: 15px; width: 100%; border: none; border-radius: 8px; margin-bottom: 5px; cursor: pointer; text-align: right; font-size: 18px; font-weight: bold; }
-        .panel { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 16px; }
-        th { background-color: #34495e; color: white; padding: 15px; border: 1px solid #bdc3c7; }
-        td { padding: 10px; border: 1px solid #bdc3c7; text-align: center; }
-        select, input { width: 95%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; margin-top: 5px; font-size: 14px; }
-        .btn { padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; margin: 5px; }
+        :root {
+            --primary: #5e72e4;
+            --bg: #f8f9fe;
+            --text: #32325d;
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); padding: 15px; margin: 0; color: var(--text); }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 15px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .stat-box { padding: 20px; border-radius: 20px; color: white; font-weight: bold; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        .admin-panel { background: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .accordion { background: #fff; border: 1px solid #e9ecef; padding: 15px; width: 100%; border-radius: 15px; margin-bottom: 10px; cursor: pointer; text-align: right; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        
+        .panel { background: white; padding: 15px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: none; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { color: #8898aa; font-size: 12px; padding: 10px; }
+        td { padding: 8px; border-bottom: 1px solid #f0f0f0; text-align: center; }
+        
+        select, input { width: 90%; padding: 8px; border: 1px solid #ddd; border-radius: 10px; font-size: 12px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; margin: 5px; }
     </style>
 </head>
 <body>
 
-<div class="nav-btns">
-    <button class="btn" style="background:#34495e" onclick="window.location.href='index.html'">🏠 الرئيسية</button>
-    <button class="btn" style="background:#3498db" onclick="login()">دخول الإدارة</button>
-    <button class="btn" id="logoutBtn" style="background:#e74c3c; display:none;" onclick="logout()">خروج</button>
-    <button class="btn" style="background:#27ae60" onclick="window.print()">🖨️ طباعة الجدول</button>
+<div class="header">
+    <h3>منصة رؤية</h3>
+    <div>
+        <button class="btn" style="background:#5e72e4" onclick="login()">دخول</button>
+        <button class="btn" id="logoutBtn" style="background:#e74c3c; display:none;" onclick="logout()">خروج</button>
+    </div>
 </div>
 
 <div class="admin-panel" id="adminPanel" style="display:none;">
-    <select id="selG" style="width:150px;"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option><option>الخامس</option><option>السادس</option></select>
-    <select id="selS" style="width:150px;"><option>أ</option><option>ب</option><option>ج</option></select>
-    <button class="btn" style="background:#f39c12" onclick="addSpecificTable()">➕ إنشاء جدول جديد</button>
+    <select id="selG"><option>الأول</option><option>الثاني</option><option>الثالث</option></select>
+    <select id="selS"><option>أ</option><option>ب</option></select>
+    <button class="btn" style="background:#2dce89" onclick="addSpecificTable()">إضافة جدول</button>
 </div>
 
 <div id="app"></div>
@@ -45,10 +59,7 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    let state = { 
-        lessons: {}, 
-        subjects: ["رياضيات", "علوم", "اللغة العربية", "إنجليزي", "الاسلامية", "فنية", "رياضة", "الاجتماعيات"] 
-    };
+    let state = { lessons: {}, subjects: ["رياضيات", "علوم", "عربي", "إنجليزي"] };
     let isMember = localStorage.getItem("userRole") === "member";
 
     function login() { if(prompt("كلمة المرور:")==="2026") { localStorage.setItem("userRole","member"); location.reload(); } }
@@ -79,19 +90,19 @@
         for (let key in state.lessons) {
             const btn = document.createElement("button");
             btn.className = "accordion";
-            btn.innerHTML = `📋 جدول الصف ${key}`;
+            btn.innerHTML = `📋 جدول الصف ${key} <span>▼</span>`;
             btn.onclick = function() { this.nextElementSibling.style.display = (this.nextElementSibling.style.display === "block") ? "none" : "block"; };
             app.appendChild(btn);
 
             const panel = document.createElement("div");
             panel.className = "panel";
-            let html = `<table><thead><tr><th>حصة</th><th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th></tr></thead><tbody>`;
+            let html = `<table><thead><tr><th>حصة</th><th>أحد</th><th>إثنين</th><th>ثلاثاء</th><th>أربعاء</th><th>خميس</th></tr></thead><tbody>`;
             for(let i=0; i<4; i++) {
                 html += `<tr><td>${i+1}</td>`;
                 for(let d=0; d<5; d++) {
                     html += `<td>${isMember ? 
-                        `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">مادة</option>${state.subjects.map(sub=>`<option value="${sub}" ${state.lessons[key][i][d].sub==sub?'selected':''}>${sub}</option>`).join('')}</select>
-                         <input type="text" placeholder="اسم الأستاذ" value="${state.lessons[key][i][d].tea || ''}" onchange="update('${key}',${i},${d},'tea',this.value)">`
+                        `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">مادة</option>${state.subjects.map(s=>`<option value="${s}" ${state.lessons[key][i][d].sub==s?'selected':''}>${s}</option>`).join('')}</select>
+                         <input type="text" placeholder="الأستاذ" value="${state.lessons[key][i][d].tea || ''}" onchange="update('${key}',${i},${d},'tea',this.value)">`
                         : (state.lessons[key][i][d].sub || "-")}</td>`;
                 } html += `</tr>`;
             }
@@ -99,7 +110,6 @@
             app.appendChild(panel);
         }
     }
-    render();
 </script>
 </body>
 </html>
