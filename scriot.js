@@ -30,10 +30,18 @@ document.addEventListener('DOMContentLoaded', () => {
 function toggleAuth() {
     let isAdmin = localStorage.getItem("isAdmin") === "true";
     let newState = !isAdmin;
+    
+    // حفظ الحالة الجديدة
     localStorage.setItem("isAdmin", newState);
     localStorage.setItem("roya_session_active", newState ? "true" : "false");
     
-    alert(newState ? "تم تفعيل وضع الإدارة" : "تم الخروج من وضع الإدارة");
+    // تحديث الواجهة فوراً
+    updateUIState();
+    
+    // الرسالة التي تظهر لك
+    alert("تم تفعيل وضع الإدارة");
+    
+    // إعادة التحميل ليظهر كل شيء بشكل سليم
     location.reload(); 
 }
 
