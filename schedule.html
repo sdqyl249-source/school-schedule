@@ -3,46 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>منصة رؤية - النظام المدرسي المتكامل</title>
+    <title>منصة رؤية - التطبيق المدرسي</title>
     <style>
         :root {
             --primary: #5e72e4;
-            --bg: #f8f9fe;
-            --text: #32325d;
+            --bg: #f4f7f6;
+            --card-shadow: 0 4px 10px rgba(0,0,0,0.08);
         }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); padding: 15px; margin: 0; color: var(--text); }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); padding: 15px; margin: 0; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 15px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .header { background: white; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 20px; box-shadow: var(--card-shadow); }
         
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .stat-box { padding: 20px; border-radius: 20px; color: white; font-weight: bold; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .admin-panel { background: white; padding: 15px; border-radius: 20px; margin-bottom: 20px; box-shadow: var(--card-shadow); text-align: center; }
         
-        .admin-panel { background: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .accordion { background: #fff; border: 1px solid #e9ecef; padding: 15px; width: 100%; border-radius: 15px; margin-bottom: 10px; cursor: pointer; text-align: right; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .accordion { 
+            background: var(--primary); color: white; padding: 15px; width: 100%; border: none; 
+            border-radius: 15px; margin-bottom: 10px; cursor: pointer; text-align: right; 
+            font-weight: bold; font-size: 16px; display: flex; justify-content: space-between;
+        }
+
+        .lesson-card { 
+            background: white; border-radius: 15px; padding: 15px; margin-bottom: 10px; 
+            box-shadow: var(--card-shadow); display: flex; flex-direction: column; gap: 10px;
+        }
+
+        .lesson-info { display: flex; justify-content: space-between; align-items: center; }
         
-        .panel { background: white; padding: 15px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: none; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th { color: #8898aa; font-size: 12px; padding: 10px; }
-        td { padding: 8px; border-bottom: 1px solid #f0f0f0; text-align: center; }
+        select, input { padding: 8px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; width: 48%; }
         
-        select, input { width: 90%; padding: 8px; border: 1px solid #ddd; border-radius: 10px; font-size: 12px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; margin: 5px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h3>منصة رؤية</h3>
-    <div>
-        <button class="btn" style="background:#5e72e4" onclick="login()">دخول</button>
-        <button class="btn" id="logoutBtn" style="background:#e74c3c; display:none;" onclick="logout()">خروج</button>
-    </div>
+    <h2>منصة رؤية</h2>
+    <button class="btn" style="background:#5e72e4" onclick="login()">دخول الإدارة</button>
+    <button class="btn" id="logoutBtn" style="background:#e74c3c; display:none;" onclick="logout()">خروج</button>
 </div>
 
 <div class="admin-panel" id="adminPanel" style="display:none;">
     <select id="selG"><option>الأول</option><option>الثاني</option><option>الثالث</option></select>
     <select id="selS"><option>أ</option><option>ب</option></select>
-    <button class="btn" style="background:#2dce89" onclick="addSpecificTable()">إضافة جدول</button>
+    <button class="btn" style="background:#2dce89" onclick="addSpecificTable()">➕ إنشاء</button>
 </div>
 
 <div id="app"></div>
@@ -91,23 +94,38 @@
             const btn = document.createElement("button");
             btn.className = "accordion";
             btn.innerHTML = `📋 جدول الصف ${key} <span>▼</span>`;
-            btn.onclick = function() { this.nextElementSibling.style.display = (this.nextElementSibling.style.display === "block") ? "none" : "block"; };
+            btn.onclick = function() { 
+                const panel = this.nextElementSibling;
+                panel.style.display = (panel.style.display === "block") ? "none" : "block"; 
+            };
             app.appendChild(btn);
 
-            const panel = document.createElement("div");
-            panel.className = "panel";
-            let html = `<table><thead><tr><th>حصة</th><th>أحد</th><th>إثنين</th><th>ثلاثاء</th><th>أربعاء</th><th>خميس</th></tr></thead><tbody>`;
+            const container = document.createElement("div");
+            container.style.display = "none";
+            
+            // تحويل كل حصة إلى بطاقة
             for(let i=0; i<4; i++) {
-                html += `<tr><td>${i+1}</td>`;
                 for(let d=0; d<5; d++) {
-                    html += `<td>${isMember ? 
-                        `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">مادة</option>${state.subjects.map(s=>`<option value="${s}" ${state.lessons[key][i][d].sub==s?'selected':''}>${s}</option>`).join('')}</select>
-                         <input type="text" placeholder="الأستاذ" value="${state.lessons[key][i][d].tea || ''}" onchange="update('${key}',${i},${d},'tea',this.value)">`
-                        : (state.lessons[key][i][d].sub || "-")}</td>`;
-                } html += `</tr>`;
+                    const div = document.createElement("div");
+                    div.className = "lesson-card";
+                    div.innerHTML = `
+                        <div class="lesson-info">
+                            <strong>الحصة ${i+1} - اليوم ${d+1}</strong>
+                        </div>
+                        ${isMember ? 
+                            `<div style="display:flex; gap:5px;">
+                                <select onchange="update('${key}',${i},${d},'sub',this.value)">
+                                    <option value="">المادة</option>
+                                    ${state.subjects.map(s=>`<option value="${s}" ${state.lessons[key][i][d].sub==s?'selected':''}>${s}</option>`).join('')}
+                                </select>
+                                <input type="text" placeholder="اسم الأستاذ" value="${state.lessons[key][i][d].tea || ''}" onchange="update('${key}',${i},${d},'tea',this.value)">
+                            </div>`
+                            : `<div>المادة: ${state.lessons[key][i][d].sub || "غير محدد"} | الأستاذ: ${state.lessons[key][i][d].tea || "-"}</div>`
+                        }`;
+                    container.appendChild(div);
+                }
             }
-            panel.innerHTML = html + "</tbody></table>";
-            app.appendChild(panel);
+            app.appendChild(container);
         }
     }
 </script>
