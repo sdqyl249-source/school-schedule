@@ -7,12 +7,12 @@
   "theme_color": "#4a90e2",
   "icons": [
     {
-      "src": "icon roya.png",
+      "src": "icon-roya.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon roya.png",
+      "src": "icon-roya.png",
       "sizes": "512x512",
       "type": "image/png"
     }
