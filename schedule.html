@@ -4,25 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة رؤية - النظام المدرسي</title>
-    <style>
-        :root { --primary: #5e72e4; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 15px; margin: 0; }
-        
-        /* تكبير وتنسيق الأزرار العلوية */
-        .nav-btns { display: flex; gap: 15px; margin-bottom: 20px; justify-content: center; }
-        .btn { padding: 14px 25px; border: none; border-radius: 15px; cursor: pointer; color: white; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        
-        .admin-panel { background: white; padding: 20px; border-radius: 20px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .accordion { background: #34495e; color: white; padding: 18px; width: 100%; border: none; border-radius: 15px; margin-bottom: 10px; cursor: pointer; font-weight: bold; text-align: right; font-size: 18px; }
-        
-        .full-day-card { background: white; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-right: 8px solid; border-radius: 10px; overflow-x: auto; display: none; }
-        table { width: 100%; border-collapse: collapse; font-size: 15px; }
-        th { background: #f8f9fe; padding: 14px; border: 1px solid #ddd; }
-        td { padding: 12px; border: 1px solid #eee; text-align: center; }
-        
-        /* تنسيق الحقول */
-        select, input { padding: 10px; border: 1px solid #ccc; border-radius: 8px; width: 95%; font-size: 14px; margin: 3px 0; }
-    </style>
+    <!-- يمكنك وضع تنسيق CSS الخاص بك هنا -->
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
 
@@ -33,83 +16,19 @@
 </div>
 
 <div class="admin-panel" id="adminPanel" style="display:none;">
-    <select id="selG" style="width:auto; padding: 10px;"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option></select>
-    <select id="selS" style="width:auto; padding: 10px;"><option>أ</option><option>ب</option></select>
-    <button class="btn" style="background:#2dce89; font-size: 14px; padding: 10px;" onclick="addTable()">➕ إضافة</button>
-    <button class="btn" style="background:#e67e22; font-size: 14px; padding: 10px;" onclick="deleteTable()">🗑️ حذف</button>
+    <select id="selG"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option></select>
+    <select id="selS"><option>أ</option><option>ب</option></select>
+    <button class="btn" style="background:#2dce89" onclick="addTable()">➕ إضافة</button>
+    <button class="btn" style="background:#e67e22" onclick="deleteTable()">🗑️ حذف</button>
 </div>
 
 <div id="app"></div>
 
+<!-- مكتبات Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
-<script>
-    const firebaseConfig = { apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI", databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com", projectId: "roya-platform-26860" };
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    const config = { days: ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس"], subjects: ["رياضيات", "علوم", "عربي", "إنجليزي", "رياضة"] };
-    let state = { lessons: {} };
-    let isMember = localStorage.getItem("userRole") === "member";
-
-    function login() { if(prompt("كلمة المرور:")==="2026") { localStorage.setItem("userRole","member"); location.reload(); } }
-    function logout() { localStorage.setItem("userRole","visitor"); location.reload(); }
-
-    database.ref('school_data').on('value', (snapshot) => { if(snapshot.exists()) { state = snapshot.val(); render(); } });
-
-    function addTable() {
-        const key = document.getElementById("selG").value + "-" + document.getElementById("selS").value;
-        if(!state.lessons[key]) { state.lessons[key] = Array(4).fill(null).map(() => Array(5).fill({sub:"", tea:""})); database.ref('school_data').set(state); }
-    }
-
-    function deleteTable() {
-        const key = document.getElementById("selG").value + "-" + document.getElementById("selS").value;
-        if(state.lessons[key]) { delete state.lessons[key]; database.ref('school_data').set(state); }
-    }
-
-    function update(key, r, d, type, val) { state.lessons[key][r][d][type] = val; database.ref('school_data').set(state); }
-
-    function render() {
-        document.getElementById("adminPanel").style.display = isMember ? "block" : "none";
-        document.getElementById("logoutBtn").style.display = isMember ? "block" : "none";
-        const app = document.getElementById("app"); app.innerHTML = "";
-        
-        const colors = ["#e74c3c", "#f1c40f", "#2ecc71", "#9b59b6", "#3498db", "#e67e22"];
-        let colorIdx = 0;
-
-        for (let key in state.lessons) {
-            const btn = document.createElement("button");
-            btn.className = "accordion";
-            btn.innerText = `📋 جدول صف ${key}`;
-            btn.onclick = function() { this.nextElementSibling.style.display = (this.nextElementSibling.style.display === "block") ? "none" : "block"; };
-            app.appendChild(btn);
-
-            const container = document.createElement("div");
-            container.className = "full-day-card";
-            container.style.borderColor = colors[colorIdx % colors.length];
-            colorIdx++;
-            
-            let html = `<table><tr><th>حصة</th>${config.days.map(d=>`<th>${d}</th>`).join('')}</tr>`;
-            for(let i=0; i<4; i++) {
-                html += `<tr><td>${i+1}</td>`;
-                for(let d=0; d<5; d++) {
-                    const l = state.lessons[key][i][d];
-                    // إذا كان عضواً يرى المادة والأستاذ، إذا لم يكن يرى المادة فقط
-                    const cellContent = isMember ? 
-                        `<select onchange="update('${key}',${i},${d},'sub',this.value)"><option value="">-</option>${config.subjects.map(s=>`<option value="${s}" ${l.sub==s?'selected':''}>${s}</option>`).join('')}</select>
-                         <input type="text" placeholder="أستاذ" value="${l.tea}" onchange="update('${key}',${i},${d},'tea',this.value)">`
-                        : (l.sub || "-");
-                    
-                    html += `<td>${cellContent}</td>`;
-                }
-                html += `</tr>`;
-            }
-            container.innerHTML = html + "</table>";
-            app.appendChild(container);
-        }
-    }
-</script>
-    <script src="main.js"></script>
+<!-- ملف التشغيل الرئيسي -->
+<script src="main.js"></script>
 </body>
 </html>
