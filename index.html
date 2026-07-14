@@ -69,7 +69,8 @@
     });
   });
 </script>
-    <button onclick="toggleSidebar()" style="position:fixed; top:10px; left:10px; z-index:1000; background: #34495e; color: white; border: none; padding: 10px; cursor: pointer;">☰ القائمة</button>
+   <button onclick="toggleSidebar()" style="position:fixed; top:10px; left:10px; z-index:1000; background: #34495e; color: white; border: none; padding: 10px; cursor: pointer;">☰ القائمة</button>
+
 <div class="sidebar" id="mySidebar">
     <!-- الرأس مع زر الإغلاق -->
     <div class="sidebar-header">
@@ -84,6 +85,14 @@
     <a href="schedule.html" style="text-decoration: none; color: white;">
         <div class="menu-item">📅 جدول الدروس</div>
     </a>
+
+    <!-- قسم المكتبة الرقمية المدمج -->
+    <div class="menu-item" onclick="toggleSubmenu('library-submenu')">📚 المكتبة الرقمية ▼</div>
+    <div id="library-submenu" style="display: none; background: #1b263b; padding-right: 15px;">
+        <div class="menu-item" onclick="show('library'); filterBooks('الصف الأول')">الصف الأول</div>
+        <div class="menu-item" onclick="show('library'); filterBooks('الصف الثاني')">الصف الثاني</div>
+        <div class="menu-item" onclick="show('library'); filterBooks('الصف الثالث')">الصف الثالث</div>
+    </div>
     
     <div class="menu-item" onclick="show('honor')">🏆 لوحة الشرف</div>
     <div class="menu-item" onclick="show('complaints')">📩 الشكاوي</div>
@@ -92,15 +101,28 @@
     <div class="sidebar-footer" id="authBtn" onclick="toggleAuth()">🔐 تسجيل الدخول</div>
 </div>
 
-    <div class="content">
-        <!-- الرئيسية -->
-        <div id="home" class="page active">
-            <div class="card">
-                <h3>📢 التبليغات اللحظية</h3>
-                <div id="news-display" style="font-weight: bold; margin: 15px 0;">لا توجد تبليغات حالية.</div>
-                <button class="btn admin-only" onclick="addNews()">+ تحديث التبليغ</button>
-            </div>
+<script>
+    // دالة لفتح القائمة المنسدلة الخاصة بالمكتبة
+    function toggleSubmenu(id) {
+        const submenu = document.getElementById(id);
+        submenu.style.display = (submenu.style.display === 'block') ? 'none' : 'block';
+    }
+</script>
+  <!-- المكتبة الرقمية -->
+<div id="library" class="page">
+    <div class="card">
+        <h3>📚 المكتبة الرقمية - <span id="current-class">الكل</span></h3>
+        <p>مساحة خاصة لرفع وتحميل الكتب الدراسية.</p>
+        
+        <!-- زر الرفع (سيظهر للجميع كما طلبت) -->
+        <button class="btn" style="background: #27ae60;" onclick="openUploadModal()">+ رفع كتاب جديد</button>
+        
+        <!-- مساحة عرض الكتب -->
+        <div id="books-grid" class="books-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+            <!-- سيتم إضافة بطاقات الكتب هنا برمجياً -->
         </div>
+    </div>
+</div>
 
         <!-- الشعب الدراسية -->
         <div id="classes" class="page">
@@ -148,5 +170,20 @@
     navigator.serviceWorker.register('service-worker.js');
   }
 </script>
+<!-- نافذة الرفع المنبثقة -->
+<div id="uploadModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000;">
+    <div class="card" style="width: 90%; max-width: 400px; margin: 100px auto;">
+        <h3>رفع كتاب جديد</h3>
+        <input type="text" id="bookTitle" placeholder="اسم الكتاب" style="width:100%; padding:8px; margin:10px 0;">
+        <select id="classSelect" style="width:100%; padding:8px; margin:10px 0;">
+            <option>الصف الأول</option>
+            <option>الصف الثاني</option>
+            <option>الصف الثالث</option>
+        </select>
+        <input type="file" id="bookFile" accept="application/pdf" style="margin:10px 0;">
+        <button class="btn" onclick="uploadBook()">إرسال الكتاب</button>
+        <button class="btn" onclick="closeUploadModal()" style="background:#7f8c8d;">إلغاء</button>
+    </div>
+</div>
 </body>
 </html>
