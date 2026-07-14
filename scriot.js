@@ -166,23 +166,6 @@ function updateUIState() {
         el.style.display = isAdmin ? 'block' : 'none';
     });
 }
-function toggleSidebar() {
-    const sidebar = document.getElementById("mySidebar");
-    if (sidebar.style.width === "0px") {
-        sidebar.style.width = "280px";
-    } else {
-        sidebar.style.width = "0px";
-    }
-}
-// فتح وإغلاق نافذة الرفع
-function openUploadModal() {
-    document.getElementById('uploadModal').style.display = 'block';
-}
-
-function closeUploadModal() {
-    document.getElementById('uploadModal').style.display = 'none';
-}
-
 // تصفية الكتب حسب المرحلة
 function filterBooks(className) {
     document.getElementById('current-class').innerText = className;
