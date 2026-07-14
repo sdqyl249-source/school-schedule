@@ -174,3 +174,34 @@ function toggleSidebar() {
         sidebar.style.width = "0px";
     }
 }
+// فتح وإغلاق نافذة الرفع
+function openUploadModal() {
+    document.getElementById('uploadModal').style.display = 'block';
+}
+
+function closeUploadModal() {
+    document.getElementById('uploadModal').style.display = 'none';
+}
+
+// تصفية الكتب حسب المرحلة
+function filterBooks(className) {
+    document.getElementById('current-class').innerText = className;
+    // هنا سيتم استدعاء Firebase لجلب الكتب الخاصة بهذا الصف فقط
+    console.log("عرض كتب: " + className);
+    // يمكنك إضافة كود جلب البيانات من Firebase هنا
+}
+
+// دالة الرفع (سنتوسع فيها لاحقاً عند ربط Firebase)
+function uploadBook() {
+    const title = document.getElementById('bookTitle').value;
+    const className = document.getElementById('classSelect').value;
+    const file = document.getElementById('bookFile').files[0];
+    
+    if(title && file) {
+        alert("جاري رفع كتاب: " + title + " إلى " + className);
+        closeUploadModal();
+        // هنا سيتم إضافة الكود الخاص بـ Firebase Storage
+    } else {
+        alert("يرجى ملء جميع الحقول");
+    }
+}
