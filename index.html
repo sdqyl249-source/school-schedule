@@ -55,7 +55,29 @@
     </style>
 </head>
 <body>
-<button onclick="toggleSidebar()" style="position:fixed; top:10px; left:10px; z-index:1000; background: #34495e; color: white; border: none; padding: 10px; cursor: pointer;">☰ القائمة</button>
+<button id="installBtn" style="display:none; padding: 10px; background: #27ae60; color: white; border: none; cursor: pointer;">
+    📥 تثبيت المنصة كتطبيق
+</button>
+
+<script>
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'block'; // إظهار الزر للمستخدم
+  });
+
+  installBtn.addEventListener('click', (e) => {
+    installBtn.style.display = 'none';
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      deferredPrompt = null;
+    });
+  });
+</script>
+    <button onclick="toggleSidebar()" style="position:fixed; top:10px; left:10px; z-index:1000; background: #34495e; color: white; border: none; padding: 10px; cursor: pointer;">☰ القائمة</button>
 <div class="sidebar" id="mySidebar">
     <!-- الرأس مع زر الإغلاق -->
     <div class="sidebar-header">
