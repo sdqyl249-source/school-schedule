@@ -1,15 +1,3 @@
-// 1. التهيئة المركزية (Firebase)
-// تهيئة Firebase (يجب أن تكون في بداية الملف)
-firebase.initializeApp({
-    apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
-    authDomain: "roya-platform-26860.firebaseapp.com",
-    databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
-    projectId: "roya-platform-26860",
-    storageBucket: "roya-platform-26860.firebasestorage.app",
-    messagingSenderId: "897544406776",
-    appId: "1:897544406776:web:aa112013dea672fb141d0d"
-});
-const database = firebase.database();
 
 // 2. التحقق عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
