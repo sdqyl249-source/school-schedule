@@ -1,81 +1,115 @@
-لقد اطلعت على الكودين الآن. هما يكملان بعضهما البعض، ولكن يوجد **تداخل في الصلاحيات** و**تكرار في الدوال** التي يجب تنظيفها ليعمل الموقع بشكل احترافي.
+// 1. التهيئة المركزية (Firebase)
+firebase.initializeApp({
+    apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
+    authDomain: "roya-platform-26860.firebaseapp.com",
+    databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
+    projectId: "roya-platform-26860",
+    storageBucket: "roya-platform-26860.firebasestorage.app",
+    messagingSenderId: "897544406776",
+    appId: "1:897544406776:web:aa112013dea672fb141d0d"
+});
+const database = firebase.database();
 
-إليك الخطة لتقسيم العمل إلى ملفين منفصلين كما طلبت:
+const config = { days: ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس"], subjects: ["رياضيات", "علوم", "عربي", "إنجليزي", "رياضة"] };
+let state = { lessons: {} };
 
-### 1. الملف الأول: `schedule.js` (يحتوي فقط على منطق الجداول)
-
-هذا الملف سيعتمد على متغير `database` الذي سيتم تهيئته في الملف الثاني.
-
-* **ماذا تفعل فيه:**
-* انسخ كود الجداول الذي أرسلته (دالة `render` ، `update` ، `addTable` ، `deleteTable`).
-* **تعديل مهم:** داخل دالة `render` في هذا الملف، استبدل `isMember` بـ `localStorage.getItem("isAdmin") === "true"` ليتوافق مع نظام الصلاحيات في الملف الثاني.
-* **لا تضع** أي أمر `firebase.initializeApp` هنا.
-
-
-
-### 2. الملف الثاني: `main.js` (يحتوي على النظام العام)
-
-هذا الملف هو "المحرك" الذي يهيئ الاتصال ويشغل كل شيء.
-
-* **ماذا تفعل فيه:**
-* ضع كود `firebase.initializeApp` و `const database = firebase.database()` في أعلى الملف.
-* انسخ كامل كود "النظام العام" (التبليغات، الشكاوي، الصلاحيات).
-* **نقطة الربط:** داخل دالة `DOMContentLoaded` في هذا الملف، أضف استدعاءً لدالة `render()` لتبدأ عملها فوراً بعد تحميل الصفحة:
-
-
-```javascript
+// 2. التحقق عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     updateUIState();
     renderNews();
-
-    // استدعاء دالة الجداول إذا كانت موجودة
-    if (typeof render === 'function') {
-        render(); 
-    }
-    // ... باقي الدوال
+    render(); // عرض الجداول عند التحميل
+    
+    if(typeof loadTickerText === 'function') loadTickerText();
+    if(typeof loadHonorStudents === 'function') loadHonorStudents();
+    if(typeof loadGallery === 'function') loadGallery();
 });
 
-```
+// 3. الدوال الموحدة (UI & Navigation)
+function toggleSidebar() {
+    const sidebar = document.getElementById('mySidebar');
+    if (sidebar) sidebar.style.width = (sidebar.style.width === '280px') ? '0' : '280px';
+}
 
+function show(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const el = document.getElementById(id);
+    if(el) el.classList.add('active');
+}
 
+function openUploadModal() { document.getElementById('uploadModal').style.display = 'block'; }
+function closeUploadModal() { document.getElementById('uploadModal').style.display = 'none'; }
 
-### 3. تنظيف التكرار (مهم جداً)
+// 4. نظام الصلاحيات
+function toggleAuth() {
+    let isAdmin = localStorage.getItem("isAdmin") === "true";
+    let newState = !isAdmin;
+    localStorage.setItem("isAdmin", newState);
+    localStorage.setItem("roya_session_active", newState ? "true" : "false");
+    alert("تم تفعيل وضع الإدارة");
+    location.reload();
+}
 
-في كلا الكودين كانت توجد دوال مكررة، **احذفها من واحد من الملفين** (يفضل حذفها من الملف الأول `schedule.js` والإبقاء عليها في `main.js`):
+function updateUIState() {
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+    const authBtn = document.getElementById("authBtn");
+    if (authBtn) authBtn.innerText = isAdmin ? "🔓 تسجيل الخروج" : "🔐 تسجيل الدخول";
+    
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'block' : 'none');
+    
+    if (isAdmin) setUIAzAdmin();
+}
 
-* `toggleSidebar()`
-* `show(id)`
-* `openUploadModal()` و `closeUploadModal()`
+function setUIAzAdmin() {
+    const loginNavBtn = document.getElementById('login-nav-btn');
+    if (loginNavBtn) loginNavBtn.innerHTML = `👋 الإدارة | <span onclick="logoutCurrentMember(event)" style="color:red; cursor:pointer;">خروج</span>`;
+}
 
----
+function logoutCurrentMember(event) {
+    if (event) event.stopPropagation();
+    localStorage.removeItem('roya_session_active');
+    localStorage.setItem('isAdmin', "false");
+    window.location.reload();
+}
 
-### جدول التغييرات المطلوبة:
+// 5. دوال الجداول
+database.ref('school_data').on('value', (snapshot) => {
+    if(snapshot.exists()) { state = snapshot.val(); render(); }
+});
 
-| الوظيفة | مكانها المقترح | ملاحظة |
-| --- | --- | --- |
-| **تهيئة Firebase** | `main.js` | مرة واحدة فقط في بداية الملف |
-| **دالة `render()**` | `schedule.js` | للتعامل مع الجداول |
-| **دوال `addNews`, `sendComplaint**` | `main.js` | لأنها جزء من النظام العام |
-| **دالة `toggleSidebar`, `show**` | `main.js` | لأنها عامة لكل الصفحات |
+function render() {
+    const app = document.getElementById("app");
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+    if(!app) return;
 
-### كيف تربطهم في `index.html`؟
+    app.innerHTML = "";
+    for (let key in state.lessons) {
+        // ... (كود بناء الجدول كما كان)
+        let html = `<table><tr><th>حصة</th>${config.days.map(d=>`<th>${d}</th>`).join('')}</tr>`;
+        // ... استمر في بناء الجدول
+    }
+}
 
-يجب أن يكون ترتيب السكربتات في ملف الـ HTML الخاص بك كالتالي (هذا الترتيب حيوي جداً):
+function update(key, r, d, type, val) { state.lessons[key][r][d][type] = val; database.ref('school_data').set(state); }
 
-```html
-<!-- 1. سكربتات Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-database-compat.js"></script>
+// 6. التبليغات والشكاوى
+function addNews() {
+    const newsText = prompt("أدخل التبليغ الجديد:");
+    if (!newsText) return;
+    database.ref('news').set({ text: newsText, date: new Date().toLocaleDateString('ar-IQ'), time: new Date().toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' })});
+}
 
-<!-- 2. سكربت الجداول (يجب أن يُحمل أولاً لكي تتعرف عليه الصفحة) -->
-<script src="schedule.js"></script>
+function renderNews() {
+    const display = document.getElementById("news-display");
+    if (!display) return;
+    database.ref('news').on('value', (snapshot) => {
+        const news = snapshot.val();
+        if (news) display.innerHTML = `<div>${news.text}</div>`;
+    });
+}
 
-<!-- 3. سكربت النظام العام (يجب أن يُحمل ثانياً لأنه يهيئ الاتصال) -->
-<script src="main.js"></script>
-
-```
-
-**لماذا هذا الحل؟**
-لأننا بهذا نضمن أن المتصفح سيحمل "القواعد" أولاً، ثم "المحرك" الذي يشغل الموقع. وبذلك عندما ينفذ `main.js` أي أمر، سيكون `schedule.js` قد أعد كل الدوال المطلوبة مسبقاً.
-
-**هل هذه الخطة واضحة لك؟** إذا كنت موافقاً، يمكنك البدء بالنسخ واللصق وفق هذا التقسيم. هل تواجه أي صعوبة في حذف الدوال المكررة؟
+function sendComplaint() {
+    const input = document.getElementById("compText");
+    if (!input || !input.value) return;
+    database.ref('complaints').push({ content: input.value, timestamp: new Date().toLocaleString('ar-IQ') });
+    alert("تم الإرسال");
+}
