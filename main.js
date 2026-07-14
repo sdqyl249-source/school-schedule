@@ -1,8 +1,14 @@
-// main.js - النسخة المدققة
-
-// 1. إعدادات Firebase
-const firebaseConfig = { apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI", databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com", projectId: "roya-platform-26860" };
-firebase.initializeApp(firebaseConfig);
+// 1. التهيئة المركزية (Firebase)
+// تهيئة Firebase (يجب أن تكون في بداية الملف)
+firebase.initializeApp({
+    apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
+    authDomain: "roya-platform-26860.firebaseapp.com",
+    databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
+    projectId: "roya-platform-26860",
+    storageBucket: "roya-platform-26860.firebasestorage.app",
+    messagingSenderId: "897544406776",
+    appId: "1:897544406776:web:aa112013dea672fb141d0d"
+});
 const database = firebase.database();
 
 const config = { days: ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس"], subjects: ["رياضيات", "علوم", "عربي", "إنجليزي", "رياضة"] };
@@ -118,3 +124,13 @@ function render() {
         app.appendChild(container);
     }
 }
+document.addEventListener('DOMContentLoaded', () => {
+    updateUIState();
+    renderNews();
+
+    // استدعاء دالة الجداول إذا كانت موجودة
+    if (typeof render === 'function') {
+        render(); 
+    }
+    // ... باقي الدوال
+});
