@@ -1,11 +1,10 @@
 {
-  "name": "منصة رؤية – جدول الحصص",
+  "name": "منصة رؤية التعليمية - لوحة التحكم",
   "short_name": "رؤية",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4a90e2",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "icon roya.png",
