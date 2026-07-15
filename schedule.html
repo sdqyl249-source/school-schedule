@@ -75,6 +75,37 @@
         document.getElementById("adminPanel").style.display = "none";
         document.getElementById("logoutBtn").style.display = "none";
     }
+    // عند تحميل الصفحة، تحقق من مستوى المستخدم فوراً
+    document.addEventListener('DOMContentLoaded', () => {
+        const level = localStorage.getItem("userLevel");
+        
+        if (level === "admin") {
+            document.getElementById("adminPanel").style.display = "block";
+            document.getElementById("logoutBtn").style.display = "inline-block";
+        }
+    });
+
+    // دالة الدخول المحدثة لربطها مع نظامنا
+    function login() {
+        const code = prompt("يرجى إدخال رمز الدخول:");
+        if (code === "ahmed") {
+            localStorage.setItem("userLevel", "admin");
+            location.reload(); // إعادة تحميل لتفعيل الصلاحيات
+        } else if (code === "2026") {
+            localStorage.setItem("userLevel", "member");
+            alert("تم الدخول كعضو (للقراءة فقط)");
+            location.reload();
+        } else {
+            localStorage.setItem("userLevel", "visitor");
+            alert("رمز خاطئ!");
+        }
+    }
+
+    // دالة الخروج
+    function logout() {
+        localStorage.removeItem("userLevel");
+        location.reload();
+    }
 </script>
 
 </body>
