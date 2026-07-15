@@ -6,14 +6,14 @@
     <title>منصة رؤية</title>
     <style>
         body { font-family: sans-serif; margin: 0; background: #f4f4f4;overfiow-x:hidden }
-.sidebar.active { right: 0 !important; }
-        .sidebar {
+/* تنسيق السايد بار */
+#mySidebar {
     height: 100%;
     width: 400px;
     position: fixed;
     top: 0;
-    right: -400px; /* مخفي في البداية */
-    background: linear-gradient(180deg, #1a252f 0%, #2c3e50 100%); /* تدرج لوني أزرق غامق */
+    right: -400px; /* يجب أن تتطابق هذه القيمة مع width */
+    background: linear-gradient(180deg, #1a252f 0%, #2c3e50 100%);
     color: white;
     transition: 0.4s;
     z-index: 1000;
@@ -21,8 +21,13 @@
     box-shadow: -2px 0 10px rgba(0,0,0,0.3);
     display: flex;
     flex-direction: column;
-}   
-        .sidebar.active { right: 0; }
+}
+
+/* التعديل المهم هنا: استخدام !important لضمان الظهور */
+#mySidebar.active { 
+    right: 0 !important; 
+}
+
 .sidebar-header {
     padding: 20px;
     font-size: 22px;
@@ -30,8 +35,8 @@
     text-align: center;
     border-bottom: 1px solid rgba(255,255,255,0.1);
     margin-bottom: 20px;
-}    
-        
+}
+
 .menu-item {
     padding: 18px 25px;
     cursor: pointer;
@@ -40,25 +45,27 @@
     align-items: center;
     border-bottom: 1px solid rgba(255,255,255,0.05);
     transition: 0.2s;
-}   
+}
+
 .menu-item:hover {
     background-color: rgba(255,255,255,0.1);
-    border-right: 4px solid #3498db; /* لمسة جمالية عند المرور */
-}       
-        .page { padding: 20px; display: none; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-top: 50px; }
-        .btn { padding: 10px 20px; background: #3498db; color: white; border: none; cursor: pointer; border-radius: 5px; margin: 5px 0; }
-        .admin-only { display: none; }
-        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px; background: #1a252f; cursor: pointer; text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        table, th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    border-right: 4px solid #3498db;
+}
+
+.page { padding: 20px; display: none; }
+.card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-top: 50px; }
+.btn { padding: 10px 20px; background: #3498db; color: white; border: none; cursor: pointer; border-radius: 5px; margin: 5px 0; }
+.admin-only { display: none; }
+.sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 15px; background: #1a252f; cursor: pointer; text-align: center; }
+
+table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+table, th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
     </style>
 </head>
 <body>
 
 <button id="installBtn" style="display:none; padding: 10px; background: #27ae60; color: white; border: none; cursor: pointer; width: 100%;">📥 تثبيت المنصة كتطبيق</button>
-<button onclick="toggleSidebar()" style="position:fixed; top:10px; left:10px; z-index:1000; background: #34495e; color: white; border: none; padding: 10px; cursor: pointer;">☰ القائمة</button>
-
+<button onclick="toggleSidebar()" style="position:fixed; top:10px; right:10px; z-index:1000; background: #34495e; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px;">  ☰ القائمة</button>
 <div class="sidebar" id="mySidebar">
     <div class="sidebar-header">👁️ منصة رؤية <span onclick="toggleSidebar()" style="cursor:pointer; float:left; padding:0 10px; font-size: 18px;">✕</span></div>
     <div class="menu-item" onclick="show('home')">🏠 الرئيسية</div>
