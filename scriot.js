@@ -137,18 +137,36 @@ function loadAnnouncements() {
     database.ref('announcements').on('value', (snapshot) => {
         const list = document.getElementById('announcements-list');
         if (!list) return;
+        
         list.innerHTML = ''; 
+        
         snapshot.forEach((childSnapshot) => {
             const data = childSnapshot.val();
+            
+            // نتحقق إذا كان هناك رابط ملف وسائط
+            let mediaHtml = '';
+            if (data.mediaUrl) {
+                // إذا كان الرابط ينتهي بصيغة فيديو
+                if (data.mediaUrl.match(/\.(mp4|webm|ogg)$/i)) {
+                    mediaHtml = `<video src="${data.mediaUrl}" controls style="width:100%; margin-top:10px;"></video>`;
+                } else {
+                    // افتراضياً نعرضه كصورة
+                    mediaHtml = `<img src="${data.mediaUrl}" style="width:100%; margin-top:10px; border-radius:8px;">`;
+                }
+            }
+
+            // عرض البطاقة بتنسيق احترافي
             list.innerHTML += `
-                <div class="announcement-item" style="padding: 10px; border-bottom: 1px solid #eee;">
-                    <p>${data.title}</p>
-                    <small style="color: #999;">${data.date}</small>
-                </div>`;
+                <div class="card" style="margin-bottom: 20px; padding: 15px; border-bottom: 2px solid #3498db;">
+                    <h3 style="margin:0;">${data.title}</h3>
+                    <p style="color:#555; margin: 10px 0;">${data.desc}</p>
+                    ${mediaHtml}
+                    <small style="color: #999; display:block; margin-top:10px;">نُشر في: ${data.date}</small>
+                </div>
+            `;
         });
     });
 }
-
 // 6. تهيئة الصفحة (دمج كل شيء في مكان واحد)
 window.onload = function() {
     // تحديث نص زر تسجيل الدخول
