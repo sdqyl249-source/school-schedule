@@ -15,21 +15,22 @@ const config = {
 };
 let state = { lessons: {} };
 
-// 2. نظام الصلاحيات الموحد
-function login() {
-    const code = prompt("يرجى إدخال رمز الدخول:");
-    if (code === "ahmed") localStorage.setItem("userLevel", "admin");
-    else if (code === "2026") localStorage.setItem("userLevel", "member");
-    else localStorage.setItem("userLevel", "visitor");
+// 2. نظام الصلاحيات
+function handleAuth() {
+    const currentLevel = localStorage.getItem("userLevel");
+    if (currentLevel) {
+        localStorage.removeItem("userLevel");
+        alert("تم تسجيل الخروج");
+    } else {
+        const code = prompt("يرجى إدخال رمز الدخول:");
+        if (code === "ahmed") localStorage.setItem("userLevel", "admin");
+        else if (code === "2026") localStorage.setItem("userLevel", "member");
+        else localStorage.setItem("userLevel", "visitor");
+    }
     location.reload();
 }
 
-function logout() {
-    localStorage.removeItem("userLevel");
-    location.reload();
-}
-
-// 3. دالة الجلب والعرض (Render) للجدول
+// 3. الجدول الدراسي
 database.ref('school_data/lessons').on('value', (snapshot) => {
     state.lessons = snapshot.val() || {}; 
     render();
@@ -78,135 +79,75 @@ function render() {
     }
 }
 
-// 4. الدوال المساعدة
-function update(key, r, d, type, val) {
-    if (localStorage.getItem("userLevel") !== "admin") {
-        alert("صلاحياتك لا تسمح بالتعديل!");
-        location.reload();
-        return;
-    }
-    database.ref(`school_data/lessons/${key}/data/${r}/${d}/${type}`).set(val); 
-}
-
-function addTable() {
-    if (localStorage.getItem("userLevel") !== "admin") return alert("فقط المدير يمكنه إضافة جداول!");
-    const cls = document.getElementById("selG").value;
-    const sec = document.getElementById("selS").value;
-    const newKey = database.ref('school_data/lessons').push().key;
-    database.ref('school_data/lessons/' + newKey).set({ class: cls, section: sec, data: [] }).then(() => location.reload());
-}
-
-function deleteTable(key) {
-    if(confirm("هل أنت متأكد؟")) database.ref('school_data/lessons/' + key).remove();
-}
+// 4. وظائف الإعلانات والمكتبة
 function uploadAnnouncement() {
     const title = document.getElementById('ann-title').value;
     const desc = document.getElementById('ann-desc').value;
-    const file = document.getElementById('ann-media').files[0];
+    const media = document.getElementById('ann-media').value;
     const date = new Date().toLocaleDateString('ar-IQ');
 
     if (!title || !desc) return alert("يرجى ملء العنوان والوصف!");
-
-    if (file) {
-        // إذا كان هناك ملف، نرفعه أولاً
-        const storageRef = firebase.storage().ref('announcements/' + file.name);
-        storageRef.put(file).then(snapshot => {
-            snapshot.ref.getDownloadURL().then(url => {
-                saveToDatabase(title, desc, url, date);
-            });
-        });
-    } else {
-        // بدون ملف
-        saveToDatabase(title, desc, null, date);
-    }
-}
-
-function saveToDatabase(title, desc, url, date) {
-    database.ref('announcements').push({
-        title: title,
-        desc: desc,
-        mediaUrl: url,
-        date: date
-    }).then(() => {
-        alert("تم نشر الإعلان بنجاح!");
+    
+    database.ref('announcements').push({ title, desc, mediaUrl: media, date }).then(() => {
+        alert("تم النشر!");
         location.reload();
     });
 }
-// 5. قسم الإعلانات (المدمج)
+
 function loadAnnouncements() {
     database.ref('announcements').on('value', (snapshot) => {
         const list = document.getElementById('announcements-list');
         if (!list) return;
-        
         list.innerHTML = ''; 
-        
         snapshot.forEach((childSnapshot) => {
             const data = childSnapshot.val();
-            
-            // نتحقق إذا كان هناك رابط ملف وسائط
-            let mediaHtml = '';
-            if (data.mediaUrl) {
-                // إذا كان الرابط ينتهي بصيغة فيديو
-                if (data.mediaUrl.match(/\.(mp4|webm|ogg)$/i)) {
-                    mediaHtml = `<video src="${data.mediaUrl}" controls style="width:100%; margin-top:10px;"></video>`;
-                } else {
-                    // افتراضياً نعرضه كصورة
-                    mediaHtml = `<img src="${data.mediaUrl}" style="width:100%; margin-top:10px; border-radius:8px;">`;
-                }
-            }
-
-            // عرض البطاقة بتنسيق احترافي
-            list.innerHTML += `
-                <div class="card" style="margin-bottom: 20px; padding: 15px; border-bottom: 2px solid #3498db;">
-                    <h3 style="margin:0;">${data.title}</h3>
-                    <p style="color:#555; margin: 10px 0;">${data.desc}</p>
-                    ${mediaHtml}
-                    <small style="color: #999; display:block; margin-top:10px;">نُشر في: ${data.date}</small>
-                </div>
-            `;
+            list.innerHTML += `<div class="card" style="border-bottom: 2px solid #3498db;"><h3>${data.title}</h3><p>${data.desc}</p>${data.mediaUrl ? `<img src="${data.mediaUrl}" style="width:100%">` : ''}</div>`;
         });
     });
 }
-// 6. تهيئة الصفحة (دمج كل شيء في مكان واحد)
-window.onload = function() {
-    // تحديث نص زر تسجيل الدخول
-    const btn = document.getElementById("authBtn");
-    if(btn) btn.innerText = localStorage.getItem("userLevel") ? "🔓 خروج" : "🔐 تسجيل الدخول";
-    
-    // إظهار لوحة التحكم للمدير
-    const adminPanel = document.getElementById("adminPanel");
-    if (adminPanel && localStorage.getItem("userLevel") === "admin") {
-        adminPanel.style.display = "block";
-    }
 
-    // تشغيل الإعلانات
-    loadAnnouncements();
-};
 function loadLibrary() {
     database.ref('library').on('value', (snapshot) => {
         const list = document.getElementById('library-list');
         if (!list) return;
-        
         list.innerHTML = '';
         snapshot.forEach((childSnapshot) => {
             const item = childSnapshot.val();
-            list.innerHTML += `
-                <div style="border:1px solid #ddd; padding:10px; border-radius:8px; text-align:center;">
-                    <p><b>${item.name}</b></p>
-                    <a href="${item.url}" target="_blank" style="text-decoration:none; background:#3498db; color:white; padding:5px 15px; border-radius:5px; display:inline-block;">تحميل الملف</a>
-                </div>
-            `;
+            list.innerHTML += `<div style="border:1px solid #ddd; padding:10px; text-align:center;"><p><b>${item.name}</b></p><a href="${item.url}" target="_blank">تحميل</a></div>`;
         });
     });
 }
+
 function addLibraryItem() {
     const name = document.getElementById('lib-name').value;
     const url = document.getElementById('lib-url').value;
-    
     if (name && url) {
-        database.ref('library').push({ name: name, url: url });
-        alert("تمت إضافة الملف بنجاح!");
-        document.getElementById('lib-name').value = '';
-        document.getElementById('lib-url').value = '';
+        database.ref('library').push({ name, url }).then(() => alert("تمت الإضافة!"));
     }
 }
+
+// 5. التهيئة النهائية
+window.onload = function() {
+    // 1. تحديث زر تسجيل الدخول
+    const authBtn = document.getElementById("authBtn");
+    if(authBtn) authBtn.innerText = localStorage.getItem("userLevel") ? "🔓 خروج" : "🔐 تسجيل الدخول";
+    
+    // 2. تشغيل البيانات
+    loadAnnouncements();
+    loadLibrary();
+    
+    // 3. ملاحظة: render() تعمل تلقائياً مع دالة الـ on('value') للجدول
+};
+
+// وظائف مساعدة
+function toggleSidebar() { document.getElementById('mySidebar').classList.toggle('active'); }
+function show(id) {
+    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+    toggleSidebar();
+}
+function update(key, r, d, type, val) {
+    if (localStorage.getItem("userLevel") !== "admin") return location.reload();
+    database.ref(`school_data/lessons/${key}/data/${r}/${d}/${type}`).set(val); 
+}
+function deleteTable(key) { if(confirm("حذف؟")) database.ref('school_data/lessons/' + key).remove(); }
