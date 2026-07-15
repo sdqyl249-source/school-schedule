@@ -7,7 +7,7 @@
     <style>
         body { font-family: sans-serif; margin: 0; background: #f4f4f4;overfiow-x:hidden }
 /* تنسيق السايد بار */
-.mySidebar {
+.Sidebar {
     height: 100%;
     width: 260px;
     position: fixed;
@@ -67,7 +67,7 @@ table, th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
 <button id="installBtn" style="display:none; padding: 10px; background: #27ae60; color: white; border: none; cursor: pointer; width: 100%;">📥 تثبيت المنصة كتطبيق</button>
 <button onclick="toggleSidebar()" style="position:fixed; top:10px; right:10px; z-index:1000; background: #34495e; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px;">  ☰ القائمة</button>
 <div class="sidebar" id="mySidebar">
-    <div class="sidebar-header">👁️ منصة رؤية <span onclick="toggleSidebar()" style="cursor:pointer; float:left; padding:0 10px; font-size: 18px;">✕</span></div>
+    <div class="-header">👁️ منصة رؤية <span onclick="toggle()" style="cursor:pointer; float:left; padding:0 10px; font-size: 18px;">✕</span></div>
     <div class="menu-item" onclick="show('home')">🏠 الرئيسية</div>
     <div class="menu-item" onclick="show('classes')">🏫 الشعب الدراسية</div>
     <div class="menu-item" onclick="show('schedule')">📅 جدول الدروس</div>
