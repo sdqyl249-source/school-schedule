@@ -11,50 +11,33 @@ firebase.initializeApp({
 const database = firebase.database();
 
 const config = { 
-    days: ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس"], 
-    subjects: ["رياضيات", "علوم", "عربي", "إنجليزي", "رياضة"] 
+    days: ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس"]
 };
 let state = { lessons: {} };
 
-// 2. التحقق عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', () => {
-    updateUIState();
-    renderNews();
-    // تمت إزالة render() من هنا لأنها ستستدعى تلقائياً عند وصول البيانات في دالة الجلب أدناه
-});
-
-// 3. الدوال الموحدة (UI & Navigation)
-function toggleSidebar() {
-    const sidebar = document.getElementById('mySidebar');
-    if (sidebar) sidebar.style.width = (sidebar.style.width === '280px') ? '0' : '280px';
+// 2. نظام الصلاحيات الموحد
+function login() {
+    const code = prompt("يرجى إدخال رمز الدخول:");
+    if (code === "ahmed") localStorage.setItem("userLevel", "admin");
+    else if (code === "2026") localStorage.setItem("userLevel", "member");
+    else localStorage.setItem("userLevel", "visitor");
+    location.reload();
 }
 
-function updateUIState() {
-    const isAdmin = localStorage.getItem("isAdmin") === "true";
-    document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'block' : 'none');
-    if (isAdmin) setUIAzAdmin();
+function logout() {
+    localStorage.removeItem("userLevel");
+    location.reload();
 }
 
-function setUIAzAdmin() {
-    const loginNavBtn = document.getElementById('login-nav-btn');
-    if (loginNavBtn) loginNavBtn.innerHTML = `👋 الإدارة | <span onclick="logoutCurrentMember(event)" style="color:red; cursor:pointer;">خروج</span>`;
-}
-
-function logoutCurrentMember(event) {
-    if (event) event.stopPropagation();
-    localStorage.setItem('isAdmin', "false");
-    window.location.reload();
-}
-
-// 4. دوال الجداول والـ Firebase (المسار المصحح)
+// 3. دالة الجلب والـ Render
 database.ref('school_data/lessons').on('value', (snapshot) => {
-    // هنا نستقبل البيانات ونضعها مباشرة في state.lessons
     state.lessons = snapshot.val() || {}; 
     render();
 });
 
 function render() {
     const app = document.getElementById("app");
+    const level = localStorage.getItem("userLevel") || "visitor";
     if(!app) return;
 
     app.innerHTML = "";
@@ -70,45 +53,50 @@ function render() {
                             <td>الحصة ${r+1}</td>
                             ${config.days.map((d, colIndex) => `
                                 <td>
-                                    <div class="info-txt" contenteditable="true" onblur="update('${key}', ${r}, ${colIndex}, 'subject', this.innerText)">
+                                    <!-- المادة للجميع -->
+                                    <div class="info-txt" contenteditable="${level === 'admin'}" 
+                                         onblur="update('${key}', ${r}, ${colIndex}, 'subject', this.innerText)">
                                         ${tableData.data?.[r]?.[colIndex]?.subject || "..."}
                                     </div>
+                                    <!-- الأستاذ للمدير والعضو فقط -->
+                                    ${(level === 'admin' || level === 'member') ? `
+                                        <div class="info-txt teacher" contenteditable="${level === 'admin'}"
+                                             onblur="update('${key}', ${r}, ${colIndex}, 'teacher', this.innerText)"
+                                             style="color:#9333ea; font-size:0.8em;">
+                                            ${tableData.data?.[r]?.[colIndex]?.teacher || "الأستاذ..."}
+                                        </div>
+                                    ` : ''}
                                 </td>
                             `).join('')}
                         </tr>
                     `).join('')}
                 </table>
-                ${localStorage.getItem("isAdmin") === "true" ? `<button onclick="deleteTable('${key}')" class="btn" style="background:red; margin-top:10px;">🗑️ حذف الجدول</button>` : ''}
+                ${level === 'admin' ? `<button onclick="deleteTable('${key}')" class="btn" style="background:red; margin-top:10px;">🗑️ حذف الجدول</button>` : ''}
             </div>
         `;
         app.innerHTML += html;
     }
 }
 
-function addTable() {
-    const cls = document.getElementById("selG").value;
-    const sec = document.getElementById("selS").value;
-    const newKey = database.ref('school_data/lessons').push().key;
-    database.ref('school_data/lessons/' + newKey).set({ class: cls, section: sec, data: [] });
-    alert("تمت إضافة الجدول!");
+// 4. دالة التحديث مع حماية الصلاحيات
+function update(key, r, d, type, val) {
+    if (localStorage.getItem("userLevel") !== "admin") {
+        alert("صلاحياتك لا تسمح بالتعديل!");
+        location.reload();
+        return;
+    }
+    database.ref(`school_data/lessons/${key}/data/${r}/${d}/${type}`).set(val); 
 }
 
+// 5. دوال مساعدة
 function deleteTable(key) {
     if(confirm("هل أنت متأكد من حذف هذا الجدول؟")) {
         database.ref('school_data/lessons/' + key).remove();
     }
 }
 
-function update(key, r, d, type, val) { 
-    database.ref(`school_data/lessons/${key}/data/${r}/${d}/${type}`).set(val); 
-}
-
-// 5. الأخبار والشكاوى
-function renderNews() {
-    const display = document.getElementById("news-display");
-    if (!display) return;
-    database.ref('news').on('value', (snapshot) => {
-        const news = snapshot.val();
-        if (news) display.innerHTML = `<div>${news.text}</div>`;
-    });
-}
+document.addEventListener('DOMContentLoaded', () => {
+    // تحديث زر الدخول في الواجهة
+    const btn = document.getElementById("authBtn");
+    if(btn) btn.innerText = localStorage.getItem("userLevel") ? "🔓 خروج" : "🔐 تسجيل الدخول";
+});
