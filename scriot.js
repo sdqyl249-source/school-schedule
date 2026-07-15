@@ -81,23 +81,39 @@ function render() {
 
 // 4. وظائف الإعلانات والمكتبة
 function uploadAnnouncement() {
-    const title = document.getElementById('ann-title').value.trim();
-    const desc = document.getElementById('ann-desc').value.trim();
-    const mediaUrl = document.getElementById('ann-media').value.trim();
+    // 1. جلب القيم من حقول الإدخال في صفحة index.html
+    const titleElement = document.getElementById('ann-title');
+    const descElement = document.getElementById('ann-desc');
+    const mediaElement = document.getElementById('ann-media');
+
+    const title = titleElement.value.trim();
+    const desc = descElement.value.trim();
+    const mediaUrl = mediaElement.value.trim();
     const date = new Date().toLocaleDateString('ar-IQ');
 
-    if (!title || !desc) return alert("يرجى ملء العنوان والوصف!");
+    // 2. التحقق من أن الحقول الأساسية ليست فارغة
+    if (title === "" || desc === "") {
+        alert("يرجى ملء العنوان والوصف!");
+        return;
+    }
 
-    database.ref('announcements').push({ title, desc, mediaUrl, date }).then(() => {
+    // 3. إرسال البيانات إلى قاعدة بيانات Firebase
+    database.ref('announcements').push({
+        title: title,
+        desc: desc,
+        mediaUrl: mediaUrl,
+        date: date
+    }).then(function() {
+        // 4. في حالة النجاح: تنظيف الحقول وإظهار رسالة
         alert("✅ تم نشر الإعلان بنجاح!");
-        document.getElementById('ann-title').value = '';
-        document.getElementById('ann-desc').value = '';
-        document.getElementById('ann-media').value = '';
-    }).catch(error => {
+        titleElement.value = '';
+        descElement.value = '';
+        mediaElement.value = '';
+    }).catch(function(error) {
+        // 5. في حالة حدوث خطأ
         alert("حدث خطأ أثناء النشر: " + error.message);
     });
 }
-
 function loadAnnouncements() {
     database.ref('announcements').on('value', (snapshot) => {
         const list = document.getElementById('ann-list');
