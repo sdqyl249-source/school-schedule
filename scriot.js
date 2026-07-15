@@ -10,18 +10,17 @@ firebase.initializeApp({
 });
 const database = firebase.database();
 
-const config = { days: ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس"], subjects: ["رياضيات", "علوم", "عربي", "إنجليزي", "رياضة"] };
+const config = { 
+    days: ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس"], 
+    subjects: ["رياضيات", "علوم", "عربي", "إنجليزي", "رياضة"] 
+};
 let state = { lessons: {} };
 
 // 2. التحقق عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     updateUIState();
     renderNews();
-    render(); // عرض الجداول عند التحميل
-    
-    if(typeof loadTickerText === 'function') loadTickerText();
-    if(typeof loadHonorStudents === 'function') loadHonorStudents();
-    if(typeof loadGallery === 'function') loadGallery();
+    render(); // عرض الجداول
 });
 
 // 3. الدوال الموحدة (UI & Navigation)
@@ -30,32 +29,17 @@ function toggleSidebar() {
     if (sidebar) sidebar.style.width = (sidebar.style.width === '280px') ? '0' : '280px';
 }
 
-function show(id) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const el = document.getElementById(id);
-    if(el) el.classList.add('active');
-}
-
-function openUploadModal() { document.getElementById('uploadModal').style.display = 'block'; }
-function closeUploadModal() { document.getElementById('uploadModal').style.display = 'none'; }
-
-// 4. نظام الصلاحيات
 function toggleAuth() {
     let isAdmin = localStorage.getItem("isAdmin") === "true";
     let newState = !isAdmin;
     localStorage.setItem("isAdmin", newState);
-    localStorage.setItem("roya_session_active", newState ? "true" : "false");
-    alert("تم تفعيل وضع الإدارة");
+    alert(newState ? "تم تفعيل وضع الإدارة" : "تم الخروج من وضع الإدارة");
     location.reload();
 }
 
 function updateUIState() {
     const isAdmin = localStorage.getItem("isAdmin") === "true";
-    const authBtn = document.getElementById("authBtn");
-    if (authBtn) authBtn.innerText = isAdmin ? "🔓 تسجيل الخروج" : "🔐 تسجيل الدخول";
-    
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'block' : 'none');
-    
     if (isAdmin) setUIAzAdmin();
 }
 
@@ -66,53 +50,67 @@ function setUIAzAdmin() {
 
 function logoutCurrentMember(event) {
     if (event) event.stopPropagation();
-    localStorage.removeItem('roya_session_active');
     localStorage.setItem('isAdmin', "false");
     window.location.reload();
 }
 
-// 5. دوال الجداول
+// 4. دوال الجداول والـ Firebase
 database.ref('school_data').on('value', (snapshot) => {
-    if(snapshot.exists()) { state = snapshot.val(); render(); }
+    if(snapshot.exists()) { 
+        state = snapshot.val(); 
+        render(); 
+    }
 });
 
 function render() {
     const app = document.getElementById("app");
-    const isAdmin = localStorage.getItem("isAdmin") === "true";
     if(!app) return;
 
     app.innerHTML = "";
     for (let key in state.lessons) {
-        // ... (كود بناء الجدول كما كان)
-        let html = `<table><tr><th>حصة</th>${config.days.map(d=>`<th>${d}</th>`).join('')}</tr>`;
-        // ... استمر في بناء الجدول
+        let tableData = state.lessons[key];
+        let html = `
+            <div class="card">
+                <h4>جدول الصف: ${tableData.class} - ${tableData.section}</h4>
+                <table>
+                    <tr><th>الحصة</th>${config.days.map(d => `<th>${d}</th>`).join('')}</tr>
+                    ${[0,1,2,3].map(r => `
+                        <tr>
+                            <td>الحصة ${r+1}</td>
+                            ${config.days.map((d, colIndex) => `
+                                <td>
+                                    <div class="info-txt" contenteditable="true" onblur="update('${key}', ${r}, ${colIndex}, 'subject', this.innerText)">
+                                        ${tableData.data?.[r]?.[colIndex]?.subject || "..."}
+                                    </div>
+                                </td>
+                            `).join('')}
+                        </tr>
+                    `).join('')}
+                </table>
+                ${localStorage.getItem("isAdmin") === "true" ? `<button onclick="deleteTable('${key}')" class="btn" style="background:red">🗑️ حذف</button>` : ''}
+            </div>
+        `;
+        app.innerHTML += html;
     }
 }
-function renderTables() {
-    const app = document.getElementById('app');
-    
-    // هذا الشرط يحمي الصفحة من الانهيار إذا لم تجد العنصر
-    if (!app) return; 
 
-    // هنا تضع كود رسم الجدول الخاص بك...
-    // مثال:
-    app.innerHTML = "جاري تحميل الجدول...";
-    // ... (بقية كود رسم الجداول من Firebase)
+function addTable() {
+    const cls = document.getElementById("selG").value;
+    const sec = document.getElementById("selS").value;
+    const newKey = database.ref('school_data/lessons').push().key;
+    database.ref('school_data/lessons/' + newKey).set({ class: cls, section: sec, data: [] });
+    alert("تمت إضافة الجدول!");
 }
 
-// استدعاء الدالة عند تحميل الصفحة
-window.onload = function() {
-    renderTables();
-};
-function update(key, r, d, type, val) { state.lessons[key][r][d][type] = val; database.ref('school_data').set(state); }
-
-// 6. التبليغات والشكاوى
-function addNews() {
-    const newsText = prompt("أدخل التبليغ الجديد:");
-    if (!newsText) return;
-    database.ref('news').set({ text: newsText, date: new Date().toLocaleDateString('ar-IQ'), time: new Date().toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' })});
+function deleteTable(key) {
+    if(confirm("هل أنت متأكد؟")) database.ref('school_data/lessons/' + key).remove();
 }
 
+function update(key, r, d, type, val) { 
+    database.ref(`school_data/lessons/${key}/data/${r}/${d}/${type}`).set(val); 
+}
+
+// 5. الأخبار والشكاوى
 function renderNews() {
     const display = document.getElementById("news-display");
     if (!display) return;
@@ -120,11 +118,4 @@ function renderNews() {
         const news = snapshot.val();
         if (news) display.innerHTML = `<div>${news.text}</div>`;
     });
-}
-
-function sendComplaint() {
-    const input = document.getElementById("compText");
-    if (!input || !input.value) return;
-    database.ref('complaints').push({ content: input.value, timestamp: new Date().toLocaleString('ar-IQ') });
-    alert("تم الإرسال");
 }
