@@ -81,37 +81,41 @@ function render() {
 
 // 4. وظائف الإعلانات والمكتبة
 function uploadAnnouncement() {
-    const title = document.getElementById('ann-title').value;
-    const desc = document.getElementById('ann-desc').value;
-    const media = document.getElementById('ann-media').value;
-    const date = new Date().toLocaleDateString('ar-IQ');
-
-    if (!title || !desc) return alert("يرجى ملء العنوان والوصف!");
-    
-    database.ref('announcements').push({ title, desc, mediaUrl: media, date }).then(() => {
-        alert("تم النشر!");
-        location.reload();
-    });
-}
-
-function uploadAnnouncement() {
-    const title = document.getElementById('ann-title').value;
-    const desc = document.getElementById('ann-desc').value;
-    const mediaUrl = document.getElementById('ann-media').value; // جلب النص مباشرة
+    const title = document.getElementById('ann-title').value.trim();
+    const desc = document.getElementById('ann-desc').value.trim();
+    const mediaUrl = document.getElementById('ann-media').value.trim();
     const date = new Date().toLocaleDateString('ar-IQ');
 
     if (!title || !desc) return alert("يرجى ملء العنوان والوصف!");
 
-    database.ref('announcements').push({
-        title: title,
-        desc: desc,
-        mediaUrl: mediaUrl, // حفظ الرابط النصي
-        date: date
-    }).then(() => {
-        alert("تم نشر الإعلان بنجاح!");
-        location.reload();
+    database.ref('announcements').push({ title, desc, mediaUrl, date }).then(() => {
+        alert("✅ تم نشر الإعلان بنجاح!");
+        document.getElementById('ann-title').value = '';
+        document.getElementById('ann-desc').value = '';
+        document.getElementById('ann-media').value = '';
+    }).catch(error => {
+        alert("حدث خطأ أثناء النشر: " + error.message);
     });
 }
+
+function loadAnnouncements() {
+    database.ref('announcements').on('value', (snapshot) => {
+        const list = document.getElementById('ann-list');
+        if (!list) return;
+        list.innerHTML = '';
+        snapshot.forEach((childSnapshot) => {
+            const item = childSnapshot.val();
+            list.innerHTML += `
+                <div style="border:1px solid #ddd; padding:10px; margin:5px;">
+                    <h4>${item.title}</h4>
+                    <p>${item.desc}</p>
+                    ${item.mediaUrl ? `<p><a href="${item.mediaUrl}" target="_blank">📎 رابط مرفق</a></p>` : ''}
+                    <small>${item.date}</small>
+                </div>`;
+        });
+    });
+}
+
 function loadLibrary() {
     database.ref('library').on('value', (snapshot) => {
         const list = document.getElementById('library-list');
@@ -123,6 +127,7 @@ function loadLibrary() {
         });
     });
 }
+
 function uploadFileToStorage() {
     const name = document.getElementById('lib-name').value;
     const fileInput = document.getElementById('lib-file');
@@ -130,14 +135,9 @@ function uploadFileToStorage() {
 
     if (!name || !file) return alert("يرجى كتابة الاسم واختيار ملف!");
 
-    // إنشاء مرجع للملف في Firebase Storage
     const storageRef = firebase.storage().ref('library_files/' + file.name);
-    
-    // رفع الملف
     storageRef.put(file).then(snapshot => {
-        // الحصول على رابط التحميل بعد الرفع
         snapshot.ref.getDownloadURL().then(url => {
-            // حفظ الرابط في Realtime Database
             database.ref('library').push({ name: name, url: url });
             alert("تم رفع الملف بنجاح!");
             document.getElementById('lib-name').value = '';
@@ -146,6 +146,7 @@ function uploadFileToStorage() {
         alert("حدث خطأ أثناء الرفع: " + error.message);
     });
 }
+
 function addLibraryItem() {
     const name = document.getElementById('lib-name').value;
     const url = document.getElementById('lib-url').value;
@@ -156,15 +157,10 @@ function addLibraryItem() {
 
 // 5. التهيئة النهائية
 window.onload = function() {
-    // 1. تحديث زر تسجيل الدخول
     const authBtn = document.getElementById("authBtn");
     if(authBtn) authBtn.innerText = localStorage.getItem("userLevel") ? "🔓 خروج" : "🔐 تسجيل الدخول";
-    
-    // 2. تشغيل البيانات
     loadAnnouncements();
     loadLibrary();
-    
-    // 3. ملاحظة: render() تعمل تلقائياً مع دالة الـ on('value') للجدول
 };
 
 // وظائف مساعدة
