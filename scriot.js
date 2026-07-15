@@ -34,7 +34,15 @@ database.ref('school_data/lessons').on('value', (snapshot) => {
     state.lessons = snapshot.val() || {}; 
     render();
 });
-
+// دالة لتحديد اللون بناءً على الشعبة
+function getSectionColor(section) {
+    const colors = {
+        "أ": "#e74c3c", // أحمر
+        "ب": "#27ae60", // أخضر
+        "ج": "#3498db"  // أزرق
+    };
+    return colors[section] || "#95a5a6";
+}
 function render() {
     const app = document.getElementById("app");
     const level = localStorage.getItem("userLevel") || "visitor";
@@ -44,9 +52,11 @@ function render() {
     for (let key in state.lessons) {
         let tableData = state.lessons[key];
         let html = `
-            <div class="card" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
-                <h4>جدول الصف: ${tableData.class} - ${tableData.section}</h4>
-                <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+<div class="card" style="border-right: 8px solid ${color};">
+<h4 style="color: ${color}; margin: 0;">
+            جدول الصف: ${tableData.class} - شعبة ${tableData.section}
+        </h4>
+        <table style="width:100%; border-collapse:collapse; margin-top:10px;">
                     <tr><th>الحصة</th>${config.days.map(d => `<th style="padding:8px; border:1px solid #ccc;">${d}</th>`).join('')}</tr>
                     ${[0,1,2,3].map(r => `
                         <tr>
