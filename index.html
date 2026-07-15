@@ -26,56 +26,73 @@
 <body>
 
 <button onclick="toggleSidebar()" style="position:fixed; top:10px; right:10px; z-index:999; background: #34495e; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px;">☰ القائمة</button>
-<!-- قسم لوحة الإعلانات -->
-<div id="announcements-section" class="card">
-    <h3>📢 لوحة إعلانات المدرسة</h3>
-    <!-- سيتم عرض الإعلانات هنا ديناميكياً -->
-    <div id="announcements-list"></div>
-    
-    <!-- زر الإضافة يظهر للمشرف فقط -->
-    <div id="admin-add-area" style="display:none; margin-top: 15px;">
-        <textarea id="new-announcement" placeholder="اكتب إعلاناً جديداً..." style="width:100%;"></textarea>
-        <button class="btn" style="background:#27ae60" onclick="addAnnouncement()">نشر الإعلان</button>
-    </div>
-</div>
-    <div id="admin-add-area" class="card" style="display:none; padding:15px; margin-bottom:20px; background:#f9f9f9;">
-    <h4>إضافة إعلان جديد</h4>
-    <input type="text" id="ann-title" placeholder="العنوان الرئيسي" style="width:100%; margin-bottom:10px;">
-    <textarea id="ann-desc" placeholder="وصف الإعلان..." style="width:100%; margin-bottom:10px;"></textarea>
-    <input type="file" id="ann-media" accept="image/*,video/*">
-    <button onclick="uploadAnnouncement()" class="btn" style="background:#27ae60; color:white; margin-top:10px;">نشر الإعلان</button>
-</div>
+
+<!-- السايد بار -->
 <div class="sidebar" id="mySidebar">
     <div class="sidebar-header">👁️ منصة رؤية <span onclick="toggleSidebar()" style="cursor:pointer;">✕</span></div>
+    
+    <!-- تم إضافة الروابط الصحيحة للتبديل بين الأقسام -->
     <div class="menu-item" onclick="show('home')">🏠 الرئيسية</div>
-    <div class="menu-item" onclick="window.location.href='schedule.html'">📅 جدول الدروس</div>
+    <div class="menu-item" onclick="show('announcements')">📢 لوحة الإعلانات</div>
+    <div class="menu-item" onclick="show('schedule')">📅 جدول الدروس</div>
+    <div class="menu-item" onclick="show('library')">📚 المكتبة الرقمية</div>
     
     <!-- زر تسجيل الدخول/الخروج -->
     <div class="sidebar-footer" id="authBtn" onclick="handleAuth()">🔐 تسجيل الدخول</div>
 </div>
 
+<!-- ================= الصفحات (Pages) ================= -->
+
+<!-- 1. الرئيسية -->
 <div id="home" class="page" style="display: block;">
     <div class="card"><h3>مرحباً بك في منصة رؤية</h3></div>
 </div>
 
+<!-- 2. قسم الإعلانات -->
+<div id="announcements" class="page">
+    <div class="card">
+        <h3>📢 لوحة إعلانات المدرسة</h3>
+        <div id="announcements-list">
+            <!-- سيتم عرض الإعلانات هنا ديناميكياً -->
+        </div>
+        
+        <!-- مساحة إضافة الإعلان (مخفية افتراضياً، تظهر للمدير فقط) -->
+        <div id="admin-add-ann" style="display:none; padding:15px; margin-top:20px; background:#f9f9f9; border-radius:8px; border:1px solid #ddd;">
+            <h4>إضافة إعلان جديد</h4>
+            <input type="text" id="ann-title" placeholder="العنوان الرئيسي" style="width:100%; margin-bottom:10px; padding:8px;">
+            <textarea id="ann-desc" placeholder="وصف الإعلان..." style="width:100%; margin-bottom:10px; padding:8px; height:80px;"></textarea>
+            <input type="text" id="ann-media" placeholder="رابط صورة أو فيديو (اختياري)" style="width:100%; margin-bottom:10px; padding:8px;">
+            <button onclick="uploadAnnouncement()" style="background:#27ae60; color:white; padding:8px 15px; border:none; border-radius:5px; cursor:pointer;">نشر الإعلان</button>
+        </div>
+    </div>
+</div>
+
+<!-- 3. قسم جدول الدروس -->
 <div id="schedule" class="page">
     <div class="card">
         <h3>جدول الدروس</h3>
         <div id="schedule-container"></div>
     </div>
 </div>
-<div id="library-section" class="card" style="padding:15px; margin-top:20px;">
-    <h2 style="color:#2c3e50;">📚 المكتبة الرقمية</h2>
-    <div id="library-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
-        <!-- سيتم عرض الملازم هنا برمجياً -->
+
+<!-- 4. قسم المكتبة الرقمية -->
+<div id="library" class="page">
+    <div class="card">
+        <h2 style="color:#2c3e50;">📚 المكتبة الرقمية</h2>
+        <div id="library-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top:15px;">
+            <!-- سيتم عرض الملازم هنا برمجياً -->
+        </div>
+        
+        <!-- مساحة إضافة الكتب (مخفية افتراضياً، تظهر للمدير فقط) -->
+        <div id="admin-library-add" style="display:none; padding:15px; margin-top:20px; background:#f0f8ff; border-radius:8px; border:1px solid #cce7ff;">
+            <h4>إضافة ملف للمكتبة</h4>
+            <input type="text" id="lib-name" placeholder="اسم الملزمة/الملف" style="width:100%; margin-bottom:10px; padding:8px;">
+            <input type="text" id="lib-url" placeholder="رابط الملف (من Google Drive مثلاً)" style="width:100%; margin-bottom:10px; padding:8px;">
+            <button onclick="addLibraryItem()" style="background:#27ae60; color:white; padding:8px 15px; border:none; border-radius:5px; cursor:pointer;">إضافة للمكتبة</button>
+        </div>
     </div>
 </div>
-    <div id="admin-library-add" class="card" style="display:none; padding:15px; margin-top:20px; background:#f0f8ff;">
-    <h4>إضافة ملف للمكتبة</h4>
-    <input type="text" id="lib-name" placeholder="اسم الملزمة/الملف" style="width:100%; margin-bottom:5px;">
-    <input type="text" id="lib-url" placeholder="رابط الملف (من Google Drive مثلاً)" style="width:100%; margin-bottom:5px;">
-    <button onclick="addLibraryItem()" class="btn" style="background:#27ae60; color:white;">إضافة للمكتبة</button>
-</div>
+
 <script>
     // نظام الصلاحيات
     function handleAuth() {
@@ -92,20 +109,18 @@
         location.reload();
     }
 
+    // دالة عرض الجدول
     function renderSchedule() {
         const level = localStorage.getItem("userLevel") || "visitor";
         const container = document.getElementById("schedule-container");
         
-        // مثال لبيانات الجدول
         const subject = "رياضيات";
         const teacher = "أ. أحمد";
 
         let html = `<table><tr><th>الحصة</th><th>المادة</th></tr><tr><td>1</td><td>`;
         
-        // المادة تظهر للجميع
         html += `<div contenteditable="${level === 'admin'}">${subject}</div>`;
         
-        // الأستاذ يظهر للإدارة والأعضاء فقط
         if (level === 'admin' || level === 'member') {
             html += `<div class="teacher-text" contenteditable="${level === 'admin'}">${teacher}</div>`;
         }
@@ -118,23 +133,37 @@
     document.addEventListener("input", (e) => {
         if (localStorage.getItem("userLevel") !== "admin" && e.target.hasAttribute("contenteditable")) {
             alert("عذراً، الإدارة فقط مخولة بالتعديل!");
-            location.reload(); // إعادة تحميل لإلغاء أي تعديل
+            location.reload(); 
         }
     });
 
-    function toggleSidebar() { document.getElementById('mySidebar').classList.toggle('active'); }
+    // التحكم بالسايدبار والتنقل بين الصفحات
+    function toggleSidebar() { 
+        document.getElementById('mySidebar').classList.toggle('active'); 
+    }
+    
     function show(id) {
+        // إخفاء جميع الأقسام التي تحمل كلاس page
         document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+        // إظهار القسم المطلوب فقط
         document.getElementById(id).style.display = 'block';
-        toggleSidebar();
+        toggleSidebar(); // إغلاق القائمة بعد الاختيار
     }
 
+    // إعدادات عند تحميل الصفحة
     window.onload = () => {
         renderSchedule();
         const level = localStorage.getItem("userLevel");
         const authBtn = document.getElementById("authBtn");
+        
         if (authBtn) {
             authBtn.innerText = level ? "🔓 خروج" : "🔐 تسجيل الدخول";
+        }
+
+        // إظهار أدوات المدير (إضافة إعلانات ومكتبة) إذا كان المستخدم هو الإدارة
+        if (level === "admin") {
+            document.getElementById("admin-add-ann").style.display = "block";
+            document.getElementById("admin-library-add").style.display = "block";
         }
     };
 </script>
