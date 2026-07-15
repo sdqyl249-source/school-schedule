@@ -4,53 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة رؤية - جدول الدروس</title>
-    <!-- استدعاء نفس ملف التنسيق الموحد -->
+    <!-- استدعاء ملف التنسيق الموحد -->
     <link rel="stylesheet" href="style.css">
     <style>
-        /* تنسيقات إضافية خاصة بصفحة الجدول */
-        .nav-btns { padding: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .admin-panel { padding: 15px; background: #f9f9f9; border-bottom: 1px solid #ddd; }
-        .btn { padding: 8px 15px; border: none; cursor: pointer; color: white; border-radius: 4px; margin: 0 5px; }
-        .accordion { background-color: #eee; color: #444; cursor: pointer; padding: 18px; width: 100%; border: none; text-align: right; outline: none; font-size: 15px; transition: 0.4s; margin-top: 5px; }
-        .full-day-card { display: none; padding: 15px; background: white; border-right: 5px solid; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        :root { --primary: #5e72e4; --success: #2dce89; --danger: #e74c3c; }
+        body { font-family: 'Cairo', sans-serif; background: #f8fafc; margin: 0; padding: 0; }
+        
+        /* شريط التنقل */
+        .nav-btns { padding: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; gap: 10px; justify-content: center; }
+        .btn { padding: 10px 20px; border: none; cursor: pointer; color: white; border-radius: 8px; font-weight: bold; transition: 0.3s; }
+        .btn:hover { opacity: 0.9; }
+        
+        /* الحاويات */
+        .page-container { padding: 20px; max-width: 1000px; margin: auto; }
+        .admin-panel { padding: 20px; background: #f9f9f9; border-top: 2px solid #ddd; text-align: center; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-top: 20px; }
+        
+        /* الجداول */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background: var(--primary); color: white; }
     </style>
 </head>
 <body>
 
-<!-- أزرار التحكم -->
+<!-- شريط التنقل العلوي -->
 <div class="nav-btns">
-    <button class="btn" style="background:#5e72e4" onclick="login()">دخول الإدارة</button>
-    <button class="btn" id="logoutBtn" style="background:#e74c3c; display:none;" onclick="logout()">خروج</button>
-    <button class="btn" style="background:#27ae60" onclick="window.print()">🖨️ طباعة الجدول</button>
+    <button class="btn" style="background:var(--primary)" onclick="login()">دخول الإدارة</button>
+    <button class="btn" id="logoutBtn" style="background:var(--danger); display:none;" onclick="logout()">خروج</button>
+    <button class="btn" style="background:var(--success)" onclick="window.print()">🖨️ طباعة الجدول</button>
     <a href="index.html" class="btn" style="background:#34495e; text-decoration:none;">🏠 العودة للرئيسية</a>
 </div>
+
 <div class="page-container">
-    <a href="index.html" class="back-btn">🏠 العودة للرئيسية</a>
-    
     <div class="card">
         <h3>📅 جدول الدروس المدرسي</h3>
-        <!-- هنا سيقوم سكربت scriot.js برسم الجداول تلقائياً -->
+        <!-- سيقوم scriot.js برسم الجداول هنا -->
         <div id="app"></div>
     </div>
 </div>
-<!-- لوحة التحكم (تظهر فقط للمدير) -->
+
+<!-- لوحة التحكم (تظهر للمدير فقط عبر JS) -->
 <div class="admin-panel" id="adminPanel" style="display:none;">
-    <select id="selG"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option></select>
-    <select id="selS"><option>أ</option><option>ب</option></select>
-    <button class="btn" style="background:#2dce89" onclick="addTable()">➕ إضافة جدول</button>
+    <select id="selG">
+        <option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option>
+    </select>
+    <select id="selS">
+        <option>أ</option><option>ب</option><option>ج</option>
+    </select>
+    <button class="btn" style="background:var(--success)" onclick="addTable()">➕ إضافة جدول</button>
     <button class="btn" style="background:#e67e22" onclick="deleteTable()">🗑️ حذف جدول</button>
 </div>
-
-<!-- المكان الذي سيتم فيه رسم الجداول -->
-<div id="app"></div>
 
 <!-- مكتبات Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
-<!-- ربط ملف السكربت الموحد (scriot.js) -->
+<!-- ملف السكربت الموحد -->
 <script src="scriot.js"></script>
+
+<script>
+    // تفعيل عرض لوحة التحكم عند تسجيل الدخول
+    function login() {
+        // منطق تسجيل الدخول الخاص بك هنا
+        document.getElementById("adminPanel").style.display = "block";
+        document.getElementById("logoutBtn").style.display = "inline-block";
+    }
+
+    function logout() {
+        document.getElementById("adminPanel").style.display = "none";
+        document.getElementById("logoutBtn").style.display = "none";
+    }
+</script>
+
 </body>
 </html>
