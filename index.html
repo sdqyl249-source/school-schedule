@@ -83,12 +83,12 @@
         </div>
         
         <!-- مساحة إضافة الكتب (مخفية افتراضياً، تظهر للمدير فقط) -->
-        <div id="admin-library-add" style="display:none; padding:15px; margin-top:20px; background:#f0f8ff; border-radius:8px; border:1px solid #cce7ff;">
-            <h4>إضافة ملف للمكتبة</h4>
-            <input type="text" id="lib-name" placeholder="اسم الملزمة/الملف" style="width:100%; margin-bottom:10px; padding:8px;">
-            <input type="text" id="lib-url" placeholder="رابط الملف (من Google Drive مثلاً)" style="width:100%; margin-bottom:10px; padding:8px;">
-            <button onclick="addLibraryItem()" style="background:#27ae60; color:white; padding:8px 15px; border:none; border-radius:5px; cursor:pointer;">إضافة للمكتبة</button>
-        </div>
+       <div id="admin-library-add" class="card" style="display:none; padding:15px; margin-top:20px; background:#f0f8ff;">
+    <h4>إضافة ملف للمكتبة من جهازك</h4>
+    <input type="text" id="lib-name" placeholder="اسم الملف" style="width:100%; margin-bottom:5px;">
+    <input type="file" id="lib-file" style="width:100%; margin-bottom:5px;">
+    <button onclick="uploadFileToStorage()" class="btn" style="background:#27ae60; color:white;">رفع الملف للمكتبة</button>
+</div>
     </div>
 </div>
 
