@@ -99,7 +99,39 @@ function addTable() {
 function deleteTable(key) {
     if(confirm("هل أنت متأكد؟")) database.ref('school_data/lessons/' + key).remove();
 }
+function uploadAnnouncement() {
+    const title = document.getElementById('ann-title').value;
+    const desc = document.getElementById('ann-desc').value;
+    const file = document.getElementById('ann-media').files[0];
+    const date = new Date().toLocaleDateString('ar-IQ');
 
+    if (!title || !desc) return alert("يرجى ملء العنوان والوصف!");
+
+    if (file) {
+        // إذا كان هناك ملف، نرفعه أولاً
+        const storageRef = firebase.storage().ref('announcements/' + file.name);
+        storageRef.put(file).then(snapshot => {
+            snapshot.ref.getDownloadURL().then(url => {
+                saveToDatabase(title, desc, url, date);
+            });
+        });
+    } else {
+        // بدون ملف
+        saveToDatabase(title, desc, null, date);
+    }
+}
+
+function saveToDatabase(title, desc, url, date) {
+    database.ref('announcements').push({
+        title: title,
+        desc: desc,
+        mediaUrl: url,
+        date: date
+    }).then(() => {
+        alert("تم نشر الإعلان بنجاح!");
+        location.reload();
+    });
+}
 // 5. قسم الإعلانات (المدمج)
 function loadAnnouncements() {
     database.ref('announcements').on('value', (snapshot) => {
