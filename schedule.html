@@ -49,9 +49,25 @@
     <select id="selG">
         <option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option>
     </select>
-    <select id="selS">
-        <option>أ</option><option>ب</option><option>ج</option>
+    <!-- لوحة التحكم -->
+<div class="admin-panel" id="adminPanel" style="display:none;">
+    <select id="selG">
+        <option value="الأول">الأول</option>
+        <option value="الثاني">الثاني</option>
+        <option value="الثالث">الثالث</option>
+        <option value="الرابع">الرابع</option>
+        <option value="الخامس">الخامس</option>
+        <option value="السادس">السادس</option>
     </select>
+    
+    <select id="selS">
+        <option value="أ">أ</option>
+        <option value="ب">ب</option>
+        <option value="ج">ج</option>
+    </select>
+    
+    <button class="btn" style="background:var(--success)" onclick="addTable()">➕ إضافة جدول</button>
+</div>
     <button class="btn" style="background:var(--success)" onclick="addTable()">➕ إضافة جدول</button>
     <button class="btn" style="background:#e67e22" onclick="deleteTable()">🗑️ حذف جدول</button>
 </div>
