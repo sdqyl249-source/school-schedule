@@ -29,7 +29,7 @@ function logout() {
     location.reload();
 }
 
-// 3. دالة الجلب والـ Render
+// 3. دالة الجلب والعرض (Render)
 database.ref('school_data/lessons').on('value', (snapshot) => {
     state.lessons = snapshot.val() || {}; 
     render();
@@ -44,25 +44,25 @@ function render() {
     for (let key in state.lessons) {
         let tableData = state.lessons[key];
         let html = `
-            <div class="card">
+            <div class="card" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
                 <h4>جدول الصف: ${tableData.class} - ${tableData.section}</h4>
-                <table>
-                    <tr><th>الحصة</th>${config.days.map(d => `<th>${d}</th>`).join('')}</tr>
+                <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+                    <tr><th>الحصة</th>${config.days.map(d => `<th style="padding:8px; border:1px solid #ccc;">${d}</th>`).join('')}</tr>
                     ${[0,1,2,3].map(r => `
                         <tr>
-                            <td>الحصة ${r+1}</td>
+                            <td style="padding:8px; border:1px solid #ccc;">الحصة ${r+1}</td>
                             ${config.days.map((d, colIndex) => `
-                                <td>
-                                    <!-- المادة للجميع -->
+                                <td style="padding:8px; border:1px solid #ccc;">
+                                    <!-- المادة (تظهر للجميع) -->
                                     <div class="info-txt" contenteditable="${level === 'admin'}" 
                                          onblur="update('${key}', ${r}, ${colIndex}, 'subject', this.innerText)">
                                         ${tableData.data?.[r]?.[colIndex]?.subject || "..."}
                                     </div>
-                                    <!-- الأستاذ للمدير والعضو فقط -->
+                                    <!-- الأستاذ (تظهر للمدير والعضو فقط) -->
                                     ${(level === 'admin' || level === 'member') ? `
                                         <div class="info-txt teacher" contenteditable="${level === 'admin'}"
                                              onblur="update('${key}', ${r}, ${colIndex}, 'teacher', this.innerText)"
-                                             style="color:#9333ea; font-size:0.8em;">
+                                             style="color:#9333ea; font-size:0.8em; border-top:1px dashed #ccc; margin-top:2px;">
                                             ${tableData.data?.[r]?.[colIndex]?.teacher || "الأستاذ..."}
                                         </div>
                                     ` : ''}
@@ -71,7 +71,7 @@ function render() {
                         </tr>
                     `).join('')}
                 </table>
-                ${level === 'admin' ? `<button onclick="deleteTable('${key}')" class="btn" style="background:red; margin-top:10px;">🗑️ حذف الجدول</button>` : ''}
+                ${level === 'admin' ? `<button onclick="deleteTable('${key}')" class="btn" style="background:red; color:white; border:none; padding:5px 10px; margin-top:10px; cursor:pointer;">🗑️ حذف الجدول</button>` : ''}
             </div>
         `;
         app.innerHTML += html;
@@ -88,15 +88,33 @@ function update(key, r, d, type, val) {
     database.ref(`school_data/lessons/${key}/data/${r}/${d}/${type}`).set(val); 
 }
 
-// 5. دوال مساعدة
+// 5. إدارة الجداول (إضافة وحذف)
+function addTable() {
+    if (localStorage.getItem("userLevel") !== "admin") {
+        alert("فقط المدير يمكنه إضافة جداول!");
+        return;
+    }
+    const cls = document.getElementById("selG").value;
+    const sec = document.getElementById("selS").value;
+    const newKey = database.ref('school_data/lessons').push().key;
+    database.ref('school_data/lessons/' + newKey).set({ class: cls, section: sec, data: [] });
+}
+
 function deleteTable(key) {
     if(confirm("هل أنت متأكد من حذف هذا الجدول؟")) {
         database.ref('school_data/lessons/' + key).remove();
     }
 }
 
+// 6. تهيئة الصفحة
 document.addEventListener('DOMContentLoaded', () => {
-    // تحديث زر الدخول في الواجهة
+    // تحديث نص زر تسجيل الدخول
     const btn = document.getElementById("authBtn");
     if(btn) btn.innerText = localStorage.getItem("userLevel") ? "🔓 خروج" : "🔐 تسجيل الدخول";
+    
+    // إظهار لوحة التحكم للمدير فقط
+    const adminPanel = document.getElementById("adminPanel");
+    if (adminPanel && localStorage.getItem("userLevel") === "admin") {
+        adminPanel.style.display = "block";
+    }
 });
