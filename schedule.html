@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة رؤية - جدول الدروس</title>
-    <!-- ربط ملف الستايل الموحد -->
-    <link rel="stylesheet" href="style.css"> 
+    <!-- استدعاء نفس ملف التنسيق الموحد -->
+    <link rel="stylesheet" href="style.css">
     <style>
         /* تنسيقات إضافية خاصة بصفحة الجدول */
         .nav-btns { padding: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
@@ -26,7 +26,15 @@
     <button class="btn" style="background:#27ae60" onclick="window.print()">🖨️ طباعة الجدول</button>
     <a href="index.html" class="btn" style="background:#34495e; text-decoration:none;">🏠 العودة للرئيسية</a>
 </div>
-
+<div class="page-container">
+    <a href="index.html" class="back-btn">🏠 العودة للرئيسية</a>
+    
+    <div class="card">
+        <h3>📅 جدول الدروس المدرسي</h3>
+        <!-- هنا سيقوم سكربت scriot.js برسم الجداول تلقائياً -->
+        <div id="app"></div>
+    </div>
+</div>
 <!-- لوحة التحكم (تظهر فقط للمدير) -->
 <div class="admin-panel" id="adminPanel" style="display:none;">
     <select id="selG"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option></select>
