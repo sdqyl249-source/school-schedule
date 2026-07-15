@@ -88,7 +88,22 @@ function render() {
         // ... استمر في بناء الجدول
     }
 }
+function renderTables() {
+    const app = document.getElementById('app');
+    
+    // هذا الشرط يحمي الصفحة من الانهيار إذا لم تجد العنصر
+    if (!app) return; 
 
+    // هنا تضع كود رسم الجدول الخاص بك...
+    // مثال:
+    app.innerHTML = "جاري تحميل الجدول...";
+    // ... (بقية كود رسم الجداول من Firebase)
+}
+
+// استدعاء الدالة عند تحميل الصفحة
+window.onload = function() {
+    renderTables();
+};
 function update(key, r, d, type, val) { state.lessons[key][r][d][type] = val; database.ref('school_data').set(state); }
 
 // 6. التبليغات والشكاوى
