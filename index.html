@@ -38,6 +38,13 @@
         <button class="btn" style="background:#27ae60" onclick="addAnnouncement()">نشر الإعلان</button>
     </div>
 </div>
+    <div id="admin-add-area" class="card" style="display:none; padding:15px; margin-bottom:20px; background:#f9f9f9;">
+    <h4>إضافة إعلان جديد</h4>
+    <input type="text" id="ann-title" placeholder="العنوان الرئيسي" style="width:100%; margin-bottom:10px;">
+    <textarea id="ann-desc" placeholder="وصف الإعلان..." style="width:100%; margin-bottom:10px;"></textarea>
+    <input type="file" id="ann-media" accept="image/*,video/*">
+    <button onclick="uploadAnnouncement()" class="btn" style="background:#27ae60; color:white; margin-top:10px;">نشر الإعلان</button>
+</div>
 <div class="sidebar" id="mySidebar">
     <div class="sidebar-header">👁️ منصة رؤية <span onclick="toggleSidebar()" style="cursor:pointer;">✕</span></div>
     <div class="menu-item" onclick="show('home')">🏠 الرئيسية</div>
