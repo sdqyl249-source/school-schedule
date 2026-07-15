@@ -123,7 +123,29 @@ function loadLibrary() {
         });
     });
 }
+function uploadFileToStorage() {
+    const name = document.getElementById('lib-name').value;
+    const fileInput = document.getElementById('lib-file');
+    const file = fileInput.files[0];
 
+    if (!name || !file) return alert("يرجى كتابة الاسم واختيار ملف!");
+
+    // إنشاء مرجع للملف في Firebase Storage
+    const storageRef = firebase.storage().ref('library_files/' + file.name);
+    
+    // رفع الملف
+    storageRef.put(file).then(snapshot => {
+        // الحصول على رابط التحميل بعد الرفع
+        snapshot.ref.getDownloadURL().then(url => {
+            // حفظ الرابط في Realtime Database
+            database.ref('library').push({ name: name, url: url });
+            alert("تم رفع الملف بنجاح!");
+            document.getElementById('lib-name').value = '';
+        });
+    }).catch(error => {
+        alert("حدث خطأ أثناء الرفع: " + error.message);
+    });
+}
 function addLibraryItem() {
     const name = document.getElementById('lib-name').value;
     const url = document.getElementById('lib-url').value;
