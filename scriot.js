@@ -182,3 +182,31 @@ window.onload = function() {
     // تشغيل الإعلانات
     loadAnnouncements();
 };
+function loadLibrary() {
+    database.ref('library').on('value', (snapshot) => {
+        const list = document.getElementById('library-list');
+        if (!list) return;
+        
+        list.innerHTML = '';
+        snapshot.forEach((childSnapshot) => {
+            const item = childSnapshot.val();
+            list.innerHTML += `
+                <div style="border:1px solid #ddd; padding:10px; border-radius:8px; text-align:center;">
+                    <p><b>${item.name}</b></p>
+                    <a href="${item.url}" target="_blank" style="text-decoration:none; background:#3498db; color:white; padding:5px 15px; border-radius:5px; display:inline-block;">تحميل الملف</a>
+                </div>
+            `;
+        });
+    });
+}
+function addLibraryItem() {
+    const name = document.getElementById('lib-name').value;
+    const url = document.getElementById('lib-url').value;
+    
+    if (name && url) {
+        database.ref('library').push({ name: name, url: url });
+        alert("تمت إضافة الملف بنجاح!");
+        document.getElementById('lib-name').value = '';
+        document.getElementById('lib-url').value = '';
+    }
+}
