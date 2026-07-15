@@ -20,21 +20,13 @@ let state = { lessons: {} };
 document.addEventListener('DOMContentLoaded', () => {
     updateUIState();
     renderNews();
-    render(); // عرض الجداول
+    // تمت إزالة render() من هنا لأنها ستستدعى تلقائياً عند وصول البيانات في دالة الجلب أدناه
 });
 
 // 3. الدوال الموحدة (UI & Navigation)
 function toggleSidebar() {
     const sidebar = document.getElementById('mySidebar');
     if (sidebar) sidebar.style.width = (sidebar.style.width === '280px') ? '0' : '280px';
-}
-
-function toggleAuth() {
-    let isAdmin = localStorage.getItem("isAdmin") === "true";
-    let newState = !isAdmin;
-    localStorage.setItem("isAdmin", newState);
-    alert(newState ? "تم تفعيل وضع الإدارة" : "تم الخروج من وضع الإدارة");
-    location.reload();
 }
 
 function updateUIState() {
@@ -54,12 +46,11 @@ function logoutCurrentMember(event) {
     window.location.reload();
 }
 
-// 4. دوال الجداول والـ Firebase
-database.ref('school_data').on('value', (snapshot) => {
-    if(snapshot.exists()) { 
-        state = snapshot.val(); 
-        render(); 
-    }
+// 4. دوال الجداول والـ Firebase (المسار المصحح)
+database.ref('school_data/lessons').on('value', (snapshot) => {
+    // هنا نستقبل البيانات ونضعها مباشرة في state.lessons
+    state.lessons = snapshot.val() || {}; 
+    render();
 });
 
 function render() {
@@ -87,7 +78,7 @@ function render() {
                         </tr>
                     `).join('')}
                 </table>
-                ${localStorage.getItem("isAdmin") === "true" ? `<button onclick="deleteTable('${key}')" class="btn" style="background:red">🗑️ حذف</button>` : ''}
+                ${localStorage.getItem("isAdmin") === "true" ? `<button onclick="deleteTable('${key}')" class="btn" style="background:red; margin-top:10px;">🗑️ حذف الجدول</button>` : ''}
             </div>
         `;
         app.innerHTML += html;
@@ -103,7 +94,9 @@ function addTable() {
 }
 
 function deleteTable(key) {
-    if(confirm("هل أنت متأكد؟")) database.ref('school_data/lessons/' + key).remove();
+    if(confirm("هل أنت متأكد من حذف هذا الجدول؟")) {
+        database.ref('school_data/lessons/' + key).remove();
+    }
 }
 
 function update(key, r, d, type, val) { 
