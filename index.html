@@ -64,7 +64,18 @@
         <div id="schedule-container"></div>
     </div>
 </div>
-
+<div id="library-section" class="card" style="padding:15px; margin-top:20px;">
+    <h2 style="color:#2c3e50;">📚 المكتبة الرقمية</h2>
+    <div id="library-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+        <!-- سيتم عرض الملازم هنا برمجياً -->
+    </div>
+</div>
+    <div id="admin-library-add" class="card" style="display:none; padding:15px; margin-top:20px; background:#f0f8ff;">
+    <h4>إضافة ملف للمكتبة</h4>
+    <input type="text" id="lib-name" placeholder="اسم الملزمة/الملف" style="width:100%; margin-bottom:5px;">
+    <input type="text" id="lib-url" placeholder="رابط الملف (من Google Drive مثلاً)" style="width:100%; margin-bottom:5px;">
+    <button onclick="addLibraryItem()" class="btn" style="background:#27ae60; color:white;">إضافة للمكتبة</button>
+</div>
 <script>
     // نظام الصلاحيات
     function handleAuth() {
