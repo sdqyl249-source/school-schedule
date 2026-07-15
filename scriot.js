@@ -94,18 +94,24 @@ function uploadAnnouncement() {
     });
 }
 
-function loadAnnouncements() {
-    database.ref('announcements').on('value', (snapshot) => {
-        const list = document.getElementById('announcements-list');
-        if (!list) return;
-        list.innerHTML = ''; 
-        snapshot.forEach((childSnapshot) => {
-            const data = childSnapshot.val();
-            list.innerHTML += `<div class="card" style="border-bottom: 2px solid #3498db;"><h3>${data.title}</h3><p>${data.desc}</p>${data.mediaUrl ? `<img src="${data.mediaUrl}" style="width:100%">` : ''}</div>`;
-        });
+function uploadAnnouncement() {
+    const title = document.getElementById('ann-title').value;
+    const desc = document.getElementById('ann-desc').value;
+    const mediaUrl = document.getElementById('ann-media').value; // جلب النص مباشرة
+    const date = new Date().toLocaleDateString('ar-IQ');
+
+    if (!title || !desc) return alert("يرجى ملء العنوان والوصف!");
+
+    database.ref('announcements').push({
+        title: title,
+        desc: desc,
+        mediaUrl: mediaUrl, // حفظ الرابط النصي
+        date: date
+    }).then(() => {
+        alert("تم نشر الإعلان بنجاح!");
+        location.reload();
     });
 }
-
 function loadLibrary() {
     database.ref('library').on('value', (snapshot) => {
         const list = document.getElementById('library-list');
