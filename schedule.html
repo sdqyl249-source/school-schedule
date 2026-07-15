@@ -45,7 +45,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 <script src="scriot.js"></script>
-
 <script>
     // عند تحميل الصفحة، تحقق من مستوى المستخدم فوراً
     document.addEventListener('DOMContentLoaded', () => {
@@ -55,7 +54,6 @@
             document.getElementById("logoutBtn").style.display = "inline-block";
         }
     });
-
     // دالة الدخول
     function login() {
         const code = prompt("يرجى إدخال رمز الدخول:");
@@ -71,12 +69,11 @@
             alert("رمز خاطئ!");
         }
     }
-
     // دالة الخروج
     function logout() {
         localStorage.removeItem("userLevel");
         location.reload();
     }
 </script>
-
 </body>
+</html>
