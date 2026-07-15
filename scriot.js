@@ -90,16 +90,40 @@ function update(key, r, d, type, val) {
 
 // 5. إدارة الجداول (إضافة وحذف)
 function addTable() {
+    // 1. التحقق من صلاحية المدير
     if (localStorage.getItem("userLevel") !== "admin") {
         alert("فقط المدير يمكنه إضافة جداول!");
         return;
     }
-    const cls = document.getElementById("selG").value;
-    const sec = document.getElementById("selS").value;
-    const newKey = database.ref('school_data/lessons').push().key;
-    database.ref('school_data/lessons/' + newKey).set({ class: cls, section: sec, data: [] });
-}
 
+    // 2. جلب العناصر مع التأكد من وجودها لتجنب أخطاء برمجية
+    const selG = document.getElementById("selG");
+    const selS = document.getElementById("selS");
+
+    if (!selG || !selS) {
+        alert("خطأ: لم يتم العثور على قوائم الصفوف.");
+        return;
+    }
+
+    const cls = selG.value;
+    const sec = selS.value;
+
+    // 3. إنشاء المفتاح والبيانات
+    const newKey = database.ref('school_data/lessons').push().key;
+    
+    // 4. الحفظ في Firebase
+    database.ref('school_data/lessons/' + newKey).set({ 
+        class: cls, 
+        section: sec, 
+        data: [] 
+    }).then(() => {
+        alert("تمت إضافة جدول الصف " + cls + " شعبة " + sec + " بنجاح!");
+        // إعادة تحميل الصفحة ليظهر الجدول الجديد فوراً
+        location.reload(); 
+    }).catch((error) => {
+        alert("حدث خطأ أثناء الحفظ: " + error.message);
+    });
+}
 function deleteTable(key) {
     if(confirm("هل أنت متأكد من حذف هذا الجدول؟")) {
         database.ref('school_data/lessons/' + key).remove();
