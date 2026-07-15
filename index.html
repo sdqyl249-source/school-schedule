@@ -30,11 +30,15 @@
 <div class="sidebar" id="mySidebar">
     <div class="sidebar-header">👁️ منصة رؤية <span onclick="toggleSidebar()" style="cursor:pointer;">✕</span></div>
     <div class="menu-item" onclick="show('home')">🏠 الرئيسية</div>
-<!-- داخل القائمة الجانبية في كل الصفحات -->
-<!-- بدلاً من school.html، اجعله هكذا: -->
-<div class="menu-item" onclick="window.location.href='schedule.html'">📅 جدول الدروس</div></div>
+    <div class="menu-item" onclick="window.location.href='schedule.html'">📅 جدول الدروس</div>
+    
+    <!-- زر تسجيل الدخول/الخروج -->
+    <div class="sidebar-footer" id="authBtn" onclick="handleAuth()">🔐 تسجيل الدخول</div>
+</div>
 
-<div id="home" class="page" style="display: block;"><div class="card"><h3>مرحباً بك في منصة رؤية</h3></div></div>
+<div id="home" class="page" style="display: block;">
+    <div class="card"><h3>مرحباً بك في منصة رؤية</h3></div>
+</div>
 
 <div id="schedule" class="page">
     <div class="card">
@@ -99,7 +103,10 @@
     window.onload = () => {
         renderSchedule();
         const level = localStorage.getItem("userLevel");
-        document.getElementById("authBtn").innerText = level ? "🔓 خروج" : "🔐 تسجيل الدخول";
+        const authBtn = document.getElementById("authBtn");
+        if (authBtn) {
+            authBtn.innerText = level ? "🔓 خروج" : "🔐 تسجيل الدخول";
+        }
     };
 </script>
 </body>
