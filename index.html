@@ -26,7 +26,18 @@
 <body>
 
 <button onclick="toggleSidebar()" style="position:fixed; top:10px; right:10px; z-index:999; background: #34495e; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px;">☰ القائمة</button>
-
+<!-- قسم لوحة الإعلانات -->
+<div id="announcements-section" class="card">
+    <h3>📢 لوحة إعلانات المدرسة</h3>
+    <!-- سيتم عرض الإعلانات هنا ديناميكياً -->
+    <div id="announcements-list"></div>
+    
+    <!-- زر الإضافة يظهر للمشرف فقط -->
+    <div id="admin-add-area" style="display:none; margin-top: 15px;">
+        <textarea id="new-announcement" placeholder="اكتب إعلاناً جديداً..." style="width:100%;"></textarea>
+        <button class="btn" style="background:#27ae60" onclick="addAnnouncement()">نشر الإعلان</button>
+    </div>
+</div>
 <div class="sidebar" id="mySidebar">
     <div class="sidebar-header">👁️ منصة رؤية <span onclick="toggleSidebar()" style="cursor:pointer;">✕</span></div>
     <div class="menu-item" onclick="show('home')">🏠 الرئيسية</div>
