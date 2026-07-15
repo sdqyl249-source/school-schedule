@@ -2,28 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة رؤية - جدول الدروس</title>
-    <!-- استدعاء ملف التنسيق الموحد -->
-    <link rel="stylesheet" href="style.css">
+    <title>جدول الدروس</title>
     <style>
-        :root { --primary: #5e72e4; --success: #2dce89; --danger: #e74c3c; }
-        body { font-family: 'Cairo', sans-serif; background: #f8fafc; margin: 0; padding: 0; }
-        
-        /* شريط التنقل */
-        .nav-btns { padding: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; gap: 10px; justify-content: center; }
-        .btn { padding: 10px 20px; border: none; cursor: pointer; color: white; border-radius: 8px; font-weight: bold; transition: 0.3s; }
-        .btn:hover { opacity: 0.9; }
-        
-        /* الحاويات */
-        .page-container { padding: 20px; max-width: 1000px; margin: auto; }
-        .admin-panel { padding: 20px; background: #f9f9f9; border-top: 2px solid #ddd; text-align: center; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-top: 20px; }
-        
-        /* الجداول */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background: var(--primary); color: white; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        .btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; color: white; margin: 5px; }
+        .admin-panel { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ccc; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -36,80 +22,49 @@
     <a href="index.html" class="btn" style="background:#34495e; text-decoration:none;">🏠 العودة للرئيسية</a>
 </div>
 
-<div class="page-container">
-    <div class="card">
-        <h3>📅 جدول الدروس المدرسي</h3>
-        <!-- سيقوم scriot.js برسم الجداول هنا -->
-        <div id="app"></div>
-    </div>
+<!-- محتوى الجدول -->
+<div class="card">
+    <h3>📅 جدول الدروس المدرسي</h3>
+    <div id="app"></div>
 </div>
 
-<!-- لوحة التحكم (تظهر للمدير فقط عبر JS) -->
-<div class="admin-panel" id="adminPanel" style="display:none;">
+<!-- لوحة التحكم (تظهر للمدير فقط) -->
+<div class="admin-panel" id="adminPanel">
     <select id="selG">
-        <option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option>
+        <option value="الأول">الأول</option><option value="الثاني">الثاني</option>
+        <option value="الثالث">الثالث</option><option value="الرابع">الرابع</option>
+        <option value="الخامس">الخامس</option><option value="السادس">السادس</option>
     </select>
-    <!-- لوحة التحكم -->
-<div class="admin-panel" id="adminPanel" style="display:none;">
-    <select id="selG">
-        <option value="الأول">الأول</option>
-        <option value="الثاني">الثاني</option>
-        <option value="الثالث">الثالث</option>
-        <option value="الرابع">الرابع</option>
-        <option value="الخامس">الخامس</option>
-        <option value="السادس">السادس</option>
-    </select>
-    
     <select id="selS">
-        <option value="أ">أ</option>
-        <option value="ب">ب</option>
-        <option value="ج">ج</option>
+        <option value="أ">أ</option><option value="ب">ب</option><option value="ج">ج</option>
     </select>
-    
     <button class="btn" style="background:var(--success)" onclick="addTable()">➕ إضافة جدول</button>
-</div>
-    <button class="btn" style="background:var(--success)" onclick="addTable()">➕ إضافة جدول</button>
-    <button class="btn" style="background:#e67e22" onclick="deleteTable()">🗑️ حذف جدول</button>
 </div>
 
-<!-- مكتبات Firebase -->
+<!-- مكتبات Firebase والسكربت -->
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
-
-<!-- ملف السكربت الموحد -->
 <script src="scriot.js"></script>
 
 <script>
-    // تفعيل عرض لوحة التحكم عند تسجيل الدخول
-    function login() {
-        // منطق تسجيل الدخول الخاص بك هنا
-        document.getElementById("adminPanel").style.display = "block";
-        document.getElementById("logoutBtn").style.display = "inline-block";
-    }
-
-    function logout() {
-        document.getElementById("adminPanel").style.display = "none";
-        document.getElementById("logoutBtn").style.display = "none";
-    }
     // عند تحميل الصفحة، تحقق من مستوى المستخدم فوراً
     document.addEventListener('DOMContentLoaded', () => {
         const level = localStorage.getItem("userLevel");
-        
         if (level === "admin") {
             document.getElementById("adminPanel").style.display = "block";
             document.getElementById("logoutBtn").style.display = "inline-block";
         }
     });
 
-    // دالة الدخول المحدثة لربطها مع نظامنا
+    // دالة الدخول
     function login() {
         const code = prompt("يرجى إدخال رمز الدخول:");
         if (code === "ahmed") {
             localStorage.setItem("userLevel", "admin");
-            location.reload(); // إعادة تحميل لتفعيل الصلاحيات
+            location.reload();
         } else if (code === "2026") {
             localStorage.setItem("userLevel", "member");
-            alert("تم الدخول كعضو (للقراءة فقط)");
+            alert("تم الدخول كعضو");
             location.reload();
         } else {
             localStorage.setItem("userLevel", "visitor");
@@ -125,4 +80,3 @@
 </script>
 
 </body>
-</html>
