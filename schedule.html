@@ -3,32 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة رؤية - النظام المدرسي</title>
-    <!-- يمكنك وضع تنسيق CSS الخاص بك هنا -->
+    <title>منصة رؤية - جدول الدروس</title>
+    <!-- ربط ملف الستايل الموحد -->
     <link rel="stylesheet" href="style.css"> 
+    <style>
+        /* تنسيقات إضافية خاصة بصفحة الجدول */
+        .nav-btns { padding: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .admin-panel { padding: 15px; background: #f9f9f9; border-bottom: 1px solid #ddd; }
+        .btn { padding: 8px 15px; border: none; cursor: pointer; color: white; border-radius: 4px; margin: 0 5px; }
+        .accordion { background-color: #eee; color: #444; cursor: pointer; padding: 18px; width: 100%; border: none; text-align: right; outline: none; font-size: 15px; transition: 0.4s; margin-top: 5px; }
+        .full-day-card { display: none; padding: 15px; background: white; border-right: 5px solid; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    </style>
 </head>
 <body>
 
+<!-- أزرار التحكم -->
 <div class="nav-btns">
     <button class="btn" style="background:#5e72e4" onclick="login()">دخول الإدارة</button>
     <button class="btn" id="logoutBtn" style="background:#e74c3c; display:none;" onclick="logout()">خروج</button>
     <button class="btn" style="background:#27ae60" onclick="window.print()">🖨️ طباعة الجدول</button>
+    <a href="index.html" class="btn" style="background:#34495e; text-decoration:none;">🏠 العودة للرئيسية</a>
 </div>
 
+<!-- لوحة التحكم (تظهر فقط للمدير) -->
 <div class="admin-panel" id="adminPanel" style="display:none;">
     <select id="selG"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option></select>
     <select id="selS"><option>أ</option><option>ب</option></select>
-    <button class="btn" style="background:#2dce89" onclick="addTable()">➕ إضافة</button>
-    <button class="btn" style="background:#e67e22" onclick="deleteTable()">🗑️ حذف</button>
+    <button class="btn" style="background:#2dce89" onclick="addTable()">➕ إضافة جدول</button>
+    <button class="btn" style="background:#e67e22" onclick="deleteTable()">🗑️ حذف جدول</button>
 </div>
 
+<!-- المكان الذي سيتم فيه رسم الجداول -->
 <div id="app"></div>
 
 <!-- مكتبات Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
-<!-- ملف التشغيل الرئيسي -->
-<script src="main.js"></script>
+<!-- ربط ملف السكربت الموحد (scriot.js) -->
+<script src="scriot.js"></script>
 </body>
 </html>
