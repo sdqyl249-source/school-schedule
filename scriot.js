@@ -80,7 +80,6 @@ function render() {
 
 // 4. وظائف الإعلانات والمكتبة
 function uploadAnnouncement() {
-    console.log("تم الضغط على زر النشر!"); // أضف هذا السطر
     if (localStorage.getItem("userLevel") !== "admin") {
         alert("❌ عذراً، الإدارة فقط مخولة بنشر الإعلانات!");
         return;
@@ -88,32 +87,24 @@ function uploadAnnouncement() {
     const titleElement = document.getElementById('ann-title');
     const descElement = document.getElementById('ann-desc');
     const mediaElement = document.getElementById('ann-media');
-    const submitBtn = document.getElementById('submit-btn');
-
-    const title = titleElement.value.trim();
-    const desc = descElement.value.trim();
-    const mediaUrl = mediaElement.value.trim();
-    const date = new Date().toLocaleDateString('ar-IQ');
-
-    if (!title || !desc) {
+    
+    if (!titleElement.value || !descElement.value) {
         alert("⚠️ يرجى ملء العنوان والوصف!");
         return;
     }
-    if (submitBtn) submitBtn.disabled = true;
 
     database.ref('announcements').push({
-        title: title,
-        desc: desc,
-        mediaUrl: mediaUrl,
-        date: date,
+        title: titleElement.value,
+        desc: descElement.value,
+        mediaUrl: mediaElement.value,
+        date: new Date().toLocaleDateString('ar-IQ'),
         admin_key: 'ahmed'
     }).then(() => {
         alert("✅ تم نشر الإعلان بنجاح!");
         titleElement.value = '';
         descElement.value = '';
         mediaElement.value = '';
-    }).catch(err => alert("❌ خطأ: " + err.message))
-    .finally(() => { if (submitBtn) submitBtn.disabled = false; });
+    }).catch(err => alert("❌ خطأ: " + err.message));
 }
 
 function loadAnnouncements() {
@@ -125,13 +116,10 @@ function loadAnnouncements() {
         snapshot.forEach((childSnapshot) => {
             const item = childSnapshot.val();
             const key = childSnapshot.key;
-            if (!item) return;
             list.innerHTML += `
                 <div style="border:1px solid #ddd; padding:15px; margin:10px 0; border-radius:8px; background:#fff;">
                     <h4>${item.title}</h4>
                     <p>${item.desc}</p>
-                    ${item.mediaUrl ? `<p><a href="${item.mediaUrl}" target="_blank">📎 رابط مرفق</a></p>` : ''}
-                    <small>${item.date}</small>
                     ${level === 'admin' ? `<button onclick="deleteAnnouncement('${key}')" style="background:#e74c3c; color:white; border:none; padding:5px; cursor:pointer;">🗑️ حذف</button>` : ''}
                 </div>`;
         });
@@ -152,32 +140,26 @@ function loadLibrary() {
 
 function update(key, r, d, type, val) {
     if (localStorage.getItem("userLevel") !== "admin") return;
-    database.ref(`school_data/lessons/${key}/data/${r}/${d}`).update({
-        [type]: val,
-        admin_key: 'ahmed'
-    });
+    database.ref(`school_data/lessons/${key}/data/${r}/${d}`).update({ [type]: val, admin_key: 'ahmed' });
 }
 
 function deleteAnnouncement(key) {
-    if (confirm("⚠️ هل أنت متأكد من الحذف؟")) {
-        database.ref('announcements/' + key).remove()
-        .then(() => alert("✅ تم الحذف"))
-        .catch(err => alert("خطأ: " + err.message));
-    }
+    if (confirm("⚠️ هل أنت متأكد؟")) database.ref('announcements/' + key).remove();
 }
 
 // 5. التهيئة النهائية
 window.onload = function() {
-    const authBtn = document.getElementById("authBtn");
-    if(authBtn) authBtn.innerText = localStorage.getItem("userLevel") ? "🔓 خروج" : "🔐 تسجيل الدخول";
+    console.log("تم تحميل ملف scriot.js بنجاح!");
     loadAnnouncements();
     loadLibrary();
+    
     const level = localStorage.getItem("userLevel");
+    const authBtn = document.getElementById("authBtn");
+    if(authBtn) authBtn.innerText = level ? "🔓 خروج" : "🔐 تسجيل الدخول";
+    
     if (level === "admin") {
-        const annBox = document.getElementById("admin-add-ann");
-        const libBox = document.getElementById("admin-library-add");
-        if (annBox) annBox.style.display = "block";
-        if (libBox) libBox.style.display = "block";
+        document.getElementById("admin-add-ann").style.display = "block";
+        document.getElementById("admin-library-add").style.display = "block";
     }
 };
 
@@ -187,75 +169,3 @@ function show(id) {
     document.getElementById(id).style.display = 'block';
     toggleSidebar();
 }
-    // نظام الصلاحيات
-    function handleAuth() {
-        const currentLevel = localStorage.getItem("userLevel");
-        if (currentLevel) {
-            localStorage.removeItem("userLevel");
-            alert("تم تسجيل الخروج");
-        } else {
-            const code = prompt("يرجى إدخال رمز الدخول:");
-            if (code === "ahmed") localStorage.setItem("userLevel", "admin");
-            else if (code === "2026") localStorage.setItem("userLevel", "member");
-            else localStorage.setItem("userLevel", "visitor");
-        }
-        location.reload();
-    }
-
-    // دالة عرض الجدول
-    function renderSchedule() {
-        const level = localStorage.getItem("userLevel") || "visitor";
-        const container = document.getElementById("schedule-container");
-        
-        const subject = "رياضيات";
-        const teacher = "أ. أحمد";
-
-        let html = `<table><tr><th>الحصة</th><th>المادة</th></tr><tr><td>1</td><td>`;
-        
-        html += `<div contenteditable="${level === 'admin'}">${subject}</div>`;
-        
-        if (level === 'admin' || level === 'member') {
-            html += `<div class="teacher-text" contenteditable="${level === 'admin'}">${teacher}</div>`;
-        }
-        
-        html += `</td></tr></table>`;
-        container.innerHTML = html;
-    }
-
-    // منع التعديل لغير الإدارة
-    document.addEventListener("input", (e) => {
-        if (localStorage.getItem("userLevel") !== "admin" && e.target.hasAttribute("contenteditable")) {
-            alert("عذراً، الإدارة فقط مخولة بالتعديل!");
-            location.reload(); 
-        }
-    });
-
-    // التحكم بالسايدبار والتنقل بين الصفحات
-    function toggleSidebar() { 
-        document.getElementById('mySidebar').classList.toggle('active'); 
-    }
-    
-    function show(id) {
-        // إخفاء جميع الأقسام التي تحمل كلاس page
-        document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-        // إظهار القسم المطلوب فقط
-        document.getElementById(id).style.display = 'block';
-        toggleSidebar(); // إغلاق القائمة بعد الاختيار
-    }
-
-    // إعدادات عند تحميل الصفحة
-    window.onload = () => {
-        renderSchedule();
-        const level = localStorage.getItem("userLevel");
-        const authBtn = document.getElementById("authBtn");
-        
-        if (authBtn) {
-            authBtn.innerText = level ? "🔓 خروج" : "🔐 تسجيل الدخول";
-        }
-
-        // إظهار أدوات المدير (إضافة إعلانات ومكتبة) إذا كان المستخدم هو الإدارة
-        if (level === "admin") {
-            document.getElementById("admin-add-ann").style.display = "block";
-            document.getElementById("admin-library-add").style.display = "block";
-        }
-    };
