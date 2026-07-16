@@ -9,7 +9,16 @@ function showPage(id) {
     }
     document.getElementById(id).style.display = 'block';
 }
-
+function closeNav() {
+    document.getElementById("mySidebar").style.width = "0";
+    document.querySelector(".page").style.marginRight = "0"; // لجعل الصفحة تملأ الشاشة عند الإغلاق
+    document.getElementById("openBtn").style.display = "block";
+}
+function openNav() {
+    document.getElementById("mySidebar").style.width = "280px";
+    document.querySelector(".page").style.marginRight = "300px";
+    document.getElementById("openBtn").style.display = "none";
+}
 // 2. تحديث التاريخ والوقت
 function updateDateTime() {
     const now = new Date();
