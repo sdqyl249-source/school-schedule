@@ -81,7 +81,13 @@ app.innerHTML = "";
 
 // 4. وظائف الإعلانات والمكتبة
 function uploadAnnouncement() {
-    // 1. جلب القيم من حقول الإدخال في صفحة index.html
+    // 1. التحقق من صلاحية الأدمن محلياً قبل أي خطوة
+    if (localStorage.getItem("userLevel") !== "admin") {
+        alert("❌ عذراً، الإدارة فقط مخولة بنشر الإعلانات!");
+        return;
+    }
+
+    // 2. جلب القيم من حقول الإدخال
     const titleElement = document.getElementById('ann-title');
     const descElement = document.getElementById('ann-desc');
     const mediaElement = document.getElementById('ann-media');
@@ -91,26 +97,27 @@ function uploadAnnouncement() {
     const mediaUrl = mediaElement.value.trim();
     const date = new Date().toLocaleDateString('ar-IQ');
 
-    // 2. التحقق من أن الحقول الأساسية ليست فارغة
+    // 3. التحقق من أن الحقول الأساسية ليست فارغة
     if (title === "" || desc === "") {
         alert("يرجى ملء العنوان والوصف!");
         return;
     }
 
-    // 3. إرسال البيانات إلى قاعدة بيانات Firebase
+    // 4. إرسال البيانات إلى قاعدة بيانات Firebase مع تضمين المفتاح السري
     database.ref('announcements').push({
         title: title,
         desc: desc,
         mediaUrl: mediaUrl,
-        date: date
+        date: date,
+        admin_key: 'ahmed' // المفتاح السري الذي يتطلبه Firebase الآن
     }).then(function() {
-        // 4. في حالة النجاح: تنظيف الحقول وإظهار رسالة
+        // 5. في حالة النجاح: تنظيف الحقول وإظهار رسالة
         alert("✅ تم نشر الإعلان بنجاح!");
         titleElement.value = '';
         descElement.value = '';
         mediaElement.value = '';
     }).catch(function(error) {
-        // 5. في حالة حدوث خطأ
+        // 6. في حالة حدوث خطأ
         alert("حدث خطأ أثناء النشر: " + error.message);
     });
 }
@@ -212,6 +219,25 @@ function update(key, r, d, type, val) {
     database.ref(`school_data/lessons/${key}/data/${r}/${d}/${type}`).set(val); 
 }
 
-function deleteTable(key) { 
-    if(confirm("حذف؟")) database.ref('school_data/lessons/' + key).remove(); 
+function update(key, r, d, type, val) {
+    if (localStorage.getItem("userLevel") !== "admin") return;
+    
+    // التحديث يتطلب إرسال المفتاح
+    database.ref(`school_data/lessons/${key}/data/${r}/${d}/${type}`).parent.update({
+        [type]: val,
+        admin_key: 'ahmed'
+    });
+}
+function deleteAnnouncement(key) {
+    if (localStorage.getItem("userLevel") !== "admin") return;
+
+    if (confirm("هل أنت متأكد؟")) {
+        // الحذف يتطلب التحديث أولاً لإضافة المفتاح (لأن الحذف المباشر سيرفضه Firebase)
+        database.ref('announcements/' + key).update({
+            admin_key: 'ahmed' 
+        }).then(() => {
+            database.ref('announcements/' + key).remove();
+            alert("تم الحذف");
+        });
+    }
 }
