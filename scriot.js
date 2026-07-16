@@ -81,44 +81,50 @@ app.innerHTML = "";
 
 // 4. وظائف الإعلانات والمكتبة
 function uploadAnnouncement() {
-    // 1. التحقق من صلاحية الأدمن محلياً قبل أي خطوة
+    // 1. التحقق من صلاحية الأدمن
     if (localStorage.getItem("userLevel") !== "admin") {
         alert("❌ عذراً، الإدارة فقط مخولة بنشر الإعلانات!");
         return;
     }
 
-    // 2. جلب القيم من حقول الإدخال
+    // 2. جلب العناصر والقيم
     const titleElement = document.getElementById('ann-title');
     const descElement = document.getElementById('ann-desc');
     const mediaElement = document.getElementById('ann-media');
+    const submitBtn = document.getElementById('submit-btn'); // افترضنا وجود زر للنشر
 
     const title = titleElement.value.trim();
     const desc = descElement.value.trim();
     const mediaUrl = mediaElement.value.trim();
     const date = new Date().toLocaleDateString('ar-IQ');
 
-    // 3. التحقق من أن الحقول الأساسية ليست فارغة
-    if (title === "" || desc === "") {
-        alert("يرجى ملء العنوان والوصف!");
+    // 3. التحقق من الحقول
+    if (!title || !desc) {
+        alert("⚠️ يرجى ملء العنوان والوصف!");
         return;
     }
 
-    // 4. إرسال البيانات إلى قاعدة بيانات Firebase مع تضمين المفتاح السري
+    // تعطيل الزر أثناء النشر لمنع التكرار
+    if (submitBtn) submitBtn.disabled = true;
+
+    // 4. إرسال البيانات
     database.ref('announcements').push({
         title: title,
         desc: desc,
         mediaUrl: mediaUrl,
         date: date,
-        admin_key: 'ahmed' // المفتاح السري الذي يتطلبه Firebase الآن
-    }).then(function() {
-        // 5. في حالة النجاح: تنظيف الحقول وإظهار رسالة
+        admin_key: 'ahmed' // المفتاح السري المطلوب للقواعد
+    }).then(() => {
         alert("✅ تم نشر الإعلان بنجاح!");
+        // تنظيف الحقول
         titleElement.value = '';
         descElement.value = '';
         mediaElement.value = '';
-    }).catch(function(error) {
-        // 6. في حالة حدوث خطأ
-        alert("حدث خطأ أثناء النشر: " + error.message);
+    }).catch((error) => {
+        alert("❌ حدث خطأ أثناء النشر: " + error.message);
+    }).finally(() => {
+        // إعادة تفعيل الزر في كل الأحوال
+        if (submitBtn) submitBtn.disabled = false;
     });
 }
 function loadAnnouncements() {
@@ -233,16 +239,31 @@ function update(key, r, d, type, val) {
     });
 }
 function deleteAnnouncement(key) {
-    // حماية محلية
+    if (localStorage.getItem("userLevel") !== "admin") return;
+
+    if (confirm("⚠️ هل أنت متأكد من الحذف؟")) {
+        database.ref('announcements/' + key).remove()
+            .then(() => alert("✅ تم الحذف"))
+            .catch(err => alert("❌ خطأ: " + err.message));
+    }
+}
+function updateAnnouncement(key, newTitle, newDesc) {
+    // 1. تحقق من أن المستخدم هو الأدمن قبل محاولة التعديل
     if (localStorage.getItem("userLevel") !== "admin") {
-        alert("❌ غير مصرح لك بالحذف!");
+        alert("❌ غير مصرح لك بالتعديل!");
         return;
     }
 
-    if (confirm("⚠️ هل أنت متأكد من حذف هذا الإعلان؟")) {
-        // حذف مباشر (سيعمل لأننا أضفنا admin_key للإعلانات)
-        database.ref('announcements/' + key).remove()
-            .then(() => alert("✅ تم الحذف بنجاح"))
-            .catch(err => alert("❌ فشل الحذف: " + err.message));
-    }
+    // 2. تحديث البيانات في Firebase
+    database.ref('announcements/' + key).update({
+        title: newTitle,
+        desc: newDesc,
+        admin_key: 'ahmed' // المفتاح ضروري لكي تسمح قواعد Firebase بالتعديل
+    })
+    .then(() => {
+        alert("✅ تم تحديث الإعلان بنجاح.");
+    })
+    .catch((error) => {
+        alert("❌ خطأ أثناء التحديث: " + error.message);
+    });
 }
