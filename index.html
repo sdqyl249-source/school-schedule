@@ -53,12 +53,14 @@
 
 <!-- الإعلانات -->
 <div id="announcements" class="page">
-    <div class="card admin-section" id="admin-ann">
-        <h3>📢 إضافة إعلان جديد</h3>
-        <input type="text" id="ann-title" placeholder="العنوان">
-        <textarea id="ann-text" placeholder="النص"></textarea>
-        <button onclick="addAnnouncement()">نشر الإعلان</button>
+    <div class="card admin-section" id="admin-ann" style="border-right-color: #e67e22;">
+        <h3 style="color: #e67e22;">📢 إضافة إعلان جديد</h3>
+        <input type="text" id="ann-title" placeholder="عنوان الإعلان">
+        <textarea id="ann-text" placeholder="نص الإعلان..." style="height: 80px;"></textarea>
+        <button onclick="addAnnouncement()" style="background: #e67e22;">نشر الإعلان</button>
     </div>
+    
+    <h2 style="color: #2c3e50;">لوحة إعلانات منصة الوادي</h2>
     <div id="announcements-list"></div>
 </div>
 
