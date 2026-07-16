@@ -11,13 +11,14 @@ function showPage(id) {
 }
 function closeNav() {
     document.getElementById("mySidebar").style.width = "0";
-    document.querySelector(".page").style.marginRight = "0"; // لجعل الصفحة تملأ الشاشة عند الإغلاق
-    document.getElementById("openBtn").style.display = "block";
+    document.querySelector(".page").style.marginRight = "0"; // تمدد الصفحة
+    document.getElementById("openBtn").style.display = "block"; // إظهار زر الفتح
 }
+
 function openNav() {
     document.getElementById("mySidebar").style.width = "280px";
-    document.querySelector(".page").style.marginRight = "300px";
-    document.getElementById("openBtn").style.display = "none";
+    document.querySelector(".page").style.marginRight = "280px"; // إعادة الهامش
+    document.getElementById("openBtn").style.display = "none"; // إخفاء زر الفتح
 }
 // 2. تحديث التاريخ والوقت
 function updateDateTime() {
