@@ -125,23 +125,27 @@ function loadAnnouncements() {
     database.ref('announcements').on('value', (snapshot) => {
         const list = document.getElementById('ann-list');
         if (!list) return;
+        
         list.innerHTML = '';
         const level = localStorage.getItem("userLevel");
         
         snapshot.forEach((childSnapshot) => {
             const item = childSnapshot.val();
-            const key = childSnapshot.key; // الحصول على مفتاح الإعلان للحذف والتعديل
+            const key = childSnapshot.key;
             
+            // نتحقق من وجود البيانات لضمان عدم حدوث خطأ
+            if (!item) return;
+
             list.innerHTML += `
-                <div style="border:1px solid #ddd; padding:10px; margin:5px; position:relative;">
-                    <h4>${item.title}</h4>
-                    <p>${item.desc}</p>
-                    ${item.mediaUrl ? `<p><a href="${item.mediaUrl}" target="_blank">📎 رابط مرفق</a></p>` : ''}
-                    <small>${item.date}</small>
+                <div id="ann-${key}" style="border:1px solid #ddd; padding:15px; margin:10px 0; border-radius:8px; position:relative; background:#fff;">
+                    <h4 style="margin-bottom:5px;">${item.title}</h4>
+                    <p style="margin-bottom:10px;">${item.desc}</p>
+                    ${item.mediaUrl ? `<p><a href="${item.mediaUrl}" target="_blank" style="color:#3498db;">📎 رابط مرفق</a></p>` : ''}
+                    <small style="color:#888;">${item.date}</small>
                     
                     ${level === 'admin' ? `
-                        <div style="margin-top:10px;">
-                            <button onclick="deleteAnnouncement('${key}')" style="background:red; color:white; border:none; padding:5px; cursor:pointer;">🗑️ حذف</button>
+                        <div style="margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
+                            <button onclick="deleteAnnouncement('${key}')" style="background:#e74c3c; color:white; border:none; padding:6px 12px; cursor:pointer; border-radius:4px; font-size:12px;">🗑️ حذف</button>
                         </div>
                     ` : ''}
                 </div>`;
@@ -229,15 +233,28 @@ function update(key, r, d, type, val) {
     });
 }
 function deleteAnnouncement(key) {
-    if (localStorage.getItem("userLevel") !== "admin") return;
+    // 1. التحقق من صلاحية الأدمن
+    if (localStorage.getItem("userLevel") !== "admin") {
+        alert("❌ غير مصرح لك بالحذف!");
+        return;
+    }
 
-    if (confirm("هل أنت متأكد؟")) {
-        // الحذف يتطلب التحديث أولاً لإضافة المفتاح (لأن الحذف المباشر سيرفضه Firebase)
+    // 2. تأكيد الحذف
+    if (confirm("هل أنت متأكد من حذف هذا الإعلان نهائياً؟")) {
+        // 3. الخطوة الأولى: تحديث البيانات لإضافة المفتاح السري المطلوب في القواعد
         database.ref('announcements/' + key).update({
             admin_key: 'ahmed' 
         }).then(() => {
-            database.ref('announcements/' + key).remove();
-            alert("تم الحذف");
+            // 4. الخطوة الثانية: حذف الإعلان بعد التحديث الناجح
+            database.ref('announcements/' + key).remove()
+                .then(() => {
+                    alert("✅ تم حذف الإعلان بنجاح.");
+                })
+                .catch((error) => {
+                    alert("خطأ أثناء الحذف: " + error.message);
+                });
+        }).catch((error) => {
+            alert("خطأ في التحقق من الصلاحية: " + error.message);
         });
     }
 }
