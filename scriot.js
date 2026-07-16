@@ -149,34 +149,20 @@ function loadLibrary() {
     });
 }
 
-function uploadFileToStorage() {
-    const name = document.getElementById('lib-name').value;
-    const fileInput = document.getElementById('lib-file');
-    const file = fileInput.files[0];
-    if (!name || !file) return alert("يرجى كتابة الاسم واختيار ملف!");
-
-    const storageRef = firebase.storage().ref('library_files/' + file.name);
-    storageRef.put(file).then(snapshot => {
-        snapshot.ref.getDownloadURL().then(url => {
-            database.ref('library').push({ name: name, url: url, admin_key: 'ahmed' });
-            alert("تم رفع الملف بنجاح!");
-            document.getElementById('lib-name').value = '';
-        });
-    });
-}
-
-function deleteAnnouncement(key) {
-    if (confirm("⚠️ هل أنت متأكد؟")) {
-        database.ref('announcements/' + key).remove();
-    }
-}
-
 function update(key, r, d, type, val) {
     if (localStorage.getItem("userLevel") !== "admin") return;
     database.ref(`school_data/lessons/${key}/data/${r}/${d}`).update({
         [type]: val,
         admin_key: 'ahmed'
     });
+}
+
+function deleteAnnouncement(key) {
+    if (confirm("⚠️ هل أنت متأكد من الحذف؟")) {
+        database.ref('announcements/' + key).remove()
+        .then(() => alert("✅ تم الحذف"))
+        .catch(err => alert("خطأ: " + err.message));
+    }
 }
 
 // 5. التهيئة النهائية
