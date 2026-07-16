@@ -42,11 +42,11 @@ function getSectionColor(section) {
 }
 
 function render() {
-    const app = document.getElementById("app");
+const app = document.getElementById("schedule-container"); // تم التصحيح هنا
     const level = localStorage.getItem("userLevel") || "visitor";
     if(!app) return;
 
-    app.innerHTML = "";
+app.innerHTML = "";
     for (let key in state.lessons) {
         let tableData = state.lessons[key];
         let color = getSectionColor(tableData.section);
@@ -116,7 +116,7 @@ function uploadAnnouncement() {
 }
 function loadAnnouncements() {
     database.ref('announcements').on('value', (snapshot) => {
-        const list = document.getElementById('ann-list');
+        const list = document.getElementById('ann-list'); // تأكد من وجود ID="ann-list" في الـ HTML
         if (!list) return;
         list.innerHTML = '';
         snapshot.forEach((childSnapshot) => {
