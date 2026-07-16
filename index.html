@@ -2,17 +2,15 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة رؤية</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; margin: 0; }
-        .sidebar { height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; z-index: 1000; }
-        .menu-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #333; transition: 0.3s; }
+        .sidebar { height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; }
+        .menu-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #333; }
         .menu-item:hover { background: #34495e; }
         .page { margin-right: 300px; padding: 20px; display: none; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; border-right: 8px solid #3498db; }
-        .editable { border: 1px dashed #ccc; padding: 10px; border-radius: 5px; min-height: 20px; }
-        .editable:focus { border-color: #3498db; outline: none; background: #f9f9f9; }
+        .editable { border: 1px dashed #ccc; padding: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -24,55 +22,62 @@
     <div class="menu-item" onclick="showPage('classes')">🏫 إدارة الصفوف</div>
     <div class="menu-item" onclick="showPage('schedule')">📅 جدول الدروس</div>
     <div class="menu-item" onclick="showPage('library')">📚 المكتبة الرقمية</div>
-    <div class="menu-item" id="authBtn" onclick="handleAuth()">🔐 تسجيل الدخول</div>
+    <div class="menu-item" id="authBtn">🔐 تسجيل الدخول</div>
 </div>
 
-<!-- صفحة الرئيسية -->
+<!-- الرئيسية -->
 <div id="home" class="page" style="display:block;">
-    <!-- بطاقة الوقت والتاريخ -->
-    <div class="card" style="border-right-color: #34495e; text-align: center;">
-        <h3 id="date-display" style="margin: 0;">جاري تحميل التاريخ...</h3>
-        <p id="time-display" style="font-size: 1.5em; font-weight: bold; color: #2c3e50; margin: 10px 0 0 0;">--:--:--</p>
+    <div class="card" style="text-align:center;">
+        <h3 id="date-display"></h3>
+        <p id="time-display" style="font-size:1.5em; font-weight:bold;"></p>
     </div>
-
-    <div class="card">
-        <h1>مرحباً بكم في منصة رؤية</h1>
-    </div>
-    
-    <div class="card" style="border-right-color: #e67e22;">
-        <h3>رؤية المدرسة</h3>
-        <p id="school-vision" class="editable" contenteditable="false" onblur="updateInfo('vision', this.innerText)">جاري التحميل...</p>
-    </div>
-
-    <div class="card" style="border-right-color: #27ae60;">
-        <h3>نبذة عن المدرسة</h3>
-        <p id="school-about" class="editable" contenteditable="false" onblur="updateInfo('about', this.innerText)">جاري التحميل...</p>
-    </div>
-
-    <div class="card" style="text-align: center; border-right-color: #9b59b6;">
-        <h3>عدد زوار الموقع</h3>
-        <h2 id="visitor-count" style="color: #2c3e50;">0</h2>
-    </div>
+    <div class="card"><h3>رؤية المدرسة</h3><p id="school-vision" class="editable">رؤيتنا تعليم متميز...</p></div>
+    <div class="card"><h3>عدد الزوار</h3><h2 id="visitor-count">100</h2></div>
 </div>
 
-<div id="announcements" class="page"><h1>لوحة الإعلانات</h1></div>
+<!-- الإعلانات -->
+<div id="announcements" class="page">
+    <div class="card">
+        <h3>📢 إضافة إعلان جديد</h3>
+        <input type="text" id="ann-title" placeholder="عنوان الإعلان" style="width:100%; margin-bottom:10px;">
+        <textarea id="ann-text" placeholder="نص الإعلان" style="width:100%; height:80px;"></textarea>
+        <button onclick="addAnnouncement()">نشر الإعلان</button>
+    </div>
+    <div id="announcements-list"></div>
+</div>
 
-<!-- صفحة الصفوف -->
+<!-- الصفوف -->
 <div id="classes" class="page">
     <div class="card">
         <h3>🏫 إدارة الصفوف</h3>
-        <input type="text" id="class-input" placeholder="اسم الصف" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd;">
-        <input type="text" id="section-input" placeholder="الشعبة" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd;">
-        <button onclick="saveClass()" style="padding:10px 20px; background:#27ae60; color:white; border:none; cursor:pointer;">حفظ الصف</button>
+        <input type="text" id="class-name" placeholder="اسم الصف">
+        <input type="text" id="section-name" placeholder="الشعبة">
+        <button onclick="addClass()">إضافة الصف</button>
     </div>
     <div id="classes-list"></div>
 </div>
 
-<div id="schedule" class="page"><h1>جدول الدروس</h1></div>
-<div id="library" class="page"><h1>المكتبة الرقمية</h1></div>
+<!-- الجدول -->
+<div id="schedule" class="page">
+    <div class="card">
+        <h3>📅 إضافة حصة للجدول</h3>
+        <select id="select-class"></select>
+        <input type="text" id="subject-name" placeholder="اسم المادة">
+        <button onclick="addSchedule()">إضافة للجدول</button>
+    </div>
+    <div id="schedule-list"></div>
+</div>
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<!-- المكتبة -->
+<div id="library" class="page">
+    <div class="card">
+        <h3>📚 إضافة ملف للمكتبة</h3>
+        <input type="text" id="book-name" placeholder="اسم الملف/الكتاب">
+        <button onclick="addBook()">رفع الملف</button>
+    </div>
+    <div id="library-list"></div>
+</div>
+
 <script src="scriot.js"></script>
 </body>
 </html>
