@@ -80,6 +80,7 @@ function render() {
 
 // 4. وظائف الإعلانات والمكتبة
 function uploadAnnouncement() {
+    console.log("تم الضغط على زر النشر!"); // أضف هذا السطر
     if (localStorage.getItem("userLevel") !== "admin") {
         alert("❌ عذراً، الإدارة فقط مخولة بنشر الإعلانات!");
         return;
