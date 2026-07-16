@@ -116,22 +116,31 @@ function uploadAnnouncement() {
 }
 function loadAnnouncements() {
     database.ref('announcements').on('value', (snapshot) => {
-        const list = document.getElementById('ann-list'); // تأكد من وجود ID="ann-list" في الـ HTML
+        const list = document.getElementById('ann-list');
         if (!list) return;
         list.innerHTML = '';
+        const level = localStorage.getItem("userLevel");
+        
         snapshot.forEach((childSnapshot) => {
             const item = childSnapshot.val();
+            const key = childSnapshot.key; // الحصول على مفتاح الإعلان للحذف والتعديل
+            
             list.innerHTML += `
-                <div style="border:1px solid #ddd; padding:10px; margin:5px;">
+                <div style="border:1px solid #ddd; padding:10px; margin:5px; position:relative;">
                     <h4>${item.title}</h4>
                     <p>${item.desc}</p>
                     ${item.mediaUrl ? `<p><a href="${item.mediaUrl}" target="_blank">📎 رابط مرفق</a></p>` : ''}
                     <small>${item.date}</small>
+                    
+                    ${level === 'admin' ? `
+                        <div style="margin-top:10px;">
+                            <button onclick="deleteAnnouncement('${key}')" style="background:red; color:white; border:none; padding:5px; cursor:pointer;">🗑️ حذف</button>
+                        </div>
+                    ` : ''}
                 </div>`;
         });
     });
 }
-
 function loadLibrary() {
     database.ref('library').on('value', (snapshot) => {
         const list = document.getElementById('library-list');
