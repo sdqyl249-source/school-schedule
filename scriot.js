@@ -1,8 +1,4 @@
-// =========================================================
-// ملف scriot.js - منصة الوادي (إصدار التحكم الكامل)
-// =========================================================
-
-// 1. نظام التنقل (للصفحات الموجودة في index.html)
+const database = window.database;
 function showPage(id) {
     const pages = document.getElementsByClassName('page');
     for (let i = 0; i < pages.length; i++) {
