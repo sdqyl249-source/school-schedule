@@ -1,4 +1,3 @@
-// 1. التهيئة المركزية (Firebase)
 firebase.initializeApp({
     apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
     authDomain: "roya-platform-26860.firebaseapp.com",
@@ -10,162 +9,81 @@ firebase.initializeApp({
 });
 const database = firebase.database();
 
-const config = { 
-    days: ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس"]
-};
-let state = { lessons: {} };
+// 1. التنقل بين الصفحات
+function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+}
 
-// 2. نظام الصلاحيات
+// 2. التاريخ والوقت
+function updateDateTime() {
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('date-display').innerText = now.toLocaleDateString('ar-IQ', options);
+    document.getElementById('time-display').innerText = now.toLocaleTimeString('ar-IQ');
+}
+
+// 3. نظام الصلاحيات
 function handleAuth() {
-    const currentLevel = localStorage.getItem("userLevel");
-    if (currentLevel) {
-        localStorage.removeItem("userLevel");
-        alert("تم تسجيل الخروج");
-    } else {
+    const level = localStorage.getItem("userLevel");
+    if (level) { localStorage.removeItem("userLevel"); alert("تم تسجيل الخروج"); }
+    else {
         const code = prompt("يرجى إدخال رمز الدخول:");
         if (code === "ahmed") localStorage.setItem("userLevel", "admin");
-        else if (code === "2026") localStorage.setItem("userLevel", "member");
-        else localStorage.setItem("userLevel", "visitor");
+        else alert("رمز خاطئ");
     }
     location.reload();
 }
 
-// 3. الجدول الدراسي
-database.ref('school_data/lessons').on('value', (snapshot) => {
-    state.lessons = snapshot.val() || {}; 
-    render();
+// 4. البيانات الأساسية والزوار
+function loadHomeData() {
+    const isAdmin = (localStorage.getItem("userLevel") === "admin");
+    database.ref('school_info').on('value', (snapshot) => {
+        const info = snapshot.val() || { vision: "رؤيتنا...", about: "نبذة عن..." };
+        const visionEl = document.getElementById('school-vision');
+        const aboutEl = document.getElementById('school-about');
+        
+        visionEl.innerText = info.vision;
+        aboutEl.innerText = info.about;
+        visionEl.contentEditable = isAdmin;
+        aboutEl.contentEditable = isAdmin;
+    });
+
+    const vRef = database.ref('visitors');
+    vRef.transaction(c => (c || 0) + 1);
+    vRef.on('value', s => document.getElementById('visitor-count').innerText = s.val() || 0);
+}
+
+function updateInfo(field, val) {
+    if (localStorage.getItem("userLevel") !== "admin") return;
+    database.ref('school_info').update({ [field]: val });
+}
+
+// 5. إدارة الصفوف
+function saveClass() {
+    const name = document.getElementById('class-input').value;
+    const section = document.getElementById('section-input').value;
+    if (!name || !section) return alert("يرجى ملء الحقول");
+    database.ref('school_data/classes').push({ name, section }).then(() => {
+        alert("تم الحفظ!");
+        document.getElementById('class-input').value = '';
+    });
+}
+
+database.ref('school_data/classes').on('value', (snapshot) => {
+    const list = document.getElementById('classes-list');
+    list.innerHTML = '<h3>الصفوف المضافة:</h3>';
+    snapshot.forEach(child => {
+        const item = child.val();
+        list.innerHTML += `<div class="card">${item.name} - شعبة ${item.section}</div>`;
+    });
 });
 
-function getSectionColor(section) {
-    const colors = { "أ": "#e74c3c", "ب": "#27ae60", "ج": "#3498db" };
-    return colors[section] || "#95a5a6";
-}
-
-function render() {
-    const app = document.getElementById("schedule-container");
-    const level = localStorage.getItem("userLevel") || "visitor";
-    if(!app) return;
-
-    app.innerHTML = "";
-    for (let key in state.lessons) {
-        let tableData = state.lessons[key];
-        let color = getSectionColor(tableData.section);
-        app.innerHTML += `
-        <div class="card" style="border-right: 8px solid ${color};">
-            <h4 style="color: ${color}; margin: 0;">جدول الصف: ${tableData.class} - شعبة ${tableData.section}</h4>
-            <table style="width:100%; border-collapse:collapse; margin-top:10px;">
-                <tr><th>الحصة</th>${config.days.map(d => `<th style="padding:8px; border:1px solid #ccc;">${d}</th>`).join('')}</tr>
-                ${[0,1,2,3].map(r => `
-                    <tr>
-                        <td style="padding:8px; border:1px solid #ccc;">الحصة ${r+1}</td>
-                        ${config.days.map((d, colIndex) => `
-                            <td style="padding:8px; border:1px solid #ccc;">
-                                <div class="info-txt" contenteditable="${level === 'admin'}" onblur="update('${key}', ${r}, ${colIndex}, 'subject', this.innerText)">
-                                    ${tableData.data?.[r]?.[colIndex]?.subject || "..."}
-                                </div>
-                                ${(level === 'admin' || level === 'member') ? `
-                                    <div class="info-txt teacher" contenteditable="${level === 'admin'}" onblur="update('${key}', ${r}, ${colIndex}, 'teacher', this.innerText)" style="color:#9333ea; font-size:0.8em; border-top:1px dashed #ccc; margin-top:2px;">
-                                        ${tableData.data?.[r]?.[colIndex]?.teacher || "الأستاذ..."}
-                                    </div>
-                                ` : ''}
-                            </td>
-                        `).join('')}
-                    </tr>
-                `).join('')}
-            </table>
-            ${level === 'admin' ? `<button onclick="deleteTable('${key}')" class="btn" style="background:red; color:white; border:none; padding:5px 10px; margin-top:10px; cursor:pointer;">🗑️ حذف الجدول</button>` : ''}
-        </div>`;
-    }
-}
-
-// 4. وظائف الإعلانات والمكتبة
-function uploadAnnouncement() {
-    if (localStorage.getItem("userLevel") !== "admin") {
-        alert("❌ عذراً، الإدارة فقط مخولة بنشر الإعلانات!");
-        return;
-    }
-    const titleElement = document.getElementById('ann-title');
-    const descElement = document.getElementById('ann-desc');
-    const mediaElement = document.getElementById('ann-media');
-    
-    if (!titleElement.value || !descElement.value) {
-        alert("⚠️ يرجى ملء العنوان والوصف!");
-        return;
-    }
-
-    database.ref('announcements').push({
-        title: titleElement.value,
-        desc: descElement.value,
-        mediaUrl: mediaElement.value,
-        date: new Date().toLocaleDateString('ar-IQ'),
-        admin_key: 'ahmed'
-    }).then(() => {
-        alert("✅ تم نشر الإعلان بنجاح!");
-        titleElement.value = '';
-        descElement.value = '';
-        mediaElement.value = '';
-    }).catch(err => alert("❌ خطأ: " + err.message));
-}
-
-function loadAnnouncements() {
-    database.ref('announcements').on('value', (snapshot) => {
-        const list = document.getElementById('ann-list');
-        if (!list) return;
-        list.innerHTML = '';
-        const level = localStorage.getItem("userLevel");
-        snapshot.forEach((childSnapshot) => {
-            const item = childSnapshot.val();
-            const key = childSnapshot.key;
-            list.innerHTML += `
-                <div style="border:1px solid #ddd; padding:15px; margin:10px 0; border-radius:8px; background:#fff;">
-                    <h4>${item.title}</h4>
-                    <p>${item.desc}</p>
-                    ${level === 'admin' ? `<button onclick="deleteAnnouncement('${key}')" style="background:#e74c3c; color:white; border:none; padding:5px; cursor:pointer;">🗑️ حذف</button>` : ''}
-                </div>`;
-        });
-    });
-}
-
-function loadLibrary() {
-    database.ref('library').on('value', (snapshot) => {
-        const list = document.getElementById('library-list');
-        if (!list) return;
-        list.innerHTML = '';
-        snapshot.forEach((childSnapshot) => {
-            const item = childSnapshot.val();
-            list.innerHTML += `<div style="border:1px solid #ddd; padding:10px; margin:5px; text-align:center;"><p><b>${item.name}</b></p><a href="${item.url}" target="_blank">تحميل</a></div>`;
-        });
-    });
-}
-
-function update(key, r, d, type, val) {
-    if (localStorage.getItem("userLevel") !== "admin") return;
-    database.ref(`school_data/lessons/${key}/data/${r}/${d}`).update({ [type]: val, admin_key: 'ahmed' });
-}
-
-function deleteAnnouncement(key) {
-    if (confirm("⚠️ هل أنت متأكد؟")) database.ref('announcements/' + key).remove();
-}
-
-// 5. التهيئة النهائية
+// 6. التهيئة
 window.onload = function() {
-    console.log("تم تحميل ملف scriot.js بنجاح!");
-    loadAnnouncements();
-    loadLibrary();
-    
-    const level = localStorage.getItem("userLevel");
-    const authBtn = document.getElementById("authBtn");
-    if(authBtn) authBtn.innerText = level ? "🔓 خروج" : "🔐 تسجيل الدخول";
-    
-    if (level === "admin") {
-        document.getElementById("admin-add-ann").style.display = "block";
-        document.getElementById("admin-library-add").style.display = "block";
-    }
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+    loadHomeData();
+    const btn = document.getElementById("authBtn");
+    btn.innerText = localStorage.getItem("userLevel") ? "🔓 خروج" : "🔐 تسجيل الدخول";
 };
-
-function toggleSidebar() { document.getElementById('mySidebar').classList.toggle('active'); }
-function show(id) {
-    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
-    toggleSidebar();
-}
