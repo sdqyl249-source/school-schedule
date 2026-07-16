@@ -1,4 +1,7 @@
+// تعريف المتغير العام الذي يأتي من ملف HTML
 const database = window.database;
+
+// 1. التنقل بين الصفحات
 function showPage(id) {
     const pages = document.getElementsByClassName('page');
     for (let i = 0; i < pages.length; i++) {
@@ -6,7 +9,7 @@ function showPage(id) {
     }
     document.getElementById(id).style.display = 'block';
 }
-     window.database = firebase.database();
+
 // 2. تحديث التاريخ والوقت
 function updateDateTime() {
     const now = new Date();
@@ -42,11 +45,13 @@ function updateInfo(field, text) {
 
 // 5. إدارة الإعلانات
 function addAnnouncement() {
-    console.log("تم الضغط على زر النشر!"); // أضف هذا السطر
     if (!localStorage.getItem("admin")) return alert("غير مصرح لك!");
     const title = document.getElementById('ann-title').value;
     const text = document.getElementById('ann-text').value;
-    database.ref('announcements').push({ title, text, date: new Date().toLocaleDateString('ar-IQ') });
+    if (!title || !text) return alert("يرجى ملء الحقول");
+    database.ref('announcements').push({ 
+        title, text, date: new Date().toLocaleDateString('ar-IQ') 
+    });
     document.getElementById('ann-title').value = "";
     document.getElementById('ann-text').value = "";
 }
@@ -55,27 +60,36 @@ function deleteAnnouncement(id) {
     database.ref('announcements/' + id).remove();
 }
 
-// 6. التحقق من الصلاحيات عند تحميل الصفحة (هذا هو الجزء الأهم)
+// 6. التحقق من الصلاحيات والبيانات عند تحميل الصفحة
 window.onload = () => {
     updateDateTime();
     
+    // --- كود عداد الزوار ---
+    database.ref('visitors').transaction(function(current) {
+        return (current || 0) + 1;
+    });
+
+    database.ref('visitors').on('value', snap => {
+        const countEl = document.getElementById('visitor-count');
+        if(countEl) countEl.innerText = snap.val() || 0;
+    });
+    // -----------------------
+    
     const isAdmin = localStorage.getItem("admin");
 
-    // تفعيل وضع التعديل للنصوص (الرؤية والنبذة)
+    // تفعيل وضع التعديل للنصوص
     const editableElements = document.querySelectorAll('.editable');
     if (isAdmin) {
         editableElements.forEach(el => {
             el.contentEditable = "true";
-            el.style.border = "2px dashed #e67e22"; // إطار يخبرك أنك في وضع التعديل
+            el.style.border = "2px dashed #e67e22";
         });
         
-        // إظهار حقول المدير
         document.querySelectorAll('.admin-section').forEach(e => e.style.display = 'block');
         const authBtn = document.getElementById("authBtn");
         if(authBtn) authBtn.innerText = "🔓 تسجيل الخروج";
     }
 
-    // جلب البيانات من Firebase
     // جلب الرؤية
     database.ref('settings/vision').on('value', snap => {
         if(snap.val()) document.getElementById('school-vision').innerText = snap.val().content;
