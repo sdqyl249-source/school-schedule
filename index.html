@@ -5,10 +5,12 @@
     <title>منصة رؤية</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; margin: 0; }
-        .sidebar { height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; }
+        .sidebar { height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; z-index: 1000; }
         .menu-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #333; }
         .menu-item:hover { background: #34495e; }
         .page { margin-right: 300px; padding: 20px; display: none; }
+        /* جعل الصفحة الرئيسية تظهر افتراضياً */
+        #home { display: block; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; border-right: 8px solid #3498db; }
         .editable { border: 1px dashed #ccc; padding: 10px; border-radius: 5px; }
     </style>
@@ -22,12 +24,12 @@
     <div class="menu-item" onclick="showPage('classes')">🏫 إدارة الصفوف</div>
     <div class="menu-item" onclick="showPage('schedule')">📅 جدول الدروس</div>
     <div class="menu-item" onclick="showPage('library')">📚 المكتبة الرقمية</div>
-    <div class="menu-item" id="authBtn">🔐 تسجيل الدخول</div>
+    <div class="menu-item" id="authBtn" onclick="handleAuth()">🔐 تسجيل الدخول</div>
 </div>
 
 <!-- الرئيسية -->
-<div id="home" class="page" style="display:block;">
-    <div class="card" style="text-align:center;">
+<div id="home" class="page">
+    <div class="card" style="text-align:center; border-right-color: #34495e;">
         <h3 id="date-display"></h3>
         <p id="time-display" style="font-size:1.5em; font-weight:bold;"></p>
     </div>
@@ -61,7 +63,6 @@
 <div id="schedule" class="page">
     <div class="card">
         <h3>📅 إضافة حصة للجدول</h3>
-        <select id="select-class"></select>
         <input type="text" id="subject-name" placeholder="اسم المادة">
         <button onclick="addSchedule()">إضافة للجدول</button>
     </div>
@@ -72,7 +73,7 @@
 <div id="library" class="page">
     <div class="card">
         <h3>📚 إضافة ملف للمكتبة</h3>
-        <input type="text" id="book-name" placeholder="اسم الملف/الكتاب">
+        <input type="text" id="book-name" placeholder="اسم الملف">
         <button onclick="addBook()">رفع الملف</button>
     </div>
     <div id="library-list"></div>
