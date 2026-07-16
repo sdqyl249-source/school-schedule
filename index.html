@@ -25,17 +25,44 @@
     <div class="menu-item" id="authBtn">🔐 تسجيل الدخول</div>
 </div>
 
-<div id="home" class="page" style="display:block;"><h1>الرئيسية</h1></div>
+<!-- صفحة الرئيسية -->
+<div id="home" class="page" style="display:block;">
+    <div class="card">
+        <h1>مرحباً بكم في منصة رؤية</h1>
+        <div style="font-size: 1.2em; color: #7f8c8d; margin-top: 10px;">
+            <span id="date-display"></span> | <span id="time-display"></span>
+        </div>
+    </div>
+    <div class="card">
+        <h3>عن المدرسة</h3>
+        <p id="school-about">جاري تحميل البيانات...</p>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h3>عدد زوار الموقع</h3>
+        <h2 id="visitor-count" style="color: #2c3e50;">0</h2>
+    </div>
+</div>
+
+<!-- صفحة الإعلانات -->
 <div id="announcements" class="page"><h1>لوحة الإعلانات</h1></div>
-<div id="classes" class="page"><h1>إدارة الصفوف</h1></div>
+
+<!-- صفحة الصفوف -->
+<div id="classes" class="page">
+    <div class="card">
+        <h3>🏫 إدارة الصفوف</h3>
+        <input type="text" id="class-input" placeholder="اسم الصف (مثال: الأول المتوسط)" style="width:100%; padding:10px; margin-bottom:10px;">
+        <input type="text" id="section-input" placeholder="الشعبة (مثال: أ)" style="width:100%; padding:10px; margin-bottom:10px;">
+        <button onclick="saveClass()" style="padding:10px 20px; background:#27ae60; color:white; border:none; cursor:pointer;">حفظ الصف</button>
+    </div>
+    <div id="classes-list"></div>
+</div>
+
 <div id="schedule" class="page"><h1>جدول الدروس</h1></div>
 <div id="library" class="page"><h1>المكتبة الرقمية</h1></div>
 
-<!-- مكتبات Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-<!-- الملف الخاص بك -->
 <script src="scriot.js"></script>
 </body>
 </html>
