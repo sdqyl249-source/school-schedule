@@ -101,6 +101,14 @@
 <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 <script src="scriot.js"></script>
 <script>
+    function closeNav() {
+    document.getElementById("mySidebar").style.width = "0";
+    document.getElementById("openBtn").style.display = "block";
+}
+function openNav() {
+    document.getElementById("mySidebar").style.width = "280px";
+    document.getElementById("openBtn").style.display = "none";
+}
     // عند تحميل الصفحة، تحقق من مستوى المستخدم فوراً
     document.addEventListener('DOMContentLoaded', () => {
         const level = localStorage.getItem("userLevel");
