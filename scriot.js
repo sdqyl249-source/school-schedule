@@ -6,8 +6,10 @@ function showPage(id) {
     }
     document.getElementById(id).style.display = 'block';
 }
-  window.database = firebase.database();
-<script src="scriot.js"></script>
+ <script> 
+     window.database = firebase.database();
+<script>
+<script src="scriot.js"><script>
 // 2. تحديث التاريخ والوقت
 function updateDateTime() {
     const now = new Date();
