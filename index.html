@@ -2,23 +2,170 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>منصة رؤية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة رؤية التعليمية</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; margin: 0; }
-        .sidebar { height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; z-index: 1000; }
-        .menu-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #333; }
-        .menu-item:hover { background: #34495e; }
-        .page { margin-right: 300px; padding: 20px; display: none; }
+        /* التنسيقات العامة والخطوط */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f0f2f5; 
+            margin: 0; 
+            padding: 0;
+            color: #2c3e50;
+        }
+
+        /* شريط التنقل الجانبي */
+        .sidebar { 
+            height: 100%; 
+            width: 280px; 
+            position: fixed; 
+            top: 0; 
+            right: 0; 
+            background: #1a252f; 
+            color: white; 
+            padding-top: 20px; 
+            z-index: 1000;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-title {
+            text-align: center; 
+            font-size: 22px; 
+            font-weight: bold; 
+            padding-bottom: 25px;
+            border-bottom: 1px solid #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .menu-item { 
+            padding: 18px 25px; 
+            cursor: pointer; 
+            border-bottom: 1px solid #243342; 
+            transition: all 0.3s ease;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .menu-item:hover { 
+            background: #34495e; 
+            padding-right: 35px;
+        }
+
+        /* المحتوى الرئيسي والصفحات */
+        .page { 
+            margin-right: 300px; 
+            padding: 30px; 
+            display: none; 
+            animation: fadeIn 0.5s ease;
+        }
+
         /* جعل الصفحة الرئيسية تظهر افتراضياً */
-        #home { display: block; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; border-right: 8px solid #3498db; }
-        .editable { border: 1px dashed #ccc; padding: 10px; border-radius: 5px; }
+        #home { 
+            display: block; 
+        }
+
+        /* تصميم البطاقات الاحترافية */
+        .card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            margin-bottom: 25px; 
+            border-right: 8px solid #3498db; 
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+        }
+
+        /* حقول الإدخال والأزرار */
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
+            background: #f9f9f9;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, textarea:focus, select:focus {
+            border-color: #3498db;
+            background: white;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #219653;
+        }
+
+        /* تصاميم خاصة بالمحرر والأدمن */
+        .editable { 
+            border: 1px dashed #ccc; 
+            padding: 15px; 
+            border-radius: 8px; 
+            min-height: 40px;
+            background: #fafafa;
+            transition: all 0.3s;
+            line-height: 1.6;
+        }
+        
+        .editable:focus { 
+            border-color: #3498db; 
+            outline: none; 
+            background: white; 
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.2);
+        }
+
+        /* حقول تحكم الإدارة (تظهر وتختفي برمجياً) */
+        .admin-section {
+            display: none;
+            background: #fdfefe;
+            border: 2px dashed #e67e22 !important;
+        }
+
+        /* زر الحذف للأدمن */
+        .delete-btn {
+            background: #e74c3c;
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        /* حركات التلاشي */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
 
+<!-- شريط التنقل الجانبي -->
 <div class="sidebar">
-    <div style="text-align:center; font-size:20px; font-weight:bold; padding-bottom:20px;">👁️ منصة رؤية</div>
+    <div class="sidebar-title">👁️ منصة رؤية</div>
     <div class="menu-item" onclick="showPage('home')">🏠 الرئيسية</div>
     <div class="menu-item" onclick="showPage('announcements')">📢 لوحة الإعلانات</div>
     <div class="menu-item" onclick="showPage('classes')">🏫 إدارة الصفوف</div>
@@ -27,58 +174,107 @@
     <div class="menu-item" id="authBtn" onclick="handleAuth()">🔐 تسجيل الدخول</div>
 </div>
 
-<!-- الرئيسية -->
+<!-- 1. صفحة الرئيسية -->
 <div id="home" class="page">
-    <div class="card" style="text-align:center; border-right-color: #34495e;">
-        <h3 id="date-display"></h3>
-        <p id="time-display" style="font-size:1.5em; font-weight:bold;"></p>
+    <!-- بطاقة الوقت والتاريخ -->
+    <div class="card" style="border-right-color: #34495e; text-align: center;">
+        <h3 id="date-display" style="margin: 0; color: #7f8c8d;">جاري تحميل التاريخ...</h3>
+        <p id="time-display" style="font-size: 2em; font-weight: bold; color: #2c3e50; margin: 10px 0 0 0;">00:00:00</p>
     </div>
-    <div class="card"><h3>رؤية المدرسة</h3><p id="school-vision" class="editable">رؤيتنا تعليم متميز...</p></div>
-    <div class="card"><h3>عدد الزوار</h3><h2 id="visitor-count">100</h2></div>
+
+    <!-- بطاقة الترحيب -->
+    <div class="card" style="border-right-color: #3498db;">
+        <h1 style="margin: 0 0 10px 0; color: #2980b9;">مرحباً بكم في منصة رؤية التعليمية</h1>
+        <p style="margin: 0; color: #7f8c8d; line-height: 1.6;">نحن نسعى لبناء بيئة تعليمية ذكية ومتكاملة تربط الإدارة والأساتذة والطلاب بأحدث الأدوات البرمجية المعاصرة.</p>
+    </div>
+    
+    <!-- بطاقة الرؤية -->
+    <div class="card" style="border-right-color: #e67e22;">
+        <h3 style="color: #d35400; margin-top: 0;">🎯 رؤية المدرسة</h3>
+        <p id="school-vision" class="editable" contenteditable="false" onblur="updateInfo('vision', this.innerText)">جاري التحميل...</p>
+        <small id="vision-tip" style="color: #7f8c8d; display: none;">💡 اضغط مباشرة على النص أعلاه لتعديله، ثم انقر خارجه للحفظ تلقائياً.</small>
+    </div>
+
+    <!-- بطاقة النبذة والتاريخ -->
+    <div class="card" style="border-right-color: #27ae60;">
+        <h3 style="color: #27ae60; margin-top: 0;">📜 تاريخ ونبذة عن المدرسة</h3>
+        <p id="school-about" class="editable" contenteditable="false" onblur="updateInfo('about', this.innerText)">جاري التحميل...</p>
+        <small id="about-tip" style="color: #7f8c8d; display: none;">💡 اضغط مباشرة على النص أعلاه لتعديله، ثم انقر خارجه للحفظ تلقائياً.</small>
+    </div>
+
+    <!-- بطاقة عداد الزوار -->
+    <div class="card" style="text-align: center; border-right-color: #9b59b6;">
+        <h3 style="color: #8e44ad; margin: 0 0 10px 0;">📊 إجمالي زوار المنصة</h3>
+        <h2 id="visitor-count" style="font-size: 2.5em; margin: 0; color: #2c3e50;">0</h2>
+    </div>
 </div>
 
-<!-- الإعلانات -->
+<!-- 2. صفحة لوحة الإعلانات -->
 <div id="announcements" class="page">
-    <div class="card">
-        <h3>📢 إضافة إعلان جديد</h3>
-        <input type="text" id="ann-title" placeholder="عنوان الإعلان" style="width:100%; margin-bottom:10px;">
-        <textarea id="ann-text" placeholder="نص الإعلان" style="width:100%; height:80px;"></textarea>
-        <button onclick="addAnnouncement()">نشر الإعلان</button>
+    <div class="card admin-section" id="ann-admin-card">
+        <h3 style="color: #e67e22; margin-top: 0;">📢 نشر إعلان جديد (المدير)</h3>
+        <input type="text" id="ann-title" placeholder="عنوان الإعلان (مثال: جدول الامتحانات النهائية)">
+        <textarea id="ann-text" placeholder="اكتب تفاصيل الإعلان هنا بالتفصيل..." style="height: 100px;"></textarea>
+        <button onclick="addAnnouncement()">نشر الإعلان الآن</button>
     </div>
+    
+    <h2 style="border-bottom: 2px solid #3498db; padding-bottom: 10px; color: #2c3e50;">الإعلانات المنشورة</h2>
     <div id="announcements-list"></div>
 </div>
 
-<!-- الصفوف -->
+<!-- 3. صفحة إدارة الصفوف -->
 <div id="classes" class="page">
-    <div class="card">
-        <h3>🏫 إدارة الصفوف</h3>
-        <input type="text" id="class-name" placeholder="اسم الصف">
-        <input type="text" id="section-name" placeholder="الشعبة">
+    <div class="card admin-section" id="class-admin-card">
+        <h3 style="color: #e67e22; margin-top: 0;">🏫 إضافة صف جديد (المدير)</h3>
+        <input type="text" id="class-name" placeholder="اسم الصف (مثال: الثالث المتوسط)">
+        <input type="text" id="section-name" placeholder="الشعبة (مثال: أ)">
         <button onclick="addClass()">إضافة الصف</button>
     </div>
+    
+    <h2 style="border-bottom: 2px solid #27ae60; padding-bottom: 10px; color: #2c3e50;">قائمة الصفوف والشعب</h2>
     <div id="classes-list"></div>
 </div>
 
-<!-- الجدول -->
+<!-- 4. صفحة جدول الدروس -->
 <div id="schedule" class="page">
-    <div class="card">
-        <h3>📅 إضافة حصة للجدول</h3>
-        <input type="text" id="subject-name" placeholder="اسم المادة">
-        <button onclick="addSchedule()">إضافة للجدول</button>
+    <div class="card admin-section" id="schedule-admin-card">
+        <h3 style="color: #e67e22; margin-top: 0;">📅 تنظيم حصة دراسية (المدير)</h3>
+        <label for="schedule-class-select">اختر الصف والشعبة:</label>
+        <select id="schedule-class-select"></select>
+        
+        <label for="schedule-day">اختر اليوم:</label>
+        <select id="schedule-day">
+            <option value="الأحد">الأحد</option>
+            <option value="الأثنين">الأثنين</option>
+            <option value="الثلاثاء">الثلاثاء</option>
+            <option value="الأربعاء">الأربعاء</option>
+            <option value="الخميس">الخميس</option>
+        </select>
+        
+        <input type="text" id="schedule-subject" placeholder="المادة الدراسية (مثال: الرياضيات)">
+        <input type="text" id="schedule-teacher" placeholder="اسم الأستاذ">
+        <input type="text" id="schedule-time" placeholder="الحصة (مثال: الأولى 8:00 ص)">
+        <button onclick="addSchedule()">إضافة إلى الجدول</button>
     </div>
+    
+    <h2 style="border-bottom: 2px solid #f1c40f; padding-bottom: 10px; color: #2c3e50;">جدول الدروس الأسبوعي</h2>
     <div id="schedule-list"></div>
 </div>
 
-<!-- المكتبة -->
+<!-- 5. صفحة المكتبة الرقمية -->
 <div id="library" class="page">
-    <div class="card">
-        <h3>📚 إضافة ملف للمكتبة</h3>
-        <input type="text" id="book-name" placeholder="اسم الملف">
-        <button onclick="addBook()">رفع الملف</button>
+    <div class="card admin-section" id="library-admin-card">
+        <h3 style="color: #e67e22; margin-top: 0;">📚 رفع كتاب أو ملخص إلى المكتبة (المدير)</h3>
+        <input type="text" id="book-title" placeholder="اسم الكتاب أو الملف الدراسي">
+        <input type="text" id="book-link" placeholder="رابط التحميل أو الملف (رابط خارجي للآن)">
+        <button onclick="addBook()">إضافة إلى المكتبة</button>
     </div>
+    
+    <h2 style="border-bottom: 2px solid #9b59b6; padding-bottom: 10px; color: #2c3e50;">المصادر والمناهج المتوفرة</h2>
     <div id="library-list"></div>
 </div>
 
+<!-- ربط الملف البرمجي -->
 <script src="scriot.js"></script>
 </body>
 </html>
