@@ -172,22 +172,37 @@ function addLibraryItem() {
 }
 
 // 5. التهيئة النهائية
+// 5. التهيئة النهائية
 window.onload = function() {
     const authBtn = document.getElementById("authBtn");
     if(authBtn) authBtn.innerText = localStorage.getItem("userLevel") ? "🔓 خروج" : "🔐 تسجيل الدخول";
+    
     loadAnnouncements();
     loadLibrary();
+    
+    const level = localStorage.getItem("userLevel");
+    if (level === "admin") {
+        const annBox = document.getElementById("admin-add-ann");
+        const libBox = document.getElementById("admin-library-add");
+        if (annBox) annBox.style.display = "block";
+        if (libBox) libBox.style.display = "block";
+    }
 };
 
-// وظائف مساعدة
+// وظائف مساعدة (خارج الـ onload)
 function toggleSidebar() { document.getElementById('mySidebar').classList.toggle('active'); }
+
 function show(id) {
     document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
     document.getElementById(id).style.display = 'block';
     toggleSidebar();
 }
+
 function update(key, r, d, type, val) {
     if (localStorage.getItem("userLevel") !== "admin") return location.reload();
     database.ref(`school_data/lessons/${key}/data/${r}/${d}/${type}`).set(val); 
 }
-function deleteTable(key) { if(confirm("حذف؟")) database.ref('school_data/lessons/' + key).remove(); }
+
+function deleteTable(key) { 
+    if(confirm("حذف؟")) database.ref('school_data/lessons/' + key).remove(); 
+}
