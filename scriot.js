@@ -46,6 +46,7 @@ function updateInfo(field, text) {
 
 // 5. إدارة الإعلانات
 function addAnnouncement() {
+    console.log("تم الضغط على زر النشر!"); // أضف هذا السطر
     if (!localStorage.getItem("admin")) return alert("غير مصرح لك!");
     const title = document.getElementById('ann-title').value;
     const text = document.getElementById('ann-text').value;
