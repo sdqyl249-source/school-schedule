@@ -7,7 +7,114 @@
     <style>
         /* التنسيقات العامة والخطوط */
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Segoe UI', Tahoma,<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الوادي التعليمية</title>
+    <style>
+        /* التنسيقات العامة */
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; color: #2c3e50; }
+        .sidebar { height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; z-index: 1000; }
+        .sidebar-title { text-align: center; font-size: 22px; font-weight: bold; padding-bottom: 25px; border-bottom: 1px solid #2c3e50; margin-bottom: 15px; }
+        .menu-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342; transition: 0.3s; }
+        .menu-item:hover { background: #34495e; }
+        .page { margin-right: 300px; padding: 30px; display: none; }
+        #home { display: block; }
+        
+        /* تصميم البطاقات */
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; border-right: 8px solid #27ae60; }
+        .editable { border: 1px dashed #ccc; padding: 10px; border-radius: 8px; }
+        .admin-section { display: none; border: 2px dashed #27ae60 !important; padding: 20px; margin-bottom: 20px; }
+        
+        /* عناصر التحكم */
+        input, textarea, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #219150; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-title">🏞️ منصة الوادي</div>
+    <div class="menu-item" onclick="showPage('home')">🏠 الرئيسية</div>
+    <div class="menu-item" onclick="showPage('announcements')">📢 لوحة الإعلانات</div>
+    <div class="menu-item" onclick="showPage('classes')">🏫 إدارة الصفوف</div>
+    <div class="menu-item" onclick="showPage('schedule')">📅 جدول الدروس</div>
+    <div class="menu-item" onclick="showPage('library')">📚 المكتبة الرقمية</div>
+    <div class="menu-item" id="authBtn" onclick="handleAuth()">🔐 تسجيل الدخول</div>
+</div>
+
+<!-- الرئيسية -->
+<div id="home" class="page">
+    <div class="card" style="text-align:center; border-right-color: #34495e;">
+        <h3 id="date-display"></h3>
+        <p id="time-display" style="font-size:1.5em; font-weight:bold;"></p>
+    </div>
+    <div class="card"><h1>مرحباً بكم في منصة الوادي</h1></div>
+    <div class="card">
+        <h3>رؤية المنصة</h3>
+        <p id="school-vision" class="editable" contenteditable="false" onblur="updateInfo('vision', this.innerText)">...</p>
+    </div>
+    <div class="card"><h3>عدد الزوار</h3><h2 id="visitor-count">0</h2></div>
+</div>
+
+<!-- الإعلانات -->
+<div id="announcements" class="page">
+    <div class="card admin-section" id="admin-ann">
+        <h3>📢 إضافة إعلان جديد</h3>
+        <input type="text" id="ann-title" placeholder="العنوان">
+        <textarea id="ann-text" placeholder="النص"></textarea>
+        <button onclick="addAnnouncement()">نشر الإعلان</button>
+    </div>
+    <div id="announcements-list"></div>
+</div>
+
+<!-- الصفوف -->
+<div id="classes" class="page">
+    <div class="card admin-section" id="admin-class">
+        <h3>🏫 إضافة صف</h3>
+        <input type="text" id="class-name" placeholder="اسم الصف">
+        <input type="text" id="section-name" placeholder="الشعبة">
+        <button onclick="addClass()">حفظ الصف</button>
+    </div>
+    <div id="classes-list"></div>
+</div>
+
+<!-- الجدول -->
+<div id="schedule" class="page">
+    <div class="card admin-section" id="admin-sch">
+        <h3>📅 إضافة حصة</h3>
+        <input type="text" id="sub-name" placeholder="اسم المادة">
+        <button onclick="addSchedule()">إضافة</button>
+    </div>
+    <div id="schedule-list"></div>
+</div>
+
+<!-- المكتبة -->
+<div id="library" class="page">
+    <div class="card admin-section" id="admin-lib">
+        <h3>📚 إضافة ملف</h3>
+        <input type="text" id="book-name" placeholder="اسم الملف">
+        <button onclick="addBook()">رفع الملف</button>
+    </div>
+    <div id="library-list"></div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<script>
+    const firebaseConfig = {
+        /* ضع إعداداتك هنا */
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+</script>
+<script src="scriot.js"></script>
+</body>
+</html> Geneva, Verdana, sans-serif; 
             background: #f0f2f5; 
             margin: 0; 
             padding: 0;
