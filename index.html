@@ -5,102 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة رؤية</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; }
-        
-        /* السايد بار */
-        .sidebar { height: 100%; width: 280px; position: fixed; top: 0; right: -280px; background: linear-gradient(180deg, #1a252f 0%, #2c3e50 100%); color: white; transition: 0.4s ease; z-index: 1000; padding-top: 20px; box-shadow: -2px 0 10px rgba(0,0,0,0.3); display: flex; flex-direction: column; }
-        .sidebar.active { right: 0; }
-        .sidebar-header { padding: 20px; font-size: 20px; font-weight: bold; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .menu-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .menu-item:hover { background-color: rgba(255,255,255,0.1); border-right: 4px solid #3498db; }
-        .sidebar-footer { margin-top: auto; padding: 20px; background: #162029; text-align: center; cursor: pointer; }
-        
-        .page { padding: 20px; display: none; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #eee; padding: 12px; text-align: center; }
-        .teacher-text { color: #9333ea; font-size: 0.8em; font-weight: bold; margin-top: 5px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; margin: 0; }
+        .sidebar { height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; z-index: 1000; }
+        .menu-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #333; }
+        .menu-item:hover { background: #34495e; }
+        .page { margin-right: 300px; padding: 20px; display: none; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-<button onclick="toggleSidebar()" style="position:fixed; top:10px; right:10px; z-index:999; background: #34495e; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px;">☰ القائمة</button>
-
-<!-- السايد بار -->
-<div class="sidebar" id="mySidebar">
-    <div class="sidebar-header">👁️ منصة رؤية <span onclick="toggleSidebar()" style="cursor:pointer;">✕</span></div>
-    
-    <!-- تم إضافة الروابط الصحيحة للتبديل بين الأقسام -->
-    <div class="menu-item" onclick="show('home')">🏠 الرئيسية</div>
-    <div class="menu-item" onclick="show('announcements')">📢 لوحة الإعلانات</div>
-<!-- في ملف index.html ابحث عن هذا الجزء داخل الـ sidebar وقم بتعديله -->
-<div class="menu-item" onclick="window.location.href='schedule.html'">📅 جدول الدروس</div>    <div class="menu-item" onclick="show('library')">📚 المكتبة الرقمية</div>
-    
-    <!-- زر تسجيل الدخول/الخروج -->
-    <div class="sidebar-footer" id="authBtn" onclick="handleAuth()">🔐 تسجيل الدخول</div>
+<div class="sidebar">
+    <div style="text-align:center; font-size:20px; font-weight:bold; padding-bottom:20px;">👁️ منصة رؤية</div>
+    <div class="menu-item" onclick="showPage('home')">🏠 الرئيسية</div>
+    <div class="menu-item" onclick="showPage('announcements')">📢 لوحة الإعلانات</div>
+    <div class="menu-item" onclick="showPage('classes')">🏫 إدارة الصفوف</div>
+    <div class="menu-item" onclick="showPage('schedule')">📅 جدول الدروس</div>
+    <div class="menu-item" onclick="showPage('library')">📚 المكتبة الرقمية</div>
+    <div class="menu-item" id="authBtn">🔐 تسجيل الدخول</div>
 </div>
 
-<!-- ================= الصفحات (Pages) ================= -->
+<div id="home" class="page" style="display:block;"><h1>الرئيسية</h1></div>
+<div id="announcements" class="page"><h1>لوحة الإعلانات</h1></div>
+<div id="classes" class="page"><h1>إدارة الصفوف</h1></div>
+<div id="schedule" class="page"><h1>جدول الدروس</h1></div>
+<div id="library" class="page"><h1>المكتبة الرقمية</h1></div>
 
-<!-- 1. الرئيسية -->
-<div id="home" class="page" style="display: block;">
-    <div class="card"><h3>مرحباً بك في منصة رؤية</h3></div>
-</div>
-
-<!-- 2. قسم الإعلانات -->
-<div id="announcements" class="page">
-    <div class="card">
-        <h3>📢 لوحة إعلانات المدرسة</h3>
-        <div id="ann-list">
-            <!-- سيتم عرض الإعلانات هنا ديناميكياً -->
-        </div>
-        
-        <!-- مساحة إضافة الإعلان (مخفية افتراضياً، تظهر للمدير فقط) -->
-        <!-- قسم إضافة الإعلان - تأكد من إزالة التكرار -->
-<div id="admin-add-ann" style="display:none; padding:15px; margin-top:20px; background:#f9f9f9; border-radius:8px; border:1px solid #ddd;">
-    <h4>إضافة إعلان جديد</h4>
-    <!-- العنوان -->
-    <input type="text" id="ann-title" placeholder="العنوان الرئيسي" style="width:100%; margin-bottom:10px; padding:8px;">
-    <!-- الوصف -->
-    <textarea id="ann-desc" placeholder="وصف الإعلان..." style="width:100%; margin-bottom:10px; padding:8px; height:80px;"></textarea>
-    <!-- رابط الصورة - اجعل له ID واحد فقط -->
-    <input type="text" id="ann-media" placeholder="رابط صورة أو فيديو" style="width:100%; margin-bottom:10px; padding:8px;">
-    
-    <button onclick="uploadAnnouncement()" style="background:#27ae60; color:white; padding:8px 15px; border:none; border-radius:5px; cursor:pointer;">📢 نشر الإعلان </button>
-</div>
-    </div>
-</div>
-
-<!-- 3. قسم جدول الدروس -->
-<div id="schedule" class="page">
-    <div class="card">
-        <h3>جدول الدروس</h3>
-        <div id="schedule-container"></div>
-    </div>
-</div>
-
-<!-- 4. قسم المكتبة الرقمية -->
-<div id="library" class="page">
-    <div class="card">
-        <h2 style="color:#2c3e50;">📚 المكتبة الرقمية</h2>
-        <div id="library-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top:15px;">
-            <!-- سيتم عرض الملازم هنا برمجياً -->
-        </div>
-        
-        <!-- مساحة إضافة الكتب (مخفية افتراضياً، تظهر للمدير فقط) -->
-       <div id="admin-library-add" class="card" style="display:none; padding:15px; margin-top:20px; background:#f0f8ff;">
-    <h4>إضافة ملف للمكتبة من جهازك</h4>
-    <input type="text" id="lib-name" placeholder="اسم الملف" style="width:100%; margin-bottom:5px;">
-    <input type="file" id="lib-file" style="width:100%; margin-bottom:5px;">
-    <button onclick="uploadFileToStorage()" class="btn" style="background:#27ae60; color:white;">رفع الملف للمكتبة</button>
-</div>
-    </div>
-</div>
 <!-- مكتبات Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+<!-- الملف الخاص بك -->
 <script src="scriot.js"></script>
 </body>
 </html>
