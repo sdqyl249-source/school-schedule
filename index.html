@@ -7,10 +7,12 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; margin: 0; }
         .sidebar { height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; z-index: 1000; }
-        .menu-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #333; }
+        .menu-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #333; transition: 0.3s; }
         .menu-item:hover { background: #34495e; }
         .page { margin-right: 300px; padding: 20px; display: none; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; border-right: 8px solid #3498db; }
+        .editable { border: 1px dashed #ccc; padding: 10px; border-radius: 5px; min-height: 20px; }
+        .editable:focus { border-color: #3498db; outline: none; background: #f9f9f9; }
     </style>
 </head>
 <body>
@@ -22,36 +24,42 @@
     <div class="menu-item" onclick="showPage('classes')">🏫 إدارة الصفوف</div>
     <div class="menu-item" onclick="showPage('schedule')">📅 جدول الدروس</div>
     <div class="menu-item" onclick="showPage('library')">📚 المكتبة الرقمية</div>
-    <div class="menu-item" id="authBtn">🔐 تسجيل الدخول</div>
+    <div class="menu-item" id="authBtn" onclick="handleAuth()">🔐 تسجيل الدخول</div>
 </div>
 
 <!-- صفحة الرئيسية -->
 <div id="home" class="page" style="display:block;">
     <div class="card">
         <h1>مرحباً بكم في منصة رؤية</h1>
-        <div style="font-size: 1.2em; color: #7f8c8d; margin-top: 10px;">
+        <div style="font-size: 1.1em; color: #7f8c8d; margin-top: 10px;">
             <span id="date-display"></span> | <span id="time-display"></span>
         </div>
     </div>
-    <div class="card">
-        <h3>عن المدرسة</h3>
-        <p id="school-about">جاري تحميل البيانات...</p>
+    
+    <div class="card" style="border-right-color: #e67e22;">
+        <h3>رؤية المدرسة</h3>
+        <p id="school-vision" class="editable" contenteditable="false" onblur="updateInfo('vision', this.innerText)">جاري التحميل...</p>
     </div>
-    <div class="card" style="text-align: center;">
+
+    <div class="card" style="border-right-color: #27ae60;">
+        <h3>نبذة عن المدرسة</h3>
+        <p id="school-about" class="editable" contenteditable="false" onblur="updateInfo('about', this.innerText)">جاري التحميل...</p>
+    </div>
+
+    <div class="card" style="text-align: center; border-right-color: #9b59b6;">
         <h3>عدد زوار الموقع</h3>
         <h2 id="visitor-count" style="color: #2c3e50;">0</h2>
     </div>
 </div>
 
-<!-- صفحة الإعلانات -->
 <div id="announcements" class="page"><h1>لوحة الإعلانات</h1></div>
 
 <!-- صفحة الصفوف -->
 <div id="classes" class="page">
     <div class="card">
         <h3>🏫 إدارة الصفوف</h3>
-        <input type="text" id="class-input" placeholder="اسم الصف (مثال: الأول المتوسط)" style="width:100%; padding:10px; margin-bottom:10px;">
-        <input type="text" id="section-input" placeholder="الشعبة (مثال: أ)" style="width:100%; padding:10px; margin-bottom:10px;">
+        <input type="text" id="class-input" placeholder="اسم الصف" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd;">
+        <input type="text" id="section-input" placeholder="الشعبة" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd;">
         <button onclick="saveClass()" style="padding:10px 20px; background:#27ae60; color:white; border:none; cursor:pointer;">حفظ الصف</button>
     </div>
     <div id="classes-list"></div>
@@ -62,7 +70,6 @@
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
 <script src="scriot.js"></script>
 </body>
 </html>
