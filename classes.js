@@ -52,21 +52,42 @@ function renderStudentClasses() {
     });
 }
 
+    // دالة حفظ الصف المحدثة
+function saveClass() {
+    const className = document.getElementById("className").value;
+    const classSection = document.getElementById("classSection").value;
+
+    if (!className || !classSection) {
+        alert("يرجى ملء جميع الحقول!");
+        return;
+    }
+
+    const classId = "CLASS-" + Math.floor(1000 + Math.random() * 9000);
+
+    // كائن البيانات الذي سيتم رفعه للسحابة
+    const newClassData = {
+        id: classId,
+        name: className,
+        section: classSection,
+        teacher: "أ. عقيل السعد",
+        lessons: [{ title: "مقدمة" }],
+        grades: {}
+    };
+
+    // عملية الحفظ في Firebase
+    window.db.ref('classes/' + classId).set(newClassData)
     .then(() => {
         alert("تم الحفظ في سحابة الوادي بنجاح!");
-    }); هذا التعديل طبقه على هذه الدالة function saveClass() {
-    const className = document.getElementById("className").value;
-    const classSection = document.getElementById("classSection").value;
-
-    if (!className || !classSection) {
-        alert("يرجى ملء جميع الحقول!");
-        return;
-    }
-
-    const classId = "CLASS-" + Math.floor(1000 + Math.random() * 9000);
-    renderClassCard(className, classSection, classId);
-} 
-
+        renderClassCard(className, classSection, classId);
+        
+        // مسح الحقول بعد الحفظ
+        document.getElementById("className").value = "";
+        document.getElementById("classSection").value = "";
+    })
+    .catch((error) => {
+        alert("حدث خطأ أثناء الحفظ: " + error.message);
+    });
+}
 // وظيفة عرض بطاقة الصف (للأستاذ)
 function renderClassCard(name, section, id) {
     const container = document.getElementById("classesContainer");
