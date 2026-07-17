@@ -1,18 +1,11 @@
 // auth.js
-function checkAuth() {
-    const userString = localStorage.getItem("currentUser");
-    console.log("قيمة المستخدم في التخزين:", userString); // هذا سيظهر في الـ Console
-    
-    const isLoginPage = window.location.href.includes("login.html");
+(function() {
+    const user = localStorage.getItem("currentUser");
+    const path = window.location.pathname;
 
-    if (!userString && !isLoginPage) {
-        console.log("لم يتم العثور على مستخدم، سيتم التحويل لصفحة الدخول.");
+    // إذا لم يوجد مستخدم ولسنا في صفحة login.html
+    if (!user && !path.includes("login.html")) {
+        alert("يرجى تسجيل الدخول أولاً");
         window.location.href = "login.html";
-    } 
-    else if (userString && isLoginPage) {
-        console.log("المستخدم مسجل، سيتم تحويله للرئيسية.");
-        window.location.href = "index.html";
     }
-}
-
-checkAuth();
+})();
