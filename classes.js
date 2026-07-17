@@ -1,4 +1,5 @@
 // classes.js - الكود الموحد والمعدل ليعمل مع Firebase V9
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
@@ -98,14 +99,13 @@ function renderClassCard(name, section, id) {
     }
 }
 
-import { onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
+// وظيفة عرض صفوف الطالب
 function renderStudentClasses() {
     const container = document.getElementById("classes-container");
     if (!container) return;
 
     // استمع إلى مسار الصفوف في Firebase
-    const classesRef = ref(window.db, 'classes/');
+    const classesRef = ref(db, 'classes/');
     
     onValue(classesRef, (snapshot) => {
         const data = snapshot.val();
@@ -132,40 +132,47 @@ function renderStudentClasses() {
         }
     });
 }
+
 // دالة عرض الدروس
 window.viewClassLessons = function(classId) {
-    const selectedClass = allClasses.find(cls => cls.id === classId);
-    if (!selectedClass) return;
+    const classesRef = ref(db, 'classes/' + classId);
+    onValue(classesRef, (snapshot) => {
+        const selectedClass = snapshot.val();
+        if (!selectedClass) return;
 
-    const container = document.getElementById("classes-container");
-    container.innerHTML = `
-        <button onclick="renderStudentClasses()">العودة لصفوفي</button>
-        <h2>دروس صف: ${selectedClass.name}</h2>
-        <button onclick="showStudentGrade('${selectedClass.id}')">عرض درجتي في هذا الصف</button>
-        <div id="lessons-list"></div>
-    `;
+        const container = document.getElementById("classes-container");
+        container.innerHTML = `
+            <button onclick="renderStudentClasses()">العودة لصفوفي</button>
+            <h2>دروس صف: ${selectedClass.name}</h2>
+            <button onclick="showStudentGrade('${selectedClass.id}')">عرض درجتي في هذا الصف</button>
+            <div id="lessons-list"></div>
+        `;
 
-    const lessonsList = document.getElementById("lessons-list");
-    selectedClass.lessons.forEach((lesson, index) => {
-        const lessonDiv = document.createElement("div");
-        lessonDiv.className = "lesson-card";
-        lessonDiv.innerHTML = `<h4>الدرس ${index + 1}: ${lesson.title}</h4>`;
-        lessonsList.appendChild(lessonDiv);
+        const lessonsList = document.getElementById("lessons-list");
+        selectedClass.lessons.forEach((lesson, index) => {
+            const lessonDiv = document.createElement("div");
+            lessonDiv.className = "lesson-card";
+            lessonDiv.innerHTML = `<h4>الدرس ${index + 1}: ${lesson.title}</h4>`;
+            lessonsList.appendChild(lessonDiv);
+        });
     });
 };
 
 // دالة عرض الدرجة
 window.showStudentGrade = function(classId) {
-    const selectedClass = allClasses.find(cls => cls.id === classId);
-    if (!selectedClass) return;
+    const classesRef = ref(db, 'classes/' + classId);
+    onValue(classesRef, (snapshot) => {
+        const selectedClass = snapshot.val();
+        if (!selectedClass) return;
 
-    const studentName = prompt("أدخل اسمك الثلاثي لعرض درجتك:");
-    if (!studentName) return;
+        const studentName = prompt("أدخل اسمك الثلاثي لعرض درجتك:");
+        if (!studentName) return;
 
-    const grade = selectedClass.grades[studentName];
-    if (grade !== undefined) {
-        alert("مرحباً " + studentName + "، درجتك هي: " + grade);
-    } else {
-        alert("عذراً، لم يتم العثور على درجة بهذا الاسم.");
-    }
+        const grade = selectedClass.grades[studentName];
+        if (grade !== undefined) {
+            alert("مرحباً " + studentName + "، درجتك هي: " + grade);
+        } else {
+            alert("عذراً، لم يتم العثور على درجة بهذا الاسم.");
+        }
+    });
 };
