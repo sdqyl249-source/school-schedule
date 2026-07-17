@@ -99,32 +99,40 @@ function renderClassCard(name, section, id) {
     }
 }
 
-// وظيفة عرض صفوف الطالب
+import { onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
 function renderStudentClasses() {
     const container = document.getElementById("classes-container");
     if (!container) return;
 
-    const userProfile = JSON.parse(localStorage.getItem("currentUser"));
-    const joinedCodes = userProfile.joinedClasses || [];
+    // استمع إلى مسار الصفوف في Firebase
+    const classesRef = ref(window.db, 'classes/');
+    
+    onValue(classesRef, (snapshot) => {
+        const data = snapshot.val();
+        container.innerHTML = ""; // تفريغ الحاوية قبل العرض
 
-    container.innerHTML = ""; 
+        if (data) {
+            const userProfile = JSON.parse(localStorage.getItem("currentUser"));
+            const joinedCodes = userProfile.joinedClasses || [];
 
-    if (typeof allClasses !== 'undefined') {
-        allClasses.forEach(cls => {
-            if (joinedCodes.includes(cls.id)) {
-                const card = document.createElement("div");
-                card.className = "class-card";
-                card.innerHTML = `
-                    <h3>${cls.name}</h3>
-                    <p>الأستاذ: ${cls.teacher}</p>
-                    <button onclick="viewClassLessons('${cls.id}')">عرض الدروس</button>
-                `;
-                container.appendChild(card);
-            }
-        });
-    }
+            // تحويل البيانات من Firebase إلى مصفوفة لعرضها
+            Object.values(data).forEach(cls => {
+                // إذا كان الطالب منضم لهذا الصف
+                if (joinedCodes.includes(cls.id)) {
+                    const card = document.createElement("div");
+                    card.className = "class-card";
+                    card.innerHTML = `
+                        <h3>${cls.name}</h3>
+                        <p>الأستاذ: ${cls.teacher}</p>
+                        <button onclick="viewClassLessons('${cls.id}')">عرض الدروس</button>
+                    `;
+                    container.appendChild(card);
+                }
+            });
+        }
+    });
 }
-
 // دالة عرض الدروس
 window.viewClassLessons = function(classId) {
     const selectedClass = allClasses.find(cls => cls.id === classId);
