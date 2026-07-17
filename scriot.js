@@ -8,7 +8,9 @@ const firebaseConfig = {
     databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
     projectId: "roya-platform-26860"
 };
-initializeApp(firebaseConfig);
+
+const app = initializeApp(firebaseConfig);
+window.db = getDatabase(app); // جعل قاعدة البيانات متاحة عالمياً في كل الملفات
 
 window.addEventListener('DOMContentLoaded', () => {
 
@@ -17,56 +19,51 @@ window.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
         const target = document.getElementById(id);
         if (target) target.style.display = 'block';
-        document.getElementById("mySidebar").style.width = "0";
+        const sidebar = document.getElementById("mySidebar");
+        if (sidebar) sidebar.style.width = "0";
     };
 
-    // دالة حماية الصفحات (بوابة الأستاذ والطالب)
-   const setupProtectedButton = (btnId, targetUrl) => {
-    document.getElementById(btnId)?.addEventListener('click', () => {
-        // إذا كان مدير، يذهب للملف مباشرة
-        if (localStorage.getItem("admin") === "true") {
-            window.location.href = targetUrl;
-            return;
-        }
-
-        // بوابة الاختيار
-        const role = prompt("أهلاً بك في منصة الوادي، اختر صفة الدخول:\n1. أستاذ\n2. طالب");
-
-        if (role === "1") {
-            const pass = prompt("أدخل رمز الأستاذ:");
-            if (pass === "1234") {
-                localStorage.setItem("admin", "true");
-                window.location.href = targetUrl; // الانتقال للملف
-            } else {
-                alert("رمز الأستاذ خاطئ!");
+    // دالة حماية الصفحات
+    const setupProtectedButton = (btnId, targetUrl) => {
+        document.getElementById(btnId)?.addEventListener('click', () => {
+            if (localStorage.getItem("admin") === "true") {
+                window.location.href = targetUrl;
+                return;
             }
-        } else if (role === "2") {
-            const pass = prompt("أدخل رمز الصف:");
-            if (pass === "0000") {
-                const name = prompt("يرجى إدخال اسمك الثلاثي:");
-                const phone = prompt("يرجى إدخال رقم هاتفك:");
-                localStorage.setItem("studentName", name);
-                localStorage.setItem("studentPhone", phone);
-                localStorage.setItem("isStudent", "true");
-                window.location.href = targetUrl; // الانتقال للملف
-            } else {
-                alert("رمز الصف خاطئ!");
-            }
-        }
-    });
-};
 
-// الاستخدام (سيرسل الطالب أو الأستاذ إلى الملف مباشرة):
-setupProtectedButton('btn-classes', 'classes.html');
-setupProtectedButton('btn-library', 'library.html');
+            const role = prompt("أهلاً بك في منصة الوادي، اختر صفة الدخول:\n1. أستاذ\n2. طالب");
+            if (role === "1") {
+                const pass = prompt("أدخل رمز الأستاذ:");
+                if (pass === "1234") {
+                    localStorage.setItem("admin", "true");
+                    window.location.href = targetUrl;
+                } else {
+                    alert("رمز الأستاذ خاطئ!");
+                }
+            } else if (role === "2") {
+                const pass = prompt("أدخل رمز الصف:");
+                if (pass === "0000") {
+                    const name = prompt("يرجى إدخال اسمك الثلاثي:");
+                    const phone = prompt("يرجى إدخال رقم هاتفك:");
+                    localStorage.setItem("studentName", name);
+                    localStorage.setItem("studentPhone", phone);
+                    localStorage.setItem("isStudent", "true");
+                    window.location.href = targetUrl;
+                } else {
+                    alert("رمز الصف خاطئ!");
+                }
+            }
+        });
+    };
+
+    setupProtectedButton('btn-classes', 'classes.html');
+    setupProtectedButton('btn-library', 'library.html');
+
     // 2. ربط الأزرار برمجياً
     document.getElementById('btn-home')?.addEventListener('click', () => showPage('home'));
     document.getElementById('btn-announcements')?.addEventListener('click', () => showPage('announcements'));
     document.getElementById('btn-games')?.addEventListener('click', () => showPage('games'));
     document.getElementById('btn-schedule')?.addEventListener('click', () => { window.location.href = 'schedule.html'; });
-
-    setupProtectedButton('btn-classes', 'classes');
-    setupProtectedButton('btn-library', 'library');
 
     // 3. التحكم بالسايدبار
     document.getElementById('openBtn')?.addEventListener('click', () => { document.getElementById("mySidebar").style.width = "280px"; });
@@ -78,7 +75,7 @@ setupProtectedButton('btn-library', 'library.html');
         authBtn.addEventListener('click', () => {
             if (localStorage.getItem("admin") === "true") {
                 if (confirm("أنت مسجل كمدير، هل تريد تسجيل الخروج؟")) {
-                    localStorage.clear(); // مسح كل البيانات عند الخروج
+                    localStorage.clear();
                     location.reload();
                 }
             } else {
@@ -107,13 +104,9 @@ setupProtectedButton('btn-library', 'library.html');
         document.querySelectorAll('.admin-section').forEach(el => el.style.display = 'block');
     }
     
-    // إظهار ترحيب للطالب إذا كان مسجلاً
+    // 6. عرض بيانات الطالب
     if (localStorage.getItem("isStudent") === "true") {
-        console.log("مرحباً الطالب: " + localStorage.getItem("studentName"));
-    }
-// --- كود عرض بيانات الطالب تلقائياً في صفحة الصفوف ---
-    if (localStorage.getItem("isStudent") === "true") {
-        const classesPage = document.getElementById('classes'); // تأكد أن id الصفحة هو 'classes'
+        const classesPage = document.getElementById('classes');
         if (classesPage) {
             const infoCard = document.createElement('div');
             infoCard.style.cssText = "background: #e8f5e9; padding: 15px; margin: 10px; border-right: 5px solid #2e7d32; border-radius: 8px; font-weight: bold;";
@@ -122,7 +115,6 @@ setupProtectedButton('btn-library', 'library.html');
                 <p>📞 رقم الهاتف: ${localStorage.getItem("studentPhone")}</p>
                 <p>📚 رمز الصف: 0000</p>
             `;
-            // إضافة البطاقة في بداية صفحة الصفوف
             classesPage.prepend(infoCard);
         }
     }
