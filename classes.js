@@ -1,6 +1,7 @@
 // classes.js - الكود الموحد والمعدل ليعمل مع Firebase V9
-
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
 // 1. إعدادات Firebase
 const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
@@ -12,8 +13,9 @@ const firebaseConfig = {
     appId: "YOUR_APP_ID"
 };
 
-// 2. تهيئة التطبيق وقاعدة البيانات
-const app = initializeApp(firebaseConfig);
+// 2. تهيئة التطبيق وقاعدة البيانات (استخدام getApps لتجنب تكرار التهيئة)
+import { getApps } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getDatabase(app);
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -21,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!userString) return;
     
     const userProfile = JSON.parse(userString);
-
     showUserWelcome(userProfile);
 
     if (userProfile.role === 'student') {
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// وظيفة عرض الترحيب
+// [باقي الدوال تبقى كما هي بدون تغيير...]
 function showUserWelcome(user) {
     const infoBox = document.createElement('div');
     infoBox.style.cssText = "background: #e8f5e9; padding: 20px; border-right: 5px solid #2e7d32; margin-bottom: 20px; border-radius: 8px;";
@@ -40,7 +41,6 @@ function showUserWelcome(user) {
     document.body.prepend(infoBox);
 }
 
-// دالة حفظ الصف
 function saveClass() {
     const className = document.getElementById("className").value;
     const classSection = document.getElementById("classSection").value;
@@ -51,7 +51,6 @@ function saveClass() {
     }
 
     const classId = "CLASS-" + Math.floor(1000 + Math.random() * 9000);
-
     const newClassData = {
         id: classId,
         name: className,
@@ -73,49 +72,31 @@ function saveClass() {
     });
 }
 
-// وظيفة عرض بطاقة الصف
 function renderClassCard(name, section, id) {
     const container = document.getElementById("classesContainer");
     if (!container) return;
-    
     const card = document.createElement("div");
     card.className = "class-card";
-    card.innerHTML = `
-        <h3>الصف ${name} - شعبة ${section}</h3>
-        <p>رمز الصف: <strong>${id}</strong></p>
-        <div id="qr-${id}" style="margin-top:15px; display:flex; justify-content:center;"></div>
-    `;
+    card.innerHTML = `<h3>الصف ${name} - شعبة ${section}</h3><p>رمز الصف: <strong>${id}</strong></p><div id="qr-${id}" style="margin-top:15px; display:flex; justify-content:center;"></div>`;
     container.appendChild(card);
-    
-    if (typeof QRCode !== "undefined") {
-        new QRCode(document.getElementById(`qr-${id}`), id);
-    }
+    if (typeof QRCode !== "undefined") { new QRCode(document.getElementById(`qr-${id}`), id); }
 }
 
-// وظيفة عرض صفوف الطالب
 function renderStudentClasses() {
     const container = document.getElementById("classes-container");
     if (!container) return;
-
     const classesRef = ref(db, 'classes/');
-    
     onValue(classesRef, (snapshot) => {
         const data = snapshot.val();
         container.innerHTML = "";
-
         if (data) {
             const userProfile = JSON.parse(localStorage.getItem("currentUser"));
             const joinedCodes = userProfile.joinedClasses || [];
-
             Object.values(data).forEach(cls => {
                 if (joinedCodes.includes(cls.id)) {
                     const card = document.createElement("div");
                     card.className = "class-card";
-                    card.innerHTML = `
-                        <h3>${cls.name}</h3>
-                        <p>الأستاذ: ${cls.teacher}</p>
-                        <button onclick="viewClassLessons('${cls.id}')">عرض الدروس</button>
-                    `;
+                    card.innerHTML = `<h3>${cls.name}</h3><p>الأستاذ: ${cls.teacher}</p><button onclick="viewClassLessons('${cls.id}')">عرض الدروس</button>`;
                     container.appendChild(card);
                 }
             });
@@ -123,21 +104,13 @@ function renderStudentClasses() {
     });
 }
 
-// دالة عرض الدروس
 window.viewClassLessons = function(classId) {
     const classesRef = ref(db, 'classes/' + classId);
     onValue(classesRef, (snapshot) => {
         const selectedClass = snapshot.val();
         if (!selectedClass) return;
-
         const container = document.getElementById("classes-container");
-        container.innerHTML = `
-            <button onclick="renderStudentClasses()">العودة لصفوفي</button>
-            <h2>دروس صف: ${selectedClass.name}</h2>
-            <button onclick="showStudentGrade('${selectedClass.id}')">عرض درجتي في هذا الصف</button>
-            <div id="lessons-list"></div>
-        `;
-
+        container.innerHTML = `<button onclick="renderStudentClasses()">العودة لصفوفي</button><h2>دروس صف: ${selectedClass.name}</h2><button onclick="showStudentGrade('${selectedClass.id}')">عرض درجتي في هذا الصف</button><div id="lessons-list"></div>`;
         const lessonsList = document.getElementById("lessons-list");
         selectedClass.lessons.forEach((lesson, index) => {
             const lessonDiv = document.createElement("div");
@@ -148,21 +121,14 @@ window.viewClassLessons = function(classId) {
     });
 };
 
-// دالة عرض الدرجة
 window.showStudentGrade = function(classId) {
     const classesRef = ref(db, 'classes/' + classId);
     onValue(classesRef, (snapshot) => {
         const selectedClass = snapshot.val();
         if (!selectedClass) return;
-
         const studentName = prompt("أدخل اسمك الثلاثي لعرض درجتك:");
         if (!studentName) return;
-
         const grade = selectedClass.grades[studentName];
-        if (grade !== undefined) {
-            alert("مرحباً " + studentName + "، درجتك هي: " + grade);
-        } else {
-            alert("عذراً، لم يتم العثور على درجة بهذا الاسم.");
-        }
+        if (grade !== undefined) { alert("مرحباً " + studentName + "، درجتك هي: " + grade); } else { alert("عذراً، لم يتم العثور على درجة بهذا الاسم."); }
     });
 };
