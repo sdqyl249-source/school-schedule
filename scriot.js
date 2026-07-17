@@ -42,13 +42,21 @@ function openNav() {
 }
 
 // 2. تحديث التاريخ والوقت
+// 2. تحديث التاريخ والوقت
 function updateDateTime() {
     const now = new Date();
-    const dateEl = document.getElementById('date-display');
-    const timeEl = document.getElementById('time-display');
-    if (dateEl) dateEl.innerText = now.toLocaleDateString('ar-IQ');
-    if (timeEl) timeEl.innerText = now.toLocaleTimeString('ar-IQ');
+    const el = document.getElementById("date-time");
+    if (el) {
+        // نستخدم toLocaleString لعرض التاريخ والوقت معاً بتنسيق العراق
+        el.innerText = now.toLocaleString('ar-IQ');
+    }
 }
+
+// استدعاء الدالة فور تحميل الصفحة
+updateDateTime();
+
+// تحديث الوقت كل ثانية (1000 ميلي ثانية)
+setInterval(updateDateTime, 1000);
 setInterval(updateDateTime, 1000);
 
 // 3. نظام الصلاحيات
