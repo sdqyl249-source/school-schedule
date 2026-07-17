@@ -50,7 +50,7 @@ function saveClass() {
     };
 
     window.db.ref('classes/' + classId).set(newClassData)
-    then(() => {
+    .then(() => {
         alert("تم الحفظ في سحابة الوادي بنجاح!");
         renderClassCard(className, classSection, classId);
         document.getElementById("className").value = "";
@@ -59,7 +59,7 @@ function saveClass() {
     .catch((error) => {
         alert("حدث خطأ أثناء الحفظ: " + error.message);
     });
-}
+
 
 // وظيفة عرض بطاقة الصف (للأستاذ)
 function renderClassCard(name, section, id) {
