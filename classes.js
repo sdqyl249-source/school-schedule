@@ -1,5 +1,18 @@
 // classes.js
 
+// جلب بيانات المستخدم الحالي فور تحميل الصفحة
+const userData = JSON.parse(localStorage.getItem("currentUser"));
+
+// مثال: عرض ترحيب باسم المستخدم إذا كان موجوداً
+window.addEventListener('DOMContentLoaded', () => {
+    if (userData) {
+        console.log("المستخدم الحالي:", userData.name);
+        console.log("الدور:", userData.role);
+        
+        // يمكنك الآن إضافة اسم المستخدم في واجهة الصفحة إذا أردت
+        // مثلاً: document.getElementById("welcomeMsg").innerText = "أهلاً " + userData.name;
+    }
+});
 window.addEventListener('DOMContentLoaded', () => {
     // 1. عرض ترحيب الطالب تلقائياً
     showStudentInfo();
