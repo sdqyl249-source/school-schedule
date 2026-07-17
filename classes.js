@@ -11,8 +11,7 @@ function saveClass() {
     const classCode = "CLS-" + Math.floor(1000 + Math.random() * 9000);
 
     // هنا نرسل البيانات (الاسم، الشعبة، الرمز) إلى قاعدة البيانات
-    console.log("تم حفظ الصف:", className, section, "الرمز:", classCode);
-
+    console.log("تم حفظ الصف:", className, classSection, "الرمز:", classCode);
     // عرض البطاقة مع الرمز
     renderClassCard(className, classSection, classCode);
 }
