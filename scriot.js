@@ -21,46 +21,44 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     // دالة حماية الصفحات (بوابة الأستاذ والطالب)
-    const setupProtectedButton = (btnId, pageId) => {
-        document.getElementById(btnId)?.addEventListener('click', () => {
-            // إذا كان مسجلاً كمدير مسبقاً
-            if (localStorage.getItem("admin") === "true") {
-                showPage(pageId);
-                return;
+   const setupProtectedButton = (btnId, targetUrl) => {
+    document.getElementById(btnId)?.addEventListener('click', () => {
+        // إذا كان مدير، يذهب للملف مباشرة
+        if (localStorage.getItem("admin") === "true") {
+            window.location.href = targetUrl;
+            return;
+        }
+
+        // بوابة الاختيار
+        const role = prompt("أهلاً بك في منصة الوادي، اختر صفة الدخول:\n1. أستاذ\n2. طالب");
+
+        if (role === "1") {
+            const pass = prompt("أدخل رمز الأستاذ:");
+            if (pass === "1234") {
+                localStorage.setItem("admin", "true");
+                window.location.href = targetUrl; // الانتقال للملف
+            } else {
+                alert("رمز الأستاذ خاطئ!");
             }
-
-            // بوابة الاختيار
-            const role = prompt("أهلاً بك في منصة الوادي، اختر صفة الدخول:\n1. أستاذ\n2. طالب");
-
-            if (role === "1") {
-                const pass = prompt("أدخل رمز الأستاذ:");
-                if (pass === "1234") {
-                    localStorage.setItem("admin", "true");
-                    alert("أهلاً بك يا أستاذ");
-                    location.reload();
-                } else {
-                    alert("رمز الأستاذ خاطئ!");
-                }
-            } else if (role === "2") {
-                const pass = prompt("أدخل رمز الصف:");
-                if (pass === "0000") {
-                    // طلب بيانات الطالب لمرة واحدة
-                    const name = prompt("يرجى إدخال اسمك الثلاثي:");
-                    const phone = prompt("يرجى إدخال رقم هاتفك:");
-                    
-                    localStorage.setItem("studentName", name);
-                    localStorage.setItem("studentPhone", phone);
-                    localStorage.setItem("isStudent", "true");
-                    
-                    alert("مرحباً بك " + name + "، تم حفظ بياناتك.");
-                    showPage(pageId);
-                } else {
-                    alert("رمز الصف خاطئ!");
-                }
+        } else if (role === "2") {
+            const pass = prompt("أدخل رمز الصف:");
+            if (pass === "0000") {
+                const name = prompt("يرجى إدخال اسمك الثلاثي:");
+                const phone = prompt("يرجى إدخال رقم هاتفك:");
+                localStorage.setItem("studentName", name);
+                localStorage.setItem("studentPhone", phone);
+                localStorage.setItem("isStudent", "true");
+                window.location.href = targetUrl; // الانتقال للملف
+            } else {
+                alert("رمز الصف خاطئ!");
             }
-        });
-    };
+        }
+    });
+};
 
+// الاستخدام (سيرسل الطالب أو الأستاذ إلى الملف مباشرة):
+setupProtectedButton('btn-classes', 'classes.html');
+setupProtectedButton('btn-library', 'library.html');
     // 2. ربط الأزرار برمجياً
     document.getElementById('btn-home')?.addEventListener('click', () => showPage('home'));
     document.getElementById('btn-announcements')?.addEventListener('click', () => showPage('announcements'));
