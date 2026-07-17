@@ -1,5 +1,14 @@
-// تعريف المتغير العام الذي يأتي من ملف HTML
-const database = window.database;
+// أضف getDatabase إلى الاستيرادات
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+// ... (كود firebaseConfig الخاص بك كما هو) ...
+
+// تهيئة الخدمات
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getDatabase(app); // هذا المتغير db هو الذي سنستخدمه للوصول لقاعدة البياناتconst database = window.database;
 
 // 1. التنقل بين الصفحات
 function showPage(id) {
