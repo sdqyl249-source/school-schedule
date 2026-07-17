@@ -1,51 +1,58 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
   authDomain: "roya-platform-26860.firebaseapp.com",
   databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
-  projectId: "roya-platform-26860",
-  storageBucket: "roya-platform-26860.firebasestorage.app",
-  messagingSenderId: "897544406776",
-  appId: "1:897544406776:web:aa112013dea672fb141d0d"
+  projectId: "roya-platform-26860"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// دالة إظهار الصفحات
+// 1. وظيفة التنقل بين الصفحات
 window.showPage = (id) => {
     document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
+    const target = document.getElementById(id);
+    if (target) target.style.display = 'block';
 };
 
-// الربط البرمجي للأزرار
+// 2. وظيفة تسجيل الدخول
+window.handleAuth = () => {
+    const pass = prompt("يرجى إدخال كلمة مرور المدير:");
+    if (pass === "1234") {
+        localStorage.setItem("admin", "true");
+        location.reload();
+    } else { alert("كلمة مرور خاطئة!"); }
+};
+
+// 3. وظيفة تحديث الرؤية
+window.updateInfo = (key, text) => {
+    if(!localStorage.getItem("admin")) return alert("غير مصرح لك!");
+    update(ref(db, 'info/' + key), { text });
+};
+
+// 4. الربط البرمجي عند تحميل الصفحة
 window.addEventListener('DOMContentLoaded', () => {
-    // فتح وإغلاق السايدبار
-    document.getElementById('openBtn')?.addEventListener('click', () => document.getElementById("mySidebar").style.width = "280px");
-    document.getElementById('closeBtn')?.addEventListener('click', () => document.getElementById("mySidebar").style.width = "0");
-
-    // التنقل بين الصفحات
-    document.getElementById('btn-home')?.addEventListener('click', () => window.showPage('home'));
-    document.getElementById('btn-announcements')?.addEventListener('click', () => window.showPage('announcements'));
-    document.getElementById('btn-games')?.addEventListener('click', () => window.showPage('games'));
-
-    // التوقيت
+    // تحديث الوقت
     setInterval(() => {
         const now = new Date();
-        document.getElementById('date-display').innerText = now.toLocaleDateString('ar-IQ');
-        document.getElementById('time-display').innerText = now.toLocaleTimeString('ar-IQ');
+        const d = document.getElementById('date-display');
+        const t = document.getElementById('time-display');
+        if(d) d.innerText = now.toLocaleDateString('ar-IQ');
+        if(t) t.innerText = now.toLocaleTimeString('ar-IQ');
     }, 1000);
 
-    // جلب الإعلانات
-    onValue(ref(db, 'announcements'), (snap) => {
-        const list = document.getElementById('announcements-list');
-        if(!list) return;
-        list.innerHTML = "";
-        snap.forEach(c => {
-            const data = c.val();
-            list.innerHTML += `<div class="card"><h3>${data.title}</h3><p>${data.text}</p></div>`;
-        });
-    });
+    // الربط مع الأزرار
+    document.getElementById('btn-home')?.addEventListener('click', () => window.showPage('home'));
+    document.getElementById('btn-announcements')?.addEventListener('click', () => window.showPage('announcements'));
+    document.getElementById('btn-classes')?.addEventListener('click', () => window.showPage('classes'));
+    document.getElementById('btn-library')?.addEventListener('click', () => window.showPage('library'));
+    document.getElementById('btn-games')?.addEventListener('click', () => window.showPage('games'));
+    
+    // إظهار قسم الإدارة إذا كان المدير مسجلاً
+    if (localStorage.getItem("admin")) {
+        document.querySelectorAll('.admin-section').forEach(el => el.style.display = 'block');
+    }
 });
