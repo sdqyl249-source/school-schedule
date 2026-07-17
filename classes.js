@@ -57,3 +57,12 @@ function verifyUserAndEnter(name, phone, code, role) {
     alert("جارٍ التحقق من رقم هاتفك...");
     // كود إرسال الـ OTP للواتساب سيتم هنا
 }
+function loginUser(name, phone, role) {
+    // حفظ البيانات في LocalStorage (تبقى موجودة حتى لو أغلق المتصفح)
+    localStorage.setItem("userRole", role);   // قيمة تكون "student" أو "teacher"
+    localStorage.setItem("userName", name);
+    localStorage.setItem("userPhone", phone);
+
+    alert("أهلاً بك يا " + name + "، تم تفعيل صلاحياتك كـ " + role);
+    window.location.href = "index.html"; // الانتقال للصفحة الرئيسية
+}
