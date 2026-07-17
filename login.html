@@ -8,46 +8,46 @@
 <body class="login-page">
 
     <div class="login-container">
-    <h2>مرحباً بك في منصة الوادي</h2>
-    <input type="text" id="userName" placeholder="الاسم الثلاثي">
-    <input type="tel" id="userPhone" placeholder="رقم الهاتف">
-    
-    <select id="userRole">
-        <option value="student">طالب</option>
-        <option value="teacher">أستاذ</option>
-    </select>
+        <h2>مرحباً بك في منصة الوادي</h2>
+        <input type="text" id="userName" placeholder="الاسم الثلاثي">
+        <input type="tel" id="userPhone" placeholder="رقم الهاتف">
+        
+        <select id="userRole">
+            <option value="student">طالب</option>
+            <option value="teacher">أستاذ</option>
+        </select>
 
-    <button onclick="performLogin()">تسجيل الدخول</button>
-</div>
-   <script>
-    function performLogin() {
-        const name = document.getElementById("userName").value;
-        const phone = document.getElementById("userPhone").value;
-        const role = document.getElementById("userRole").value;
+        <button onclick="performLogin()">تسجيل الدخول</button>
+    </div>
 
-        if (name && phone) {
-            // استدعاء دالة تسجيل الحساب الموحد
-            registerUser(name, phone, role);
+    <script>
+        function performLogin() {
+            const name = document.getElementById("userName").value.trim();
+            const phone = document.getElementById("userPhone").value.trim();
+            const role = document.getElementById("userRole").value;
+
+            // التحقق من أن الحقول ليست فارغة
+            if (name === "" || phone === "") {
+                alert("يرجى إدخال الاسم ورقم الهاتف.");
+                return;
+            }
+
+            // إنشاء ملف تعريف المستخدم (User Profile)
+            const userProfile = {
+                name: name,
+                phone: phone,
+                role: role,
+                joinedClasses: [] // مصفوفة فارغة جاهزة لاستقبال رموز الصفوف لاحقاً
+            };
+
+            // حفظ المستخدم في الذاكرة الدائمة
+            localStorage.setItem("currentUser", JSON.stringify(userProfile));
+
+            alert("أهلاً بك يا " + name + "، تم تفعيل حسابك كـ " + (role === 'student' ? 'طالب' : 'أستاذ'));
             
             // التوجه للرئيسية
-            window.location.href = "index.html"; 
-        } else {
-            alert("يرجى إدخال البيانات كاملة");
+            window.location.href = "index.html";
         }
-    }
-
-    // الدالة الموحدة لحفظ البيانات
-    function registerUser(fullName, phone, role) {
-        const userProfile = {
-            name: fullName,
-            phone: phone,
-            role: role, 
-            joinedClasses: [] 
-        };
-        
-        // حفظ الكائن بالكامل تحت مفتاح واحد يسمى "currentUser"
-        localStorage.setItem("currentUser", JSON.stringify(userProfile));
-    }
-</script>
+    </script>
 </body>
 </html>
