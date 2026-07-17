@@ -22,23 +22,41 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // دالة لحماية الصفحات بكلمة مرور
     const setupProtectedButton = (btnId, pageId) => {
-        document.getElementById(btnId)?.addEventListener('click', () => {
-            if (localStorage.getItem("admin") === "true") {
+    document.getElementById(btnId)?.addEventListener('click', () => {
+        // إذا كان مسجلاً مسبقاً كأستاذ، يدخل مباشرة
+        if (localStorage.getItem("admin") === "true") {
+            showPage(pageId);
+            return;
+        }
+
+        // بوابة الاختيار
+        const role = prompt("اختر صفة الدخول:\n1. أستاذ\n2. طالب\n(أدخل رقم 1 أو 2)");
+
+        if (role === "1") {
+            // دخول الأستاذ
+            const pass = prompt("أدخل رمز الأستاذ:");
+            if (pass === "1234") {
+                localStorage.setItem("admin", "true");
+                alert("أهلاً بك يا أستاذ");
+                showPage(pageId);
+                location.reload();
+            } else {
+                alert("رمز الأستاذ خاطئ!");
+            }
+        } else if (role === "2") {
+            // دخول الطالب (يمكنك تعديل هذه الصفحة لتعرض للطلاب فقط ما يحتاجونه)
+            const pass = prompt("أدخل رمز الصف:");
+            if (pass === "0000") {
+                alert("أهلاً بك يا طالب في منصة الوادي");
                 showPage(pageId);
             } else {
-                const pass = prompt("هذه صفحة إدارية. يرجى إدخال كلمة مرور المدير:");
-                if (pass === "1234") {
-                    localStorage.setItem("admin", "true");
-                    alert("تم الدخول بنجاح!");
-                    showPage(pageId);
-                    location.reload(); 
-                } else {
-                    alert("كلمة مرور خاطئة!");
-                }
+                alert("رمز الطالب خاطئ!");
             }
-        });
-    };
-
+        } else {
+            alert("اختيار غير صالح!");
+        }
+    });
+};
     // 2. ربط الأزرار برمجياً
     document.getElementById('btn-home')?.addEventListener('click', () => showPage('home'));
     document.getElementById('btn-announcements')?.addEventListener('click', () => showPage('announcements'));
