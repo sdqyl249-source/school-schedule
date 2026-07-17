@@ -37,3 +37,23 @@ function renderClassCard(name, section, teacherCode, studentCode) {
     new QRCode(document.getElementById(`qr-teacher-${teacherCode}`), teacherCode);
     new QRCode(document.getElementById(`qr-student-${studentCode}`), studentCode);
 }
+function openVerificationModal(code, role) {
+    // تظهر نافذة للمستخدم تطلب الاسم ورقم الهاتف
+    const name = prompt("يرجى إدخال اسمك الثلاثي:");
+    const phone = prompt("يرجى إدخال رقم هاتفك للتأكيد:");
+
+    if (name && phone) {
+        // هنا نتحقق من البيانات (نرسلها للسيرفر أو نقارنها بقاعدة البيانات)
+        verifyUserAndEnter(name, phone, code, role);
+    } else {
+        alert("بيانات غير مكتملة، لا يمكن الدخول.");
+    }
+}
+
+function verifyUserAndEnter(name, phone, code, role) {
+    // هنا نقوم بحفظ هوية المستخدم في الـ Session
+    // ونحول الطالب للصفحه المطلوبة بناءً على صلاحيته
+    console.log(`المستخدم ${name} يحاول الدخول كـ ${role} باستخدام كود ${code}`);
+    alert("جارٍ التحقق من رقم هاتفك...");
+    // كود إرسال الـ OTP للواتساب سيتم هنا
+}
