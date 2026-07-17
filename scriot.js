@@ -43,6 +43,7 @@ function openNav() {
 
 // 2. تحديث التاريخ والوقت
 // 2. تحديث التاريخ والوقت
+// 2. تحديث التاريخ والوقت
 function updateDateTime() {
     const now = new Date();
     const el = document.getElementById("date-time");
@@ -57,8 +58,6 @@ updateDateTime();
 
 // تحديث الوقت كل ثانية (1000 ميلي ثانية)
 setInterval(updateDateTime, 1000);
-setInterval(updateDateTime, 1000);
-
 // 3. نظام الصلاحيات
 window.handleAuth = function() {
     if (localStorage.getItem("admin")) {
