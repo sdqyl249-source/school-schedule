@@ -1,4 +1,6 @@
-// classes.js - الكود الموحد والكامل
+// classes.js - الكود الموحد والمعدل ليعمل مع Firebase V9
+
+import { ref, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. جلب بيانات المستخدم الموحدة
@@ -28,7 +30,7 @@ function showUserWelcome(user) {
     document.body.prepend(infoBox);
 }
 
-// دالة حفظ الصف (النسخة المتوافقة مع Firebase)
+// دالة حفظ الصف (النسخة المعدلة لتعمل مع Firebase V9)
 function saveClass() {
     const className = document.getElementById("className").value;
     const classSection = document.getElementById("classSection").value;
@@ -49,7 +51,8 @@ function saveClass() {
         grades: {}
     };
 
-    window.db.ref('classes/' + classId).set(newClassData)
+    // استخدام ref و set المستوردة من Firebase
+    set(ref(window.db, 'classes/' + classId), newClassData)
     .then(() => {
         alert("تم الحفظ في سحابة الوادي بنجاح!");
         renderClassCard(className, classSection, classId);
@@ -59,7 +62,7 @@ function saveClass() {
     .catch((error) => {
         alert("حدث خطأ أثناء الحفظ: " + error.message);
     });
-
+}
 
 // وظيفة عرض بطاقة الصف (للأستاذ)
 function renderClassCard(name, section, id) {
@@ -90,8 +93,6 @@ function renderStudentClasses() {
 
     container.innerHTML = ""; 
 
-    // ملاحظة: هنا سنحتاج لاحقاً لجلب البيانات من Firebase
-    // حالياً تعتمد على مصفوفة allClasses الموجودة محلياً لديك
     if (typeof allClasses !== 'undefined') {
         allClasses.forEach(cls => {
             if (joinedCodes.includes(cls.id)) {
