@@ -19,20 +19,16 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 document.addEventListener('DOMContentLoaded', () => {
-    // جلب بيانات المستخدم
     const userString = localStorage.getItem("currentUser");
     if (!userString) return;
     
     const userProfile = JSON.parse(userString);
 
-    // عرض ترحيب بالمستخدم
     showUserWelcome(userProfile);
 
-    // عرض الصفوف بناءً على نوع المستخدم
     if (userProfile.role === 'student') {
         renderStudentClasses();
     } else {
-        // إذا كان أستاذ، نربط زر إضافة الصف
         const saveBtn = document.getElementById("saveClassBtn");
         if (saveBtn) saveBtn.addEventListener('click', saveClass);
     }
@@ -67,7 +63,6 @@ function saveClass() {
         grades: {}
     };
 
-    // استخدام ref و set مع db الصحيح
     set(ref(db, 'classes/' + classId), newClassData)
     .then(() => {
         alert("تم الحفظ في سحابة الوادي بنجاح!");
@@ -80,7 +75,7 @@ function saveClass() {
     });
 }
 
-// وظيفة عرض بطاقة الصف (للأستاذ)
+// وظيفة عرض بطاقة الصف
 function renderClassCard(name, section, id) {
     const container = document.getElementById("classesContainer");
     if (!container) return;
@@ -104,20 +99,17 @@ function renderStudentClasses() {
     const container = document.getElementById("classes-container");
     if (!container) return;
 
-    // استمع إلى مسار الصفوف في Firebase
     const classesRef = ref(db, 'classes/');
     
     onValue(classesRef, (snapshot) => {
         const data = snapshot.val();
-        container.innerHTML = ""; // تفريغ الحاوية قبل العرض
+        container.innerHTML = "";
 
         if (data) {
             const userProfile = JSON.parse(localStorage.getItem("currentUser"));
             const joinedCodes = userProfile.joinedClasses || [];
 
-            // تحويل البيانات من Firebase إلى مصفوفة لعرضها
             Object.values(data).forEach(cls => {
-                // إذا كان الطالب منضم لهذا الصف
                 if (joinedCodes.includes(cls.id)) {
                     const card = document.createElement("div");
                     card.className = "class-card";
