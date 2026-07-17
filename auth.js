@@ -16,6 +16,3 @@ function checkAuth() {
 
 // تنفيذ التحقق
 checkAuth();
-
-// تنفيذ التحقق تلقائياً عند تحميل أي صفحة
-checkAuth();
