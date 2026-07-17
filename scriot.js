@@ -113,4 +113,19 @@ window.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem("isStudent") === "true") {
         console.log("مرحباً الطالب: " + localStorage.getItem("studentName"));
     }
+// --- كود عرض بيانات الطالب تلقائياً في صفحة الصفوف ---
+    if (localStorage.getItem("isStudent") === "true") {
+        const classesPage = document.getElementById('classes'); // تأكد أن id الصفحة هو 'classes'
+        if (classesPage) {
+            const infoCard = document.createElement('div');
+            infoCard.style.cssText = "background: #e8f5e9; padding: 15px; margin: 10px; border-right: 5px solid #2e7d32; border-radius: 8px; font-weight: bold;";
+            infoCard.innerHTML = `
+                <p>👤 اسم الطالب: ${localStorage.getItem("studentName")}</p>
+                <p>📞 رقم الهاتف: ${localStorage.getItem("studentPhone")}</p>
+                <p>📚 رمز الصف: 0000</p>
+            `;
+            // إضافة البطاقة في بداية صفحة الصفوف
+            classesPage.prepend(infoCard);
+        }
+    }
 });
