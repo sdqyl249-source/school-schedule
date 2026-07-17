@@ -1,113 +1,91 @@
-// classes.js
+// classes.js - النسخة الموحدة والكاملة
 
-// جلب بيانات المستخدم الحالي فور تحميل الصفحة
-const userData = JSON.parse(localStorage.getItem("currentUser"));
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. جلب بيانات المستخدم الموحدة
+    const userString = localStorage.getItem("currentUser");
+    if (!userString) return;
+    
+    const userProfile = JSON.parse(userString);
 
-// مثال: عرض ترحيب باسم المستخدم إذا كان موجوداً
-window.addEventListener('DOMContentLoaded', () => {
-    if (userData) {
-        console.log("المستخدم الحالي:", userData.name);
-        console.log("الدور:", userData.role);
-        
-        // يمكنك الآن إضافة اسم المستخدم في واجهة الصفحة إذا أردت
-        // مثلاً: document.getElementById("welcomeMsg").innerText = "أهلاً " + userData.name;
-    }
-});
-window.addEventListener('DOMContentLoaded', () => {
-    // 1. عرض ترحيب الطالب تلقائياً
-    showStudentInfo();
+    // 2. عرض ترحيب بالمستخدم
+    showUserWelcome(userProfile);
 
-    // 2. ربط زر الحفظ
-    const saveBtn = document.getElementById("saveClassBtn");
-    if (saveBtn) {
-        saveBtn.addEventListener('click', saveClass);
+    // 3. عرض الصفوف بناءً على نوع المستخدم (طالب أم أستاذ)
+    if (userProfile.role === 'student') {
+        renderStudentClasses();
+    } else {
+        // إذا كان أستاذ، نربط زر إضافة الصف
+        const saveBtn = document.getElementById("saveClassBtn");
+        if (saveBtn) saveBtn.addEventListener('click', saveClass);
     }
 });
 
-// وظيفة عرض بيانات الطالب
-function showStudentInfo() {
-    if (localStorage.getItem("isStudent") === "true") {
-        const studentName = localStorage.getItem("studentName");
-        const studentPhone = localStorage.getItem("studentPhone");
-        
-        const infoBox = document.createElement('div');
-        infoBox.style.cssText = "background: #e8f5e9; padding: 20px; border-right: 5px solid #2e7d32; margin-bottom: 20px; border-radius: 8px;";
-        infoBox.innerHTML = `<h3>مرحباً بك: ${studentName}</h3><p>الهاتف: ${studentPhone}</p>`;
-        
-        document.body.prepend(infoBox);
-    }
+// وظيفة عرض الترحيب
+function showUserWelcome(user) {
+    const infoBox = document.createElement('div');
+    infoBox.style.cssText = "background: #e8f5e9; padding: 20px; border-right: 5px solid #2e7d32; margin-bottom: 20px; border-radius: 8px;";
+    infoBox.innerHTML = `<h3>مرحباً بك يا ${user.name}</h3><p>الدور الحالي: ${user.role}</p>`;
+    document.body.prepend(infoBox);
 }
 
-// وظيفة حفظ الصف (الموحدة)
+// وظيفة عرض صفوف الطالب (فلترة حسب الرموز)
+function renderStudentClasses() {
+    const container = document.getElementById("classes-container");
+    if (!container) return;
+
+    const userProfile = JSON.parse(localStorage.getItem("currentUser"));
+    const joinedCodes = userProfile.joinedClasses || [];
+
+    container.innerHTML = ""; 
+
+    // ملاحظة: تأكد أن مصفوفة allClasses معرفة في ملف classesDatabase.js
+    allClasses.forEach(cls => {
+        if (joinedCodes.includes(cls.id)) {
+            const card = document.createElement("div");
+            card.className = "class-card";
+            card.innerHTML = `
+                <h3>${cls.name}</h3>
+                <p>الأستاذ: ${cls.teacher}</p>
+                <button onclick="viewClassLessons('${cls.id}')">عرض الدروس</button>
+            `;
+            container.appendChild(card);
+        }
+    });
+}
+
+// وظيفة حفظ الصف (للأستاذ)
 function saveClass() {
     const className = document.getElementById("className").value;
     const classSection = document.getElementById("classSection").value;
 
-    if (className === "" || classSection === "") {
+    if (!className || !classSection) {
         alert("يرجى ملء جميع الحقول!");
         return;
     }
 
-    // توليد رموز صف عشوائية
-    const teacherCode = "T-" + Math.floor(1000 + Math.random() * 9000);
-    const studentCode = "S-" + Math.floor(1000 + Math.random() * 9000);
-
-    renderClassCard(className, classSection, teacherCode, studentCode);
+    // توليد رموز الصف
+    const classId = "CLASS-" + Math.floor(1000 + Math.random() * 9000);
+    renderClassCard(className, classSection, classId);
 }
 
-// وظيفة عرض بطاقة الصف (التصميم الاحترافي)
-function renderClassCard(name, section, teacherCode, studentCode) {
+// وظيفة عرض بطاقة الصف (للأستاذ)
+function renderClassCard(name, section, id) {
     const container = document.getElementById("classesContainer");
     const card = document.createElement("div");
-    card.className = "class-card"; // تأكد أن هذا الكلاس موجود في CSS
-    
+    card.className = "class-card";
     card.innerHTML = `
         <h3>الصف ${name} - شعبة ${section}</h3>
-        <p>الوصول السريع:</p>
-        <div style="display: flex; justify-content: center; gap: 10px;">
-            <button onclick="openVerificationModal('${teacherCode}', 'teacher')">دخول كمعلم</button>
-            <button onclick="openVerificationModal('${studentCode}', 'student')">دخول كطالب</button>
-        </div>
-        <div id="qr-${teacherCode}" style="margin-top:15px; display:flex; justify-content:center;"></div>
+        <p>رمز الصف: <strong>${id}</strong></p>
+        <div id="qr-${id}" style="margin-top:15px; display:flex; justify-content:center;"></div>
     `;
     container.appendChild(card);
     
-    // توليد الـ QR
     if (typeof QRCode !== "undefined") {
-        new QRCode(document.getElementById(`qr-${teacherCode}`), teacherCode);
+        new QRCode(document.getElementById(`qr-${id}`), id);
     }
 }
 
-// وظيفة فتح نافذة التحقق
-window.openVerificationModal = function(code, role) {
-    const name = prompt("يرجى إدخال اسمك الثلاثي:");
-    const phone = prompt("يرجى إدخال رقم هاتفك للتأكيد:");
-
-    if (name && phone) {
-        verifyUserAndEnter(name, phone, code, role);
-    } else {
-        alert("بيانات غير مكتملة، لا يمكن الدخول.");
-    }
-}
-
-// وظيفة التحقق والدخول
-function verifyUserAndEnter(name, phone, code, role) {
-    alert("جارٍ التحقق من رقم هاتفك...");
-    loginUser(name, phone, role);
-}
-
-// وظيفة تسجيل الدخول النهائي
-function loginUser(name, phone, role) {
-    localStorage.setItem("userRole", role); 
-    localStorage.setItem("userName", name);
-    localStorage.setItem("userPhone", phone);
-    
-    if (role === 'student') {
-        localStorage.setItem("isStudent", "true");
-        localStorage.setItem("studentName", name);
-        localStorage.setItem("studentPhone", phone);
-    }
-
-    alert("أهلاً بك يا " + name + "، تم تفعيل صلاحياتك كـ " + role);
-    window.location.href = "index.html"; 
-}
+// دالة عرض الدروس (سيتم برمجتها لاحقاً)
+window.viewClassLessons = function(id) {
+    alert("جارٍ فتح دروس الصف: " + id);
+};
