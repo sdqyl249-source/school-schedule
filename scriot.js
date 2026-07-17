@@ -20,50 +20,53 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById("mySidebar").style.width = "0";
     };
 
-    // دالة لحماية الصفحات بكلمة مرور
+    // دالة حماية الصفحات (بوابة الأستاذ والطالب)
     const setupProtectedButton = (btnId, pageId) => {
-    document.getElementById(btnId)?.addEventListener('click', () => {
-        // إذا كان مسجلاً مسبقاً كأستاذ، يدخل مباشرة
-        if (localStorage.getItem("admin") === "true") {
-            showPage(pageId);
-            return;
-        }
-
-        // بوابة الاختيار
-        const role = prompt("اختر صفة الدخول:\n1. أستاذ\n2. طالب\n(أدخل رقم 1 أو 2)");
-
-        if (role === "1") {
-            // دخول الأستاذ
-            const pass = prompt("أدخل رمز الأستاذ:");
-            if (pass === "1234") {
-                localStorage.setItem("admin", "true");
-                alert("أهلاً بك يا أستاذ");
+        document.getElementById(btnId)?.addEventListener('click', () => {
+            // إذا كان مسجلاً كمدير مسبقاً
+            if (localStorage.getItem("admin") === "true") {
                 showPage(pageId);
-                location.reload();
-            } else {
-                alert("رمز الأستاذ خاطئ!");
+                return;
             }
-        } else if (role === "2") {
-            // دخول الطالب (يمكنك تعديل هذه الصفحة لتعرض للطلاب فقط ما يحتاجونه)
-            const pass = prompt("أدخل رمز الصف:");
-            if (pass === "0000") {
-                alert("أهلاً بك يا طالب في منصة الوادي");
-                showPage(pageId);
-            } else {
-                alert("رمز الطالب خاطئ!");
+
+            // بوابة الاختيار
+            const role = prompt("أهلاً بك في منصة الوادي، اختر صفة الدخول:\n1. أستاذ\n2. طالب");
+
+            if (role === "1") {
+                const pass = prompt("أدخل رمز الأستاذ:");
+                if (pass === "1234") {
+                    localStorage.setItem("admin", "true");
+                    alert("أهلاً بك يا أستاذ");
+                    location.reload();
+                } else {
+                    alert("رمز الأستاذ خاطئ!");
+                }
+            } else if (role === "2") {
+                const pass = prompt("أدخل رمز الصف:");
+                if (pass === "0000") {
+                    // طلب بيانات الطالب لمرة واحدة
+                    const name = prompt("يرجى إدخال اسمك الثلاثي:");
+                    const phone = prompt("يرجى إدخال رقم هاتفك:");
+                    
+                    localStorage.setItem("studentName", name);
+                    localStorage.setItem("studentPhone", phone);
+                    localStorage.setItem("isStudent", "true");
+                    
+                    alert("مرحباً بك " + name + "، تم حفظ بياناتك.");
+                    showPage(pageId);
+                } else {
+                    alert("رمز الصف خاطئ!");
+                }
             }
-        } else {
-            alert("اختيار غير صالح!");
-        }
-    });
-};
+        });
+    };
+
     // 2. ربط الأزرار برمجياً
     document.getElementById('btn-home')?.addEventListener('click', () => showPage('home'));
     document.getElementById('btn-announcements')?.addEventListener('click', () => showPage('announcements'));
     document.getElementById('btn-games')?.addEventListener('click', () => showPage('games'));
     document.getElementById('btn-schedule')?.addEventListener('click', () => { window.location.href = 'schedule.html'; });
 
-    // ربط الصفحات المحمية
     setupProtectedButton('btn-classes', 'classes');
     setupProtectedButton('btn-library', 'library');
 
@@ -71,20 +74,19 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('openBtn')?.addEventListener('click', () => { document.getElementById("mySidebar").style.width = "280px"; });
     document.getElementById('closeBtn')?.addEventListener('click', () => { document.getElementById("mySidebar").style.width = "0"; });
 
-    // 4. تسجيل الدخول العام
+    // 4. تسجيل الدخول العام (للإدارة)
     const authBtn = document.getElementById('authBtn');
     if (authBtn) {
         authBtn.addEventListener('click', () => {
             if (localStorage.getItem("admin") === "true") {
                 if (confirm("أنت مسجل كمدير، هل تريد تسجيل الخروج؟")) {
-                    localStorage.removeItem("admin");
+                    localStorage.clear(); // مسح كل البيانات عند الخروج
                     location.reload();
                 }
             } else {
                 const pass = prompt("يرجى إدخال كلمة مرور المدير:");
                 if (pass === "1234") {
                     localStorage.setItem("admin", "true");
-                    alert("تم تسجيل الدخول بنجاح!");
                     location.reload();
                 } else {
                     alert("كلمة مرور خاطئة!");
@@ -105,5 +107,10 @@ window.addEventListener('DOMContentLoaded', () => {
     // إظهار قسم الإدارة
     if (localStorage.getItem("admin") === "true") {
         document.querySelectorAll('.admin-section').forEach(el => el.style.display = 'block');
+    }
+    
+    // إظهار ترحيب للطالب إذا كان مسجلاً
+    if (localStorage.getItem("isStudent") === "true") {
+        console.log("مرحباً الطالب: " + localStorage.getItem("studentName"));
     }
 });
