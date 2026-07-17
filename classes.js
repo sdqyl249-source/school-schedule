@@ -1,4 +1,4 @@
-// classes.js - النسخة النهائية والموحدة
+// classes.js - الكود الموحد والكامل
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. جلب بيانات المستخدم الموحدة
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. عرض ترحيب بالمستخدم
     showUserWelcome(userProfile);
 
-    // 3. عرض الصفوف بناءً على نوع المستخدم (طالب أم أستاذ)
+    // 3. عرض الصفوف بناءً على نوع المستخدم
     if (userProfile.role === 'student') {
         renderStudentClasses();
     } else {
@@ -28,31 +28,7 @@ function showUserWelcome(user) {
     document.body.prepend(infoBox);
 }
 
-// وظيفة عرض صفوف الطالب (فلترة حسب الرموز)
-function renderStudentClasses() {
-    const container = document.getElementById("classes-container");
-    if (!container) return;
-
-    const userProfile = JSON.parse(localStorage.getItem("currentUser"));
-    const joinedCodes = userProfile.joinedClasses || [];
-
-    container.innerHTML = ""; 
-
-    allClasses.forEach(cls => {
-        if (joinedCodes.includes(cls.id)) {
-            const card = document.createElement("div");
-            card.className = "class-card";
-            card.innerHTML = `
-                <h3>${cls.name}</h3>
-                <p>الأستاذ: ${cls.teacher}</p>
-                <button onclick="viewClassLessons('${cls.id}')">عرض الدروس</button>
-            `;
-            container.appendChild(card);
-        }
-    });
-}
-
-    // دالة حفظ الصف المحدثة
+// دالة حفظ الصف (النسخة المتوافقة مع Firebase)
 function saveClass() {
     const className = document.getElementById("className").value;
     const classSection = document.getElementById("classSection").value;
@@ -64,7 +40,6 @@ function saveClass() {
 
     const classId = "CLASS-" + Math.floor(1000 + Math.random() * 9000);
 
-    // كائن البيانات الذي سيتم رفعه للسحابة
     const newClassData = {
         id: classId,
         name: className,
@@ -74,13 +49,10 @@ function saveClass() {
         grades: {}
     };
 
-    // عملية الحفظ في Firebase
     window.db.ref('classes/' + classId).set(newClassData)
     .then(() => {
         alert("تم الحفظ في سحابة الوادي بنجاح!");
         renderClassCard(className, classSection, classId);
-        
-        // مسح الحقول بعد الحفظ
         document.getElementById("className").value = "";
         document.getElementById("classSection").value = "";
     })
@@ -88,9 +60,12 @@ function saveClass() {
         alert("حدث خطأ أثناء الحفظ: " + error.message);
     });
 }
+
 // وظيفة عرض بطاقة الصف (للأستاذ)
 function renderClassCard(name, section, id) {
     const container = document.getElementById("classesContainer");
+    if (!container) return;
+    
     const card = document.createElement("div");
     card.className = "class-card";
     card.innerHTML = `
@@ -105,7 +80,35 @@ function renderClassCard(name, section, id) {
     }
 }
 
-// دالة عرض الدروس (المدمجة مع زر الدرجات)
+// وظيفة عرض صفوف الطالب
+function renderStudentClasses() {
+    const container = document.getElementById("classes-container");
+    if (!container) return;
+
+    const userProfile = JSON.parse(localStorage.getItem("currentUser"));
+    const joinedCodes = userProfile.joinedClasses || [];
+
+    container.innerHTML = ""; 
+
+    // ملاحظة: هنا سنحتاج لاحقاً لجلب البيانات من Firebase
+    // حالياً تعتمد على مصفوفة allClasses الموجودة محلياً لديك
+    if (typeof allClasses !== 'undefined') {
+        allClasses.forEach(cls => {
+            if (joinedCodes.includes(cls.id)) {
+                const card = document.createElement("div");
+                card.className = "class-card";
+                card.innerHTML = `
+                    <h3>${cls.name}</h3>
+                    <p>الأستاذ: ${cls.teacher}</p>
+                    <button onclick="viewClassLessons('${cls.id}')">عرض الدروس</button>
+                `;
+                container.appendChild(card);
+            }
+        });
+    }
+}
+
+// دالة عرض الدروس
 window.viewClassLessons = function(classId) {
     const selectedClass = allClasses.find(cls => cls.id === classId);
     if (!selectedClass) return;
@@ -127,7 +130,7 @@ window.viewClassLessons = function(classId) {
     });
 };
 
-// دالة عرض الدرجة الخاصة بكل طالب
+// دالة عرض الدرجة
 window.showStudentGrade = function(classId) {
     const selectedClass = allClasses.find(cls => cls.id === classId);
     if (!selectedClass) return;
@@ -136,9 +139,8 @@ window.showStudentGrade = function(classId) {
     if (!studentName) return;
 
     const grade = selectedClass.grades[studentName];
-
     if (grade !== undefined) {
-        alert("مرحباً " + studentName + "، درجتك في " + selectedClass.name + " هي: " + grade);
+        alert("مرحباً " + studentName + "، درجتك هي: " + grade);
     } else {
         alert("عذراً، لم يتم العثور على درجة بهذا الاسم.");
     }
