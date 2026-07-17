@@ -80,12 +80,23 @@ function showUserWelcome(user) {
     document.body.prepend(infoBox);
 }
 
-function saveClass() {
-    const className = document.getElementById("className").value;
-    const classSection = document.getElementById("classSection").value;
-    if (!className || !classSection) { alert("يرجى ملء جميع الحقول!"); return; }
+window.saveClass = function() {
+    // 1. جلب القيم من العناصر
+    const classNameSelect = document.getElementById("className");
+    const classSectionSelect = document.getElementById("classSection");
+    
+    const className = classNameSelect.value;
+    const classSection = classSectionSelect.value;
 
+    // 2. التحقق من وجود البيانات
+    if (!className || !classSection) {
+        alert("يرجى اختيار اسم الصف والشعبة!");
+        return;
+    }
+
+    // 3. إنشاء كود فريد للصف
     const classId = "CLASS-" + Math.floor(1000 + Math.random() * 9000);
+    
     const newClassData = {
         id: classId,
         name: className,
@@ -95,16 +106,26 @@ function saveClass() {
         grades: {}
     };
 
+    // 4. الحفظ في قاعدة البيانات
+    // تأكد من أن متغير db معرف بشكل صحيح في ملفك
     set(ref(db, 'classes/' + classId), newClassData)
     .then(() => {
         alert("تم الحفظ في سحابة الوادي بنجاح!");
-        renderClassCard(className, classSection, classId);
-        document.getElementById("className").value = "";
-        document.getElementById("classSection").value = "";
+        
+        // إعادة عرض البطاقة (تأكد أن هذه الدالة معرفة في نفس الملف)
+        if (typeof renderClassCard === 'function') {
+            renderClassCard(className, classSection, classId);
+        }
+        
+        // إعادة تعيين الحقول (لـ select نفضل اختيار القيمة الأولى)
+        classNameSelect.selectedIndex = 0;
+        classSectionSelect.selectedIndex = 0;
     })
-    .catch((error) => { alert("حدث خطأ أثناء الحفظ: " + error.message); });
-}
-
+    .catch((error) => {
+        console.error("خطأ Firebase:", error);
+        alert("حدث خطأ أثناء الحفظ: " + error.message);
+    });
+};
 function renderClassCard(name, section, id) {
     const container = document.getElementById("classesContainer");
     if (!container) return;
