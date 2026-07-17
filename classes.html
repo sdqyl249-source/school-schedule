@@ -47,11 +47,16 @@
     </div>
 
     <!-- المكتبات والملفات البرمجية -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="global.js"></script>
-    <script type="module" src="scriot.js"></script>
-    <script type="module" src="classes.js" defer></script>
-    <script src="auth.js"></script>
-    <script type="module" src="classes.js" defer></script>
+    <!-- 1. أولاً: حارس البوابة (يتحقق من الدخول فوراً) -->
+<script src="auth.js"></script>
+
+<!-- 2. ثانياً: المكتبات والملفات العامة -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="global.js"></script>
+<script type="module" src="scriot.js"></script>
+
+<!-- 3. ثالثاً: ملف الصفوف (مرة واحدة فقط!) -->
+<script type="module" src="classes.js" defer></script>
+    
     </body>
 </html>
