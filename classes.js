@@ -52,12 +52,6 @@ function renderStudentClasses() {
     });
 }
 
-// وظيفة حفظ الصف (للأستاذ)
-الآن، لنقوم باختبار الاتصال فوراً:
-في ملف classes.js (في دالة saveClass التي برمجناها سابقاً)، استبدل سطر الحفظ بـ window.db كما يلي:
-
-JavaScript
-
 // بدلاً من firebase.database().ref(...) استخدم التالي:window.db.ref('classes/' + classId).set(newClassData)
     .then(() => {
         alert("تم الحفظ في سحابة الوادي بنجاح!");
