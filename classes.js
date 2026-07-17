@@ -52,7 +52,6 @@ function renderStudentClasses() {
     });
 }
 
-// بدلاً من firebase.database().ref(...) استخدم التالي:window.db.ref('classes/' + classId).set(newClassData)
     .then(() => {
         alert("تم الحفظ في سحابة الوادي بنجاح!");
     }); هذا التعديل طبقه على هذه الدالة function saveClass() {
