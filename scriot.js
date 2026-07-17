@@ -106,3 +106,19 @@ window.onload = () => {
         });
     });
 };
+// نضع هذا الجزء في نهاية ملف scriot.js
+window.addEventListener('DOMContentLoaded', () => {
+    // ربط زر الفتح والإغلاق
+    const openBtn = document.getElementById('openBtn');
+    if (openBtn) openBtn.addEventListener('click', window.openNav);
+
+    const closeBtn = document.getElementById('closeBtn');
+    if (closeBtn) closeBtn.addEventListener('click', window.closeNav);
+
+    // ربط الأزرار بالصفحات
+    const btnHome = document.getElementById('btn-home');
+    if (btnHome) btnHome.addEventListener('click', () => window.showPage('home'));
+
+    const btnAnn = document.getElementById('btn-announcements');
+    if (btnAnn) btnAnn.addEventListener('click', () => window.showPage('announcements'));
+});
