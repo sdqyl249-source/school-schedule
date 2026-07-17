@@ -1,8 +1,9 @@
-// الاستيرادات (يجب وضعها في أعلى الملف)
+// استيراد الدوال اللازمة من مكتبة Firebase v9
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
 import { getDatabase, ref, set, push, remove, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
+// إعدادات المشروع
 const firebaseConfig = {
   apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
   authDomain: "roya-platform-26860.firebaseapp.com",
@@ -14,17 +15,58 @@ const firebaseConfig = {
   measurementId: "G-Y88LCNKED2"
 };
 
+// تهيئة Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const db = getDatabase(app); 
+const db = getDatabase(app);
 
-// 1. التنقل بين الصفحات (باقي كودك كما هو)
+// 1. التنقل بين الصفحات
 function showPage(id) {
     const pages = document.getElementsByClassName('page');
-    for (let i = 0; i < pages.length; i++) { pages[i].style.display = 'none'; }
+    for (let i = 0; i < pages.length; i++) {
+        pages[i].style.display = 'none';
+    }
     document.getElementById(id).style.display = 'block';
 }
-// ... (دوال openNav و closeNav كما هي)
+
+function closeNav() {
+    document.getElementById("mySidebar").style.width = "0";
+    document.querySelector(".page").style.marginRight = "0";
+    document.getElementById("openBtn").style.display = "block";
+}
+
+function openNav() {
+    document.getElementById("mySidebar").style.width = "280px";
+    document.querySelector(".page").style.marginRight = "280px";
+    document.getElementById("openBtn").style.display = "none";
+}
+
+// 2. تحديث التاريخ والوقت
+function updateDateTime() {
+    const now = new Date();
+    const dateEl = document.getElementById('date-display');
+    const timeEl = document.getElementById('time-display');
+    if (dateEl) dateEl.innerText = now.toLocaleDateString('ar-IQ');
+    if (timeEl) timeEl.innerText = now.toLocaleTimeString('ar-IQ');
+}
+setInterval(updateDateTime, 1000);
+
+// 3. نظام الصلاحيات
+window.handleAuth = function() {
+    if (localStorage.getItem("admin")) {
+        localStorage.removeItem("admin");
+        alert("تم تسجيل الخروج");
+        location.reload();
+    } else {
+        const pass = prompt("يرجى إدخال كلمة مرور المدير:");
+        if (pass === "1234") {
+            localStorage.setItem("admin", "true");
+            location.reload();
+        } else {
+            alert("كلمة مرور خاطئة!");
+        }
+    }
+}
 
 // 4. الرؤية والنبذة
 window.updateInfo = function(field, text) {
@@ -55,14 +97,29 @@ window.onload = () => {
     
     // عداد الزوار
     const visitorsRef = ref(db, 'visitors');
-    runTransaction(visitorsRef, (current) => (current || 0) + 1);
+    runTransaction(visitorsRef, (current) => {
+        return (current || 0) + 1;
+    });
+
     onValue(visitorsRef, (snap) => {
         const countEl = document.getElementById('visitor-count');
         if(countEl) countEl.innerText = snap.val() || 0;
     });
 
     const isAdmin = localStorage.getItem("admin");
-    // (باقي كود الـ isAdmin كما هو)
+
+    // تفعيل وضع التعديل
+    const editableElements = document.querySelectorAll('.editable');
+    if (isAdmin) {
+        editableElements.forEach(el => {
+            el.contentEditable = "true";
+            el.style.border = "2px dashed #e67e22";
+        });
+        
+        document.querySelectorAll('.admin-section').forEach(e => e.style.display = 'block');
+        const authBtn = document.getElementById("authBtn");
+        if(authBtn) authBtn.innerText = "🔓 تسجيل الخروج";
+    }
 
     // جلب الرؤية
     onValue(ref(db, 'settings/vision'), (snap) => {
