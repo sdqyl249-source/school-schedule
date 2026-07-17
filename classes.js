@@ -1,6 +1,6 @@
 // classes.js - الكود الموحد والمعدل ليعمل مع Firebase V9
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 // 1. إعدادات Firebase
 const firebaseConfig = {
@@ -14,22 +14,41 @@ const firebaseConfig = {
 };
 
 // 2. تهيئة التطبيق وقاعدة البيانات (استخدام getApps لتجنب تكرار التهيئة)
-import { getApps } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getDatabase(app);
 
+// دالة مزامنة البيانات من السحابة (الخطوة الثانية)
+function loadUserDataFromCloud(phone) {
+    const userRef = ref(db, 'users/' + phone);
+    onValue(userRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            localStorage.setItem("currentUser", JSON.stringify(data));
+            console.log("تمت مزامنة البيانات من السحابة بنجاح!");
+        }
+    });
+}
 document.addEventListener('DOMContentLoaded', () => {
-    const userString = localStorage.getItem("currentUser");
-    if (!userString) return;
+    // 1. جلب البيانات الأساسية من الجهاز
+    let userString = localStorage.getItem("currentUser");
     
-    const userProfile = JSON.parse(userString);
-    showUserWelcome(userProfile);
-
-    if (userProfile.role === 'student') {
-        renderStudentClasses();
+    if (userString) {
+        const userProfile = JSON.parse(userString);
+        
+        // 2. مزامنة فورية مع السحابة (تحديث البيانات من هاتفك)
+        loadUserDataFromCloud(userProfile.phone);
+        
+        // 3. عرض الواجهة
+        showUserWelcome(userProfile);
+        
+        if (userProfile.role === 'student') {
+            renderStudentClasses();
+        } else if (userProfile.role === 'teacher') {
+            // سنضيف دالة عرض صفوف الأستاذ لاحقاً، أو يمكنك استخدام دالة renderStudentClasses الحالية مؤقتاً
+        }
     } else {
-        const saveBtn = document.getElementById("saveClassBtn");
-        if (saveBtn) saveBtn.addEventListener('click', saveClass);
+        alert("يرجى تسجيل الدخول أولاً!");
+        // window.location.href = "login.html"; // قم بإلغاء التعليق عند جاهزية صفحة الدخول
     }
 });
 
