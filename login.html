@@ -19,39 +19,35 @@
 
     <button onclick="performLogin()">تسجيل الدخول</button>
 </div>
+   <script>
+    function performLogin() {
+        const name = document.getElementById("userName").value;
+        const phone = document.getElementById("userPhone").value;
+        const role = document.getElementById("userRole").value;
 
-    <script>
-        function performLogin() {
-            const name = document.getElementById("userName").value;
-            const phone = document.getElementById("userPhone").value;
-            const role = document.getElementById("userRole").value;
-
-            if (name && phone) {
-                // حفظ البيانات في LocalStorage ليتم التعرف على المستخدم في كل الصفحات
-                localStorage.setItem("userRole", role);
-                localStorage.setItem("userName", name);
-                localStorage.setItem("userPhone", phone);
-
-                alert("مرحباً بك يا " + name);
-                window.location.href = "index.html"; // التوجه للرئيسية
-            } else {
-                alert("يرجى إدخال البيانات كاملة");
-            }
+        if (name && phone) {
+            // استدعاء دالة تسجيل الحساب الموحد
+            registerUser(name, phone, role);
+            
+            // التوجه للرئيسية
+            window.location.href = "index.html"; 
+        } else {
+            alert("يرجى إدخال البيانات كاملة");
         }
-        // دالة إنشاء حساب جديد وتخزينه
-function registerUser(fullName, phone, role) {
-    const userProfile = {
-        name: fullName,
-        phone: phone,
-        role: role, // 'admin', 'teacher', أو 'student'
-        joinedClasses: [] // قائمة الصفوف التي ينضم إليها لاحقاً
-    };
-    
-    // تحويل الكائن إلى نص وحفظه في التخزين الدائم
-    localStorage.setItem("currentUser", JSON.stringify(userProfile));
-    
-    alert("أهلاً بك يا " + fullName + "، تم إنشاء حسابك بنجاح.");
-}
-    </script>
+    }
+
+    // الدالة الموحدة لحفظ البيانات
+    function registerUser(fullName, phone, role) {
+        const userProfile = {
+            name: fullName,
+            phone: phone,
+            role: role, 
+            joinedClasses: [] 
+        };
+        
+        // حفظ الكائن بالكامل تحت مفتاح واحد يسمى "currentUser"
+        localStorage.setItem("currentUser", JSON.stringify(userProfile));
+    }
+</script>
 </body>
 </html>
