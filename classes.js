@@ -53,18 +53,26 @@ function renderStudentClasses() {
 }
 
 // وظيفة حفظ الصف (للأستاذ)
-function saveClass() {
-    const className = document.getElementById("className").value;
-    const classSection = document.getElementById("classSection").value;
+الآن، لنقوم باختبار الاتصال فوراً:
+في ملف classes.js (في دالة saveClass التي برمجناها سابقاً)، استبدل سطر الحفظ بـ window.db كما يلي:
 
-    if (!className || !classSection) {
-        alert("يرجى ملء جميع الحقول!");
-        return;
-    }
+JavaScript
 
-    const classId = "CLASS-" + Math.floor(1000 + Math.random() * 9000);
-    renderClassCard(className, classSection, classId);
-}
+// بدلاً من firebase.database().ref(...) استخدم التالي:window.db.ref('classes/' + classId).set(newClassData)
+    .then(() => {
+        alert("تم الحفظ في سحابة الوادي بنجاح!");
+    }); هذا التعديل طبقه على هذه الدالة function saveClass() {
+    const className = document.getElementById("className").value;
+    const classSection = document.getElementById("classSection").value;
+
+    if (!className || !classSection) {
+        alert("يرجى ملء جميع الحقول!");
+        return;
+    }
+
+    const classId = "CLASS-" + Math.floor(1000 + Math.random() * 9000);
+    renderClassCard(className, classSection, classId);
+} 
 
 // وظيفة عرض بطاقة الصف (للأستاذ)
 function renderClassCard(name, section, id) {
