@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>إدارة الصفوف - منصة الوادي</title>
+    <!-- ربط ملفات التنسيق -->
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="classes_style.css">
 </head>
 <body>
 
-    <!-- القائمة الجانبية (يمكنك نسخها من ملفك الرئيسي) -->
+    <!-- القائمة الجانبية (يتم استدعاؤها من ملفك الرئيسي أو إدراجها هنا) -->
     
     <div class="main-content" style="margin-right: 280px; padding: 20px;">
         <h2>إدارة الصفوف 🏫</h2>
@@ -15,18 +17,39 @@
         <!-- بوكس إضافة الصف (يظهر للمدير فقط) -->
         <div id="adminPanel" class="admin-section" style="border: 2px dashed #27ae60; padding: 20px; margin-bottom: 20px; border-radius: 10px;">
             <h3>إضافة صف جديد 🏫</h3>
-            <input type="text" id="className" placeholder="اسم الصف (مثلاً: الأول)">
-            <input type="text" id="classSection" placeholder="الشعبة (مثلاً: أ)">
-            <button onclick="saveClass()" style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">حفظ الصف</button>
+            
+            <label>اسم الصف:</label>
+            <select id="className">
+                <option value="الاول">الاول</option>
+                <option value="الثاني">الثاني</option>
+                <option value="الثالث">الثالث</option>
+                <option value="الرابع">الرابع</option>
+                <option value="الخامس">الخامس</option>
+                <option value="السادس">السادس</option>
+            </select>
+
+            <label>الشعبة:</label>
+            <select id="classSection">
+                <option value="أ">أ</option>
+                <option value="ب">ب</option>
+                <option value="ج">ج</option>
+                <option value="د">د</option>
+                <option value="هـ">هـ</option>
+            </select>
+
+            <button id="saveClassBtn" style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">حفظ الصف</button>
         </div>
 
         <!-- المنطقة التي ستظهر فيها بطاقات الصفوف -->
-        <div class="classes-grid" id="classesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+        <div class="dashboard-container" id="classesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 20px;">
             <!-- سيتم إضافة بطاقات الصفوف هنا برمجياً -->
         </div>
     </div>
-<script src="global.js"></script>
-<script type="module" src="scriot.js"></script>
-<script src="classes.js"></script>
+
+    <!-- المكتبات والملفات البرمجية -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="global.js"></script>
+    <script type="module" src="scriot.js"></script>
+    <script type="module" src="classes.js"></script>
 </body>
 </html>
