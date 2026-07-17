@@ -1,25 +1,28 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <link rel="stylesheet" href="style.css"> <!-- بنفس التنسيق الذي ضبطناه -->
+    <meta charset="UTF-8">
+    <title>إدارة الصفوف - منصة الوادي</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- القائمة الجانبية (نفسها) -->
+
+    <!-- القائمة الجانبية (يمكنك نسخها من ملفك الرئيسي) -->
     
-    <!-- محتوى صفحة الصفوف -->
-    <div class="page" id="classesPage">
-        <h2>إدارة الصفوف</h2>
-        
-        <!-- البوكس الخاص بالأدمن لإضافة صف -->
-        <div id="adminPanel" class="admin-section">
+    <div class="main-content" style="margin-right: 280px; padding: 20px;">
+        <h2>إدارة الصفوف 🏫</h2>
+
+        <!-- بوكس إضافة الصف (يظهر للمدير فقط) -->
+        <div id="adminPanel" class="admin-section" style="border: 2px dashed #27ae60; padding: 20px; margin-bottom: 20px; border-radius: 10px;">
             <h3>إضافة صف جديد 🏫</h3>
-            <input type="text" id="className" placeholder="اسم الصف">
-            <button onclick="saveClass()">حفظ الصف</button>
+            <input type="text" id="className" placeholder="اسم الصف (مثلاً: الأول)">
+            <input type="text" id="classSection" placeholder="الشعبة (مثلاً: أ)">
+            <button onclick="saveClass()" style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">حفظ الصف</button>
         </div>
 
-        <!-- شبكة الصفوف -->
-        <div class="classes-grid" id="classesContainer">
-            <!-- ستضاف البطاقات هنا تلقائياً عن طريق scriot.js -->
+        <!-- المنطقة التي ستظهر فيها بطاقات الصفوف -->
+        <div class="classes-grid" id="classesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+            <!-- سيتم إضافة بطاقات الصفوف هنا برمجياً -->
         </div>
     </div>
 
