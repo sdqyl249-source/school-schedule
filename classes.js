@@ -1,7 +1,4 @@
 // classes.js - الكود الموحد والمعدل ليعمل مع Firebase V9
-
-// classes.js - النسخة المعدلة لتعمل مع Firebase V9
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
