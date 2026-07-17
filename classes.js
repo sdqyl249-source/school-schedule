@@ -1,3 +1,31 @@
+// classes.js
+
+window.addEventListener('DOMContentLoaded', () => {
+    // 1. عرض ترحيب الطالب تلقائياً عند فتح الصفحة
+    showStudentInfo();
+
+    // ربط زر الحفظ إذا كان موجوداً في الصفحة
+    const saveBtn = document.getElementById("saveClassBtn");
+    if (saveBtn) {
+        saveBtn.addEventListener('click', saveClass);
+    }
+});
+
+// وظيفة عرض بيانات الطالب
+function showStudentInfo() {
+    if (localStorage.getItem("isStudent") === "true") {
+        const studentName = localStorage.getItem("studentName");
+        const studentPhone = localStorage.getItem("studentPhone");
+        
+        const infoBox = document.createElement('div');
+        infoBox.style.cssText = "background: #e8f5e9; padding: 20px; border-right: 5px solid #2e7d32; margin-bottom: 20px; border-radius: 8px;";
+        infoBox.innerHTML = `<h3>مرحباً بك: ${studentName}</h3><p>الهاتف: ${studentPhone}</p>`;
+        
+        document.body.prepend(infoBox);
+    }
+}
+
+// وظيفة حفظ الصف
 function saveClass() {
     const className = document.getElementById("className").value;
     const classSection = document.getElementById("classSection").value;
@@ -7,15 +35,15 @@ function saveClass() {
         return;
     }
 
-    // توليد رمز صف عشوائي (مثلاً: رقم من 4 خانات)
-    const classCode = "CLS-" + Math.floor(1000 + Math.random() * 9000);
+    // توليد رموز صف عشوائية
+    const teacherCode = "T-" + Math.floor(1000 + Math.random() * 9000);
+    const studentCode = "S-" + Math.floor(1000 + Math.random() * 9000);
 
-    // هنا نرسل البيانات (الاسم، الشعبة، الرمز) إلى قاعدة البيانات
-    console.log("تم حفظ الصف:", className, classSection, "الرمز:", classCode);
-    // عرض البطاقة مع الرمز
-    renderClassCard(className, classSection, classCode);
+    console.log("تم حفظ الصف:", className, classSection);
+    renderClassCard(className, classSection, teacherCode, studentCode);
 }
 
+// وظيفة عرض بطاقة الصف
 function renderClassCard(name, section, teacherCode, studentCode) {
     const container = document.getElementById("classesContainer");
     const card = document.createElement("div");
@@ -32,36 +60,47 @@ function renderClassCard(name, section, teacherCode, studentCode) {
     `;
     container.appendChild(card);
     
-    // توليد الأكواد (باستخدام مكتبة QRCode.js)
-    new QRCode(document.getElementById(`qr-teacher-${teacherCode}`), teacherCode);
-    new QRCode(document.getElementById(`qr-student-${studentCode}`), studentCode);
+    // ملاحظة: تأكد من تحميل مكتبة QRCode.js في ملف HTML الخاص بك
+    if (typeof QRCode !== "undefined") {
+        new QRCode(document.getElementById(`qr-teacher-${teacherCode}`), teacherCode);
+        new QRCode(document.getElementById(`qr-student-${studentCode}`), studentCode);
+    }
 }
-function openVerificationModal(code, role) {
-    // تظهر نافذة للمستخدم تطلب الاسم ورقم الهاتف
+
+// وظيفة فتح نافذة التحقق
+window.openVerificationModal = function(code, role) {
     const name = prompt("يرجى إدخال اسمك الثلاثي:");
     const phone = prompt("يرجى إدخال رقم هاتفك للتأكيد:");
 
     if (name && phone) {
-        // هنا نتحقق من البيانات (نرسلها للسيرفر أو نقارنها بقاعدة البيانات)
         verifyUserAndEnter(name, phone, code, role);
     } else {
         alert("بيانات غير مكتملة، لا يمكن الدخول.");
     }
 }
 
+// وظيفة التحقق والدخول
 function verifyUserAndEnter(name, phone, code, role) {
-    // هنا نقوم بحفظ هوية المستخدم في الـ Session
-    // ونحول الطالب للصفحه المطلوبة بناءً على صلاحيته
     console.log(`المستخدم ${name} يحاول الدخول كـ ${role} باستخدام كود ${code}`);
     alert("جارٍ التحقق من رقم هاتفك...");
-    // كود إرسال الـ OTP للواتساب سيتم هنا
+    
+    // بعد التحقق الناجح، نقوم بتسجيل الدخول
+    loginUser(name, phone, role);
 }
+
+// وظيفة تسجيل الدخول النهائي
 function loginUser(name, phone, role) {
-    // حفظ البيانات في LocalStorage (تبقى موجودة حتى لو أغلق المتصفح)
-    localStorage.setItem("userRole", role);   // قيمة تكون "student" أو "teacher"
+    localStorage.setItem("userRole", role); 
     localStorage.setItem("userName", name);
     localStorage.setItem("userPhone", phone);
+    
+    // إذا كان طالباً، نحدث حالة الدخول
+    if (role === 'student') {
+        localStorage.setItem("isStudent", "true");
+        localStorage.setItem("studentName", name);
+        localStorage.setItem("studentPhone", phone);
+    }
 
     alert("أهلاً بك يا " + name + "، تم تفعيل صلاحياتك كـ " + role);
-    window.location.href = "index.html"; // الانتقال للصفحة الرئيسية
+    window.location.href = "index.html"; 
 }
