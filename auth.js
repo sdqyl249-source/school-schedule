@@ -1,18 +1,19 @@
 // auth.js
 function checkAuth() {
+    // 1. ننتظر قليلاً للتأكد من تحميل LocalStorage
     const user = localStorage.getItem("currentUser");
-    const currentPage = window.location.pathname;
+    
+    // 2. الحصول على اسم الصفحة الحالية
+    const path = window.location.pathname;
+    const isLoginPage = path.includes("login.html");
 
-    // إذا كان المستخدم غير مسجل، ولسنا في صفحة الدخول، أعد توجيهه
-    if (!user && !currentPage.includes("login.html")) {
-        alert("يرجى تسجيل الدخول أولاً للوصول إلى هذه الصفحة.");
+    // 3. المنطق: إذا لم يوجد مستخدم ولسنا في صفحة الدخول، نمنع الدخول
+    if (!user && !isLoginPage) {
+        console.log("لم يتم العثور على مستخدم، جاري التحويل...");
         window.location.href = "login.html";
     } 
-    // إذا كان المستخدم مسجلاً، وفتح صفحة الدخول بالخطأ، وجهه للرئيسية
-    else if (user && currentPage.includes("login.html")) {
-        window.location.href = "index.html";
-    }
+    // إذا كان المستخدم موجوداً، فلا نفعل شيئاً
 }
 
-// تنفيذ التحقق
-checkAuth();
+// تشغيل التحقق عند تحميل الصفحة
+window.addEventListener('load', checkAuth);
