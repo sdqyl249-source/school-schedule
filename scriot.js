@@ -60,3 +60,19 @@ window.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.admin-section').forEach(el => el.style.display = 'block');
     }
 });
+// أضف هذا الجزء في نهاية ملف scriot.js
+window.addEventListener('DOMContentLoaded', () => {
+    const authBtn = document.getElementById('authBtn');
+    if (authBtn) {
+        authBtn.addEventListener('click', () => {
+            const pass = prompt("يرجى إدخال كلمة مرور المدير:");
+            if (pass === "1234") {
+                localStorage.setItem("admin", "true");
+                alert("تم تسجيل الدخول بنجاح!");
+                location.reload(); // لتفعيل أقسام الإدارة
+            } else {
+                alert("كلمة مرور خاطئة!");
+            }
+        });
+    }
+});
