@@ -17,16 +17,23 @@ function saveClass() {
     renderClassCard(className, classSection, classCode);
 }
 
-function renderClassCard(name, section, code) {
+function renderClassCard(name, section, teacherCode, studentCode) {
     const container = document.getElementById("classesContainer");
     const card = document.createElement("div");
-    card.className = "class-card"; // هذا الكلاس يحمل التنسيق الذي صممناه سابقاً
+    card.className = "class-card";
     
     card.innerHTML = `
         <h3>${name} - ${section}</h3>
-        <p>الرمز: <strong>${code}</strong></p>
-        <p>الأستاذ: غير محدد</p>
-        <button onclick="enterClass('${code}')">دخول الصف</button>
+        <div class="qr-section">
+            <div id="qr-teacher-${teacherCode}"><span>رمز المعلم</span></div>
+            <div id="qr-student-${studentCode}"><span>رمز الطالب</span></div>
+        </div>
+        <button onclick="openVerificationModal('${teacherCode}', 'teacher')">دخول كمعلم</button>
+        <button onclick="openVerificationModal('${studentCode}', 'student')">دخول كطالب</button>
     `;
     container.appendChild(card);
+    
+    // توليد الأكواد (باستخدام مكتبة QRCode.js)
+    new QRCode(document.getElementById(`qr-teacher-${teacherCode}`), teacherCode);
+    new QRCode(document.getElementById(`qr-student-${studentCode}`), studentCode);
 }
