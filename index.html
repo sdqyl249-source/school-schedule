@@ -24,13 +24,14 @@ button:hover { background: #219150; }
 <body>
 
 <div class="sidebar" id="mySidebar">
-    <button onclick="closeNav()" style="background:transparent; border:none; color:white; font-size:24px; cursor:pointer; padding:10px;">×</button>
-    <button onclick="openNav()" id="openBtn">☰ القائمة</button>
+<button id="closeBtn" style="background:transparent; border:none; color:white; font-size:24px; cursor:pointer; padding:10px;">×</button>
+    <button id="openBtn">☰ القائمة</button>   
     <div class="sidebar-title">🏞️ منصة الوادي</div>
-    <div class="menu-item" onclick="showPage('home')">🏠 الرئيسية</div>
-    <div class="menu-item" onclick="showPage('announcements')">📢 لوحة الإعلانات</div>
-    <a href="classes.html" style="text-decoration: none; color: white;">
-    <div class="menu-item">🏫 إدارة الصفوف</div></a>   
+<div class="menu-item" id="btn-home">🏠 الرئيسية</div>
+<div class="menu-item" id="btn-announcements">📢 لوحة الإعلانات</div>
+<a href="classes.html" style="text-decoration: none; color: white;">📚 المكتبة الرقمية</a>
+    <div
+        class="menu-item">🏫 إدارة الصفوف</div></a>   
     <a href="schedule.html" style="text-decoration: none; color: white;">
     <div class="menu-item">📅 جدول الدروس</div></a>
     <div class="menu-item" onclick="showPage('library')">📚 المكتبة الرقمية</div>
