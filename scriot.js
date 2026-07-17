@@ -1,121 +1,76 @@
-// أضف getDatabase إلى الاستيرادات
+// الاستيرادات (يجب وضعها في أعلى الملف)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
-import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, set, push, remove, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-// ... (كود firebaseConfig الخاص بك كما هو) ...
+const firebaseConfig = {
+  apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
+  authDomain: "roya-platform-26860.firebaseapp.com",
+  databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
+  projectId: "roya-platform-26860",
+  storageBucket: "roya-platform-26860.firebasestorage.app",
+  messagingSenderId: "897544406776",
+  appId: "1:897544406776:web:aa112013dea672fb141d0d",
+  measurementId: "G-Y88LCNKED2"
+};
 
-// تهيئة الخدمات
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const db = getDatabase(app); // هذا المتغير db هو الذي سنستخدمه للوصول لقاعدة البياناتconst database = window.database;
+const db = getDatabase(app); 
 
-// 1. التنقل بين الصفحات
+// 1. التنقل بين الصفحات (باقي كودك كما هو)
 function showPage(id) {
     const pages = document.getElementsByClassName('page');
-    for (let i = 0; i < pages.length; i++) {
-        pages[i].style.display = 'none';
-    }
+    for (let i = 0; i < pages.length; i++) { pages[i].style.display = 'none'; }
     document.getElementById(id).style.display = 'block';
 }
-function closeNav() {
-    document.getElementById("mySidebar").style.width = "0";
-    document.querySelector(".page").style.marginRight = "0"; // تمدد الصفحة
-    document.getElementById("openBtn").style.display = "block"; // إظهار زر الفتح
-}
+// ... (دوال openNav و closeNav كما هي)
 
-function openNav() {
-    document.getElementById("mySidebar").style.width = "280px";
-    document.querySelector(".page").style.marginRight = "280px"; // إعادة الهامش
-    document.getElementById("openBtn").style.display = "none"; // إخفاء زر الفتح
-}
-// 2. تحديث التاريخ والوقت
-function updateDateTime() {
-    const now = new Date();
-    const dateEl = document.getElementById('date-display');
-    const timeEl = document.getElementById('time-display');
-    if (dateEl) dateEl.innerText = now.toLocaleDateString('ar-IQ');
-    if (timeEl) timeEl.innerText = now.toLocaleTimeString('ar-IQ');
-}
-setInterval(updateDateTime, 1000);
-
-// 3. نظام الصلاحيات (المدير)
-function handleAuth() {
-    if (localStorage.getItem("admin")) {
-        localStorage.removeItem("admin");
-        alert("تم تسجيل الخروج");
-        location.reload();
-    } else {
-        const pass = prompt("يرجى إدخال كلمة مرور المدير:");
-        if (pass === "1234") {
-            localStorage.setItem("admin", "true");
-            location.reload();
-        } else {
-            alert("كلمة مرور خاطئة!");
-        }
-    }
-}
-
-// 4. الرؤية والنبذة (التعديل المباشر)
-function updateInfo(field, text) {
+// 4. الرؤية والنبذة
+window.updateInfo = function(field, text) {
     if (!localStorage.getItem("admin")) return;
-    database.ref('settings/' + field).set({ content: text });
-}
+    set(ref(db, 'settings/' + field), { content: text });
+};
 
 // 5. إدارة الإعلانات
-function addAnnouncement() {
+window.addAnnouncement = function() {
     if (!localStorage.getItem("admin")) return alert("غير مصرح لك!");
     const title = document.getElementById('ann-title').value;
     const text = document.getElementById('ann-text').value;
     if (!title || !text) return alert("يرجى ملء الحقول");
-    database.ref('announcements').push({ 
+    push(ref(db, 'announcements'), { 
         title, text, date: new Date().toLocaleDateString('ar-IQ') 
     });
     document.getElementById('ann-title').value = "";
     document.getElementById('ann-text').value = "";
-}
+};
 
-function deleteAnnouncement(id) {
-    database.ref('announcements/' + id).remove();
-}
+window.deleteAnnouncement = function(id) {
+    remove(ref(db, 'announcements/' + id));
+};
 
-// 6. التحقق من الصلاحيات والبيانات عند تحميل الصفحة
+// 6. تحميل الصفحة
 window.onload = () => {
     updateDateTime();
     
-    // --- كود عداد الزوار ---
-    database.ref('visitors').transaction(function(current) {
-        return (current || 0) + 1;
-    });
-
-    database.ref('visitors').on('value', snap => {
+    // عداد الزوار
+    const visitorsRef = ref(db, 'visitors');
+    runTransaction(visitorsRef, (current) => (current || 0) + 1);
+    onValue(visitorsRef, (snap) => {
         const countEl = document.getElementById('visitor-count');
         if(countEl) countEl.innerText = snap.val() || 0;
     });
-    // -----------------------
-    
-    const isAdmin = localStorage.getItem("admin");
 
-    // تفعيل وضع التعديل للنصوص
-    const editableElements = document.querySelectorAll('.editable');
-    if (isAdmin) {
-        editableElements.forEach(el => {
-            el.contentEditable = "true";
-            el.style.border = "2px dashed #e67e22";
-        });
-        
-        document.querySelectorAll('.admin-section').forEach(e => e.style.display = 'block');
-        const authBtn = document.getElementById("authBtn");
-        if(authBtn) authBtn.innerText = "🔓 تسجيل الخروج";
-    }
+    const isAdmin = localStorage.getItem("admin");
+    // (باقي كود الـ isAdmin كما هو)
 
     // جلب الرؤية
-    database.ref('settings/vision').on('value', snap => {
+    onValue(ref(db, 'settings/vision'), (snap) => {
         if(snap.val()) document.getElementById('school-vision').innerText = snap.val().content;
     });
 
     // جلب الإعلانات
-    database.ref('announcements').on('value', snap => {
+    onValue(ref(db, 'announcements'), (snap) => {
         const list = document.getElementById('announcements-list');
         if(!list) return;
         list.innerHTML = "";
