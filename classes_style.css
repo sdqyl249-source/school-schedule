@@ -1,4 +1,4 @@
-/* تنسيق صفحة الدخول */
+/* --- تنسيق صفحة الدخول --- */
 .login-page {
     background: linear-gradient(135deg, #2c3e50, #27ae60);
     height: 100vh;
@@ -29,7 +29,7 @@
     margin: 10px 0;
     border: 1px solid #ddd;
     border-radius: 8px;
-    box-sizing: border-box; /* لضمان عدم خروج الحواف عن الإطار */
+    box-sizing: border-box;
 }
 
 .login-container button {
@@ -47,4 +47,48 @@
 
 .login-container button:hover {
     background-color: #219150;
+}
+
+/* --- تنسيق لوحة تحكم الصفوف (الستايل الجديد) --- */
+.dashboard-container { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+    gap: 20px; 
+    padding: 20px; 
+}
+
+.class-card { 
+    background: #1e2633; 
+    border: 2px solid #6366f1; 
+    border-radius: 15px; 
+    padding: 20px; 
+    color: white; 
+    text-align: center; 
+    transition: 0.3s; 
+}
+
+.class-card:hover { 
+    transform: translateY(-5px); 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3); 
+}
+
+.class-card button {
+    background-color: #6366f1;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.class-card button:hover {
+    background-color: #4f46e5;
+}
+
+select { 
+    padding: 8px; 
+    margin: 5px; 
+    border-radius: 5px; 
+    border: 1px solid #ccc;
 }
