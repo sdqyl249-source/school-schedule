@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل الدخول - منصة الوادي</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-page">
+
+    <div class="login-container">
+        <h2>تسجيل الدخول إلى منصة الوادي</h2>
+        <input type="text" id="userName" placeholder="الاسم الثلاثي">
+        <input type="text" id="userPhone" placeholder="رقم الهاتف">
+        
+        <select id="userRole">
+            <option value="student">طالب</option>
+            <option value="teacher">أستاذ</option>
+        </select>
+
+        <button onclick="performLogin()">دخول</button>
+    </div>
+
+    <script>
+        function performLogin() {
+            const name = document.getElementById("userName").value;
+            const phone = document.getElementById("userPhone").value;
+            const role = document.getElementById("userRole").value;
+
+            if (name && phone) {
+                // حفظ البيانات في LocalStorage ليتم التعرف على المستخدم في كل الصفحات
+                localStorage.setItem("userRole", role);
+                localStorage.setItem("userName", name);
+                localStorage.setItem("userPhone", phone);
+
+                alert("مرحباً بك يا " + name);
+                window.location.href = "index.html"; // التوجه للرئيسية
+            } else {
+                alert("يرجى إدخال البيانات كاملة");
+            }
+        }
+    </script>
+</body>
+</html>
