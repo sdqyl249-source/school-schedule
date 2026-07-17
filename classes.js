@@ -1,4 +1,4 @@
-// classes.js - النسخة الموحدة والكاملة
+// classes.js - النسخة النهائية والموحدة
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. جلب بيانات المستخدم الموحدة
@@ -38,7 +38,6 @@ function renderStudentClasses() {
 
     container.innerHTML = ""; 
 
-    // ملاحظة: تأكد أن مصفوفة allClasses معرفة في ملف classesDatabase.js
     allClasses.forEach(cls => {
         if (joinedCodes.includes(cls.id)) {
             const card = document.createElement("div");
@@ -63,7 +62,6 @@ function saveClass() {
         return;
     }
 
-    // توليد رموز الصف
     const classId = "CLASS-" + Math.floor(1000 + Math.random() * 9000);
     renderClassCard(className, classSection, classId);
 }
@@ -85,7 +83,41 @@ function renderClassCard(name, section, id) {
     }
 }
 
-// دالة عرض الدروس (سيتم برمجتها لاحقاً)
-window.viewClassLessons = function(id) {
-    alert("جارٍ فتح دروس الصف: " + id);
+// دالة عرض الدروس (المدمجة مع زر الدرجات)
+window.viewClassLessons = function(classId) {
+    const selectedClass = allClasses.find(cls => cls.id === classId);
+    if (!selectedClass) return;
+
+    const container = document.getElementById("classes-container");
+    container.innerHTML = `
+        <button onclick="renderStudentClasses()">العودة لصفوفي</button>
+        <h2>دروس صف: ${selectedClass.name}</h2>
+        <button onclick="showStudentGrade('${selectedClass.id}')">عرض درجتي في هذا الصف</button>
+        <div id="lessons-list"></div>
+    `;
+
+    const lessonsList = document.getElementById("lessons-list");
+    selectedClass.lessons.forEach((lesson, index) => {
+        const lessonDiv = document.createElement("div");
+        lessonDiv.className = "lesson-card";
+        lessonDiv.innerHTML = `<h4>الدرس ${index + 1}: ${lesson.title}</h4>`;
+        lessonsList.appendChild(lessonDiv);
+    });
+};
+
+// دالة عرض الدرجة الخاصة بكل طالب
+window.showStudentGrade = function(classId) {
+    const selectedClass = allClasses.find(cls => cls.id === classId);
+    if (!selectedClass) return;
+
+    const studentName = prompt("أدخل اسمك الثلاثي لعرض درجتك:");
+    if (!studentName) return;
+
+    const grade = selectedClass.grades[studentName];
+
+    if (grade !== undefined) {
+        alert("مرحباً " + studentName + "، درجتك في " + selectedClass.name + " هي: " + grade);
+    } else {
+        alert("عذراً، لم يتم العثور على درجة بهذا الاسم.");
+    }
 };
