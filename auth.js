@@ -1,20 +1,18 @@
 // auth.js
 function checkAuth() {
-    // 1. محاولة جلب المستخدم من التخزين
-    const user = localStorage.getItem("currentUser");
+    const userString = localStorage.getItem("currentUser");
+    console.log("قيمة المستخدم في التخزين:", userString); // هذا سيظهر في الـ Console
     
-    // 2. التحقق من مسار الصفحة الحالية
     const isLoginPage = window.location.href.includes("login.html");
 
-    // 3. المنطق: إذا لم يوجد مستخدم ولسنا في صفحة الدخول، نحول المستخدم للدخول
-    if (!user && !isLoginPage) {
+    if (!userString && !isLoginPage) {
+        console.log("لم يتم العثور على مستخدم، سيتم التحويل لصفحة الدخول.");
         window.location.href = "login.html";
     } 
-    // إذا وجدنا مستخدم، نتأكد أنه لا يحاول الدخول لصفحة الدخول مرة أخرى
-    else if (user && isLoginPage) {
+    else if (userString && isLoginPage) {
+        console.log("المستخدم مسجل، سيتم تحويله للرئيسية.");
         window.location.href = "index.html";
     }
 }
 
-// تشغيل التحقق فوراً
 checkAuth();
