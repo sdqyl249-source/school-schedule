@@ -1,18 +1,34 @@
 // classes.js - الكود الموحد والمعدل ليعمل مع Firebase V9
 
-import { ref, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+// 1. إعدادات Firebase
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// 2. تهيئة التطبيق وقاعدة البيانات
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. جلب بيانات المستخدم الموحدة
+    // جلب بيانات المستخدم
     const userString = localStorage.getItem("currentUser");
     if (!userString) return;
     
     const userProfile = JSON.parse(userString);
 
-    // 2. عرض ترحيب بالمستخدم
+    // عرض ترحيب بالمستخدم
     showUserWelcome(userProfile);
 
-    // 3. عرض الصفوف بناءً على نوع المستخدم
+    // عرض الصفوف بناءً على نوع المستخدم
     if (userProfile.role === 'student') {
         renderStudentClasses();
     } else {
@@ -30,7 +46,7 @@ function showUserWelcome(user) {
     document.body.prepend(infoBox);
 }
 
-// دالة حفظ الصف (النسخة المعدلة لتعمل مع Firebase V9)
+// دالة حفظ الصف
 function saveClass() {
     const className = document.getElementById("className").value;
     const classSection = document.getElementById("classSection").value;
@@ -51,8 +67,8 @@ function saveClass() {
         grades: {}
     };
 
-    // استخدام ref و set المستوردة من Firebase
-    set(ref(window.db, 'classes/' + classId), newClassData)
+    // استخدام ref و set مع db الصحيح
+    set(ref(db, 'classes/' + classId), newClassData)
     .then(() => {
         alert("تم الحفظ في سحابة الوادي بنجاح!");
         renderClassCard(className, classSection, classId);
