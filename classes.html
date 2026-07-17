@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <link rel="stylesheet" href="style.css"> <!-- بنفس التنسيق الذي ضبطناه -->
+</head>
+<body>
+    <!-- القائمة الجانبية (نفسها) -->
+    
+    <!-- محتوى صفحة الصفوف -->
+    <div class="page" id="classesPage">
+        <h2>إدارة الصفوف</h2>
+        
+        <!-- البوكس الخاص بالأدمن لإضافة صف -->
+        <div id="adminPanel" class="admin-section">
+            <h3>إضافة صف جديد 🏫</h3>
+            <input type="text" id="className" placeholder="اسم الصف">
+            <button onclick="saveClass()">حفظ الصف</button>
+        </div>
+
+        <!-- شبكة الصفوف -->
+        <div class="classes-grid" id="classesContainer">
+            <!-- ستضاف البطاقات هنا تلقائياً عن طريق scriot.js -->
+        </div>
+    </div>
+
+    <script src="scriot.js"></script>
+</body>
+</html>
