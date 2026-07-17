@@ -12,7 +12,20 @@ window.onload = function() {
     if (!role) {
         // إذا لم يجد بيانات تسجيل، يعيد المستخدم لصفحة تسجيل الدخول
         alert("يرجى تسجيل الدخول أولاً");
-        window.location.href = "login.html";
+        window.location.href = "login.html";// دالة إنشاء حساب جديد وتخزينه
+function registerUser(fullName, phone, role) {
+    const userProfile = {
+        name: fullName,
+        phone: phone,
+        role: role, // 'admin', 'teacher', أو 'student'
+        joinedClasses: [] // قائمة الصفوف التي ينضم إليها لاحقاً
+    };
+    
+    // تحويل الكائن إلى نص وحفظه في التخزين الدائم
+    localStorage.setItem("currentUser", JSON.stringify(userProfile));
+    
+    alert("أهلاً بك يا " + fullName + "، تم إنشاء حسابك بنجاح.");
+}
     } else {
         // إذا كان مسجلاً، نطبق الصلاحيات بناءً على دوره
         console.log("المستخدم الحالي مسجل كـ: " + role);
