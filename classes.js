@@ -17,7 +17,7 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getDatabase(app);
 
-// دالة مزامنة البيانات من السحابة (الخطوة الثانية)
+// دالة مزامنة البيانات من السحابة
 function loadUserDataFromCloud(phone) {
     const userRef = ref(db, 'users/' + phone);
     onValue(userRef, (snapshot) => {
@@ -28,31 +28,51 @@ function loadUserDataFromCloud(phone) {
         }
     });
 }
+
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. جلب البيانات الأساسية من الجهاز
     let userString = localStorage.getItem("currentUser");
-    
     if (userString) {
         const userProfile = JSON.parse(userString);
-        
-        // 2. مزامنة فورية مع السحابة (تحديث البيانات من هاتفك)
         loadUserDataFromCloud(userProfile.phone);
-        
-        // 3. عرض الواجهة
         showUserWelcome(userProfile);
         
         if (userProfile.role === 'student') {
             renderStudentClasses();
         } else if (userProfile.role === 'teacher') {
-            // سنضيف دالة عرض صفوف الأستاذ لاحقاً، أو يمكنك استخدام دالة renderStudentClasses الحالية مؤقتاً
+            renderTeacherClasses();
         }
     } else {
         alert("يرجى تسجيل الدخول أولاً!");
-        // window.location.href = "login.html"; // قم بإلغاء التعليق عند جاهزية صفحة الدخول
     }
 });
 
-// [باقي الدوال تبقى كما هي بدون تغيير...]
+// دالة عرض صفوف الأستاذ
+function renderTeacherClasses() {
+    const container = document.getElementById("classes-container");
+    if (!container) return;
+    
+    container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
+    const classesRef = ref(db, 'classes/');
+    
+    onValue(classesRef, (snapshot) => {
+        const data = snapshot.val();
+        container.innerHTML = "<h2>صفوفي كأستاذ:</h2>"; // إعادة التعيين
+        if (data) {
+            Object.values(data).forEach(cls => {
+                const card = document.createElement("div");
+                card.className = "class-card";
+                card.innerHTML = `
+                    <h3>${cls.name} - شعبة ${cls.section}</h3>
+                    <p>الرمز: <strong>${cls.id}</strong></p>
+                    <button onclick="viewClassLessons('${cls.id}')">عرض تفاصيل الصف</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+    });
+}
+
+// الدوال الأساسية
 function showUserWelcome(user) {
     const infoBox = document.createElement('div');
     infoBox.style.cssText = "background: #e8f5e9; padding: 20px; border-right: 5px solid #2e7d32; margin-bottom: 20px; border-radius: 8px;";
@@ -63,11 +83,7 @@ function showUserWelcome(user) {
 function saveClass() {
     const className = document.getElementById("className").value;
     const classSection = document.getElementById("classSection").value;
-
-    if (!className || !classSection) {
-        alert("يرجى ملء جميع الحقول!");
-        return;
-    }
+    if (!className || !classSection) { alert("يرجى ملء جميع الحقول!"); return; }
 
     const classId = "CLASS-" + Math.floor(1000 + Math.random() * 9000);
     const newClassData = {
@@ -86,9 +102,7 @@ function saveClass() {
         document.getElementById("className").value = "";
         document.getElementById("classSection").value = "";
     })
-    .catch((error) => {
-        alert("حدث خطأ أثناء الحفظ: " + error.message);
-    });
+    .catch((error) => { alert("حدث خطأ أثناء الحفظ: " + error.message); });
 }
 
 function renderClassCard(name, section, id) {
@@ -129,7 +143,7 @@ window.viewClassLessons = function(classId) {
         const selectedClass = snapshot.val();
         if (!selectedClass) return;
         const container = document.getElementById("classes-container");
-        container.innerHTML = `<button onclick="renderStudentClasses()">العودة لصفوفي</button><h2>دروس صف: ${selectedClass.name}</h2><button onclick="showStudentGrade('${selectedClass.id}')">عرض درجتي في هذا الصف</button><div id="lessons-list"></div>`;
+        container.innerHTML = `<button onclick="location.reload()">العودة للرئيسية</button><h2>دروس صف: ${selectedClass.name}</h2><button onclick="showStudentGrade('${selectedClass.id}')">عرض درجتي</button><div id="lessons-list"></div>`;
         const lessonsList = document.getElementById("lessons-list");
         selectedClass.lessons.forEach((lesson, index) => {
             const lessonDiv = document.createElement("div");
