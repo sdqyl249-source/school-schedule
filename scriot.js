@@ -1,6 +1,5 @@
-// استيراد الدوال اللازمة من مكتبة Firebase v9
+// استيراد الدوال من مكتبة Firebase v9
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
 import { getDatabase, ref, set, push, remove, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 // إعدادات المشروع
@@ -15,51 +14,41 @@ const firebaseConfig = {
   measurementId: "G-Y88LCNKED2"
 };
 
-// تهيئة Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const db = getDatabase(app);
 
-// 1. التنقل بين الصفحات
-function showPage(id) {
+// ربط الدوال بـ window لتعمل مباشرة من ملفات الـ HTML
+window.showPage = (id) => {
     const pages = document.getElementsByClassName('page');
-    for (let i = 0; i < pages.length; i++) {
-        pages[i].style.display = 'none';
-    }
-    document.getElementById(id).style.display = 'block';
-}
+    for (let i = 0; i < pages.length; i++) pages[i].style.display = 'none';
+    const target = document.getElementById(id);
+    if(target) target.style.display = 'block';
+};
 
-function closeNav() {
-    document.getElementById("mySidebar").style.width = "0";
-    document.querySelector(".page").style.marginRight = "0";
-    document.getElementById("openBtn").style.display = "block";
-}
+window.openNav = () => {
+    const sidebar = document.getElementById("mySidebar");
+    const openBtn = document.getElementById("openBtn");
+    if(sidebar) sidebar.style.width = "280px";
+    const page = document.querySelector(".page");
+    if(page) page.style.marginRight = "280px";
+    if(openBtn) openBtn.style.display = "none";
+};
 
-function openNav() {
-    document.getElementById("mySidebar").style.width = "280px";
-    document.querySelector(".page").style.marginRight = "280px";
-    document.getElementById("openBtn").style.display = "none";
-}
+window.closeNav = () => {
+    const sidebar = document.getElementById("mySidebar");
+    const openBtn = document.getElementById("openBtn");
+    if(sidebar) sidebar.style.width = "0";
+    const page = document.querySelector(".page");
+    if(page) page.style.marginRight = "0";
+    if(openBtn) openBtn.style.display = "block";
+};
 
-// 2. تحديث التاريخ والوقت
-// 2. تحديث التاريخ والوقت
-// 2. تحديث التاريخ والوقت
-function updateDateTime() {
-    const now = new Date();
+window.updateDateTime = () => {
     const el = document.getElementById("date-time");
-    if (el) {
-        // نستخدم toLocaleString لعرض التاريخ والوقت معاً بتنسيق العراق
-        el.innerText = now.toLocaleString('ar-IQ');
-    }
-}
+    if (el) el.innerText = new Date().toLocaleString('ar-IQ');
+};
 
-// استدعاء الدالة فور تحميل الصفحة
-updateDateTime();
-
-// تحديث الوقت كل ثانية (1000 ميلي ثانية)
-setInterval(updateDateTime, 1000);
-// 3. نظام الصلاحيات
-window.handleAuth = function() {
+window.handleAuth = () => {
     if (localStorage.getItem("admin")) {
         localStorage.removeItem("admin");
         alert("تم تسجيل الخروج");
@@ -73,16 +62,13 @@ window.handleAuth = function() {
             alert("كلمة مرور خاطئة!");
         }
     }
-}
-
-// 4. الرؤية والنبذة
-window.updateInfo = function(field, text) {
-    if (!localStorage.getItem("admin")) return;
-    set(ref(db, 'settings/' + field), { content: text });
 };
 
-// 5. إدارة الإعلانات
-window.addAnnouncement = function() {
+window.deleteAnnouncement = (id) => {
+    remove(ref(db, 'announcements/' + id));
+};
+
+window.addAnnouncement = () => {
     if (!localStorage.getItem("admin")) return alert("غير مصرح لك!");
     const title = document.getElementById('ann-title').value;
     const text = document.getElementById('ann-text').value;
@@ -90,54 +76,23 @@ window.addAnnouncement = function() {
     push(ref(db, 'announcements'), { 
         title, text, date: new Date().toLocaleDateString('ar-IQ') 
     });
-    document.getElementById('ann-title').value = "";
-    document.getElementById('ann-text').value = "";
 };
 
-window.deleteAnnouncement = function(id) {
-    remove(ref(db, 'announcements/' + id));
-};
-
-// 6. تحميل الصفحة
+// تشغيل الوظائف عند تحميل الصفحة
 window.onload = () => {
-    updateDateTime();
-    
+    window.updateDateTime();
+    setInterval(window.updateDateTime, 1000);
+
     // عداد الزوار
     const visitorsRef = ref(db, 'visitors');
-    runTransaction(visitorsRef, (current) => {
-        return (current || 0) + 1;
-    });
-
-    onValue(visitorsRef, (snap) => {
-        const countEl = document.getElementById('visitor-count');
-        if(countEl) countEl.innerText = snap.val() || 0;
-    });
-
-    const isAdmin = localStorage.getItem("admin");
-
-    // تفعيل وضع التعديل
-    const editableElements = document.querySelectorAll('.editable');
-    if (isAdmin) {
-        editableElements.forEach(el => {
-            el.contentEditable = "true";
-            el.style.border = "2px dashed #e67e22";
-        });
-        
-        document.querySelectorAll('.admin-section').forEach(e => e.style.display = 'block');
-        const authBtn = document.getElementById("authBtn");
-        if(authBtn) authBtn.innerText = "🔓 تسجيل الخروج";
-    }
-
-    // جلب الرؤية
-    onValue(ref(db, 'settings/vision'), (snap) => {
-        if(snap.val()) document.getElementById('school-vision').innerText = snap.val().content;
-    });
+    runTransaction(visitorsRef, (current) => (current || 0) + 1);
 
     // جلب الإعلانات
     onValue(ref(db, 'announcements'), (snap) => {
         const list = document.getElementById('announcements-list');
         if(!list) return;
         list.innerHTML = "";
+        const isAdmin = localStorage.getItem("admin");
         snap.forEach(c => {
             const data = c.val();
             const id = c.key;
@@ -146,7 +101,7 @@ window.onload = () => {
                     <small>${data.date || ''}</small>
                     <h3>${data.title}</h3>
                     <p>${data.text}</p>
-                    ${isAdmin ? `<button onclick="deleteAnnouncement('${id}')" style="background:#e74c3c;">حذف الإعلان</button>` : ''}
+                    ${isAdmin ? `<button onclick="deleteAnnouncement('${id}')" style="background:#e74c3c; color:white;">حذف الإعلان</button>` : ''}
                 </div>`;
         });
     });
