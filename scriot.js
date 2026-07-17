@@ -20,19 +20,40 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById("mySidebar").style.width = "0";
     };
 
+    // دالة لحماية الصفحات بكلمة مرور
+    const setupProtectedButton = (btnId, pageId) => {
+        document.getElementById(btnId)?.addEventListener('click', () => {
+            if (localStorage.getItem("admin") === "true") {
+                showPage(pageId);
+            } else {
+                const pass = prompt("هذه صفحة إدارية. يرجى إدخال كلمة مرور المدير:");
+                if (pass === "1234") {
+                    localStorage.setItem("admin", "true");
+                    alert("تم الدخول بنجاح!");
+                    showPage(pageId);
+                    location.reload(); 
+                } else {
+                    alert("كلمة مرور خاطئة!");
+                }
+            }
+        });
+    };
+
     // 2. ربط الأزرار برمجياً
     document.getElementById('btn-home')?.addEventListener('click', () => showPage('home'));
     document.getElementById('btn-announcements')?.addEventListener('click', () => showPage('announcements'));
-    document.getElementById('btn-classes')?.addEventListener('click', () => showPage('classes'));
-    document.getElementById('btn-library')?.addEventListener('click', () => showPage('library'));
     document.getElementById('btn-games')?.addEventListener('click', () => showPage('games'));
     document.getElementById('btn-schedule')?.addEventListener('click', () => { window.location.href = 'schedule.html'; });
+
+    // ربط الصفحات المحمية
+    setupProtectedButton('btn-classes', 'classes');
+    setupProtectedButton('btn-library', 'library');
 
     // 3. التحكم بالسايدبار
     document.getElementById('openBtn')?.addEventListener('click', () => { document.getElementById("mySidebar").style.width = "280px"; });
     document.getElementById('closeBtn')?.addEventListener('click', () => { document.getElementById("mySidebar").style.width = "0"; });
 
-    // 4. تسجيل الدخول
+    // 4. تسجيل الدخول العام
     const authBtn = document.getElementById('authBtn');
     if (authBtn) {
         authBtn.addEventListener('click', () => {
