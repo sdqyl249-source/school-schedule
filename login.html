@@ -8,17 +8,17 @@
 <body class="login-page">
 
     <div class="login-container">
-        <h2>تسجيل الدخول إلى منصة الوادي</h2>
-        <input type="text" id="userName" placeholder="الاسم الثلاثي">
-        <input type="text" id="userPhone" placeholder="رقم الهاتف">
-        
-        <select id="userRole">
-            <option value="student">طالب</option>
-            <option value="teacher">أستاذ</option>
-        </select>
+    <h2>مرحباً بك في منصة الوادي</h2>
+    <input type="text" id="userName" placeholder="الاسم الثلاثي">
+    <input type="tel" id="userPhone" placeholder="رقم الهاتف">
+    
+    <select id="userRole">
+        <option value="student">طالب</option>
+        <option value="teacher">أستاذ</option>
+    </select>
 
-        <button onclick="performLogin()">دخول</button>
-    </div>
+    <button onclick="performLogin()">تسجيل الدخول</button>
+</div>
 
     <script>
         function performLogin() {
