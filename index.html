@@ -5,40 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة الوادي التعليمية</title>
     <style>
-body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; color: #2c3e50; }
-.sidebar { height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; z-index: 1000; transition: 0.3s; overflow: hidden; }
-.sidebar-title { text-align: center; font-size: 22px; font-weight: bold; padding-bottom: 25px; border-bottom: 1px solid #2c3e50; margin-bottom: 15px; }
-#openBtn { display: none; position: fixed; top: 20px; right: 20px; z-index: 2000; background: #1a252f; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 18px; border: none; }
-.menu-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342; transition: 0.3s; }
-.menu-item:hover { background: #34495e; }
-.page { margin-right: 300px; padding: 30px; display: none; transition: 0.3s; }
-#home { display: block; }
-.card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; border-right: 8px solid #27ae60; }
-.editable { border: 1px dashed #ccc; padding: 10px; border-radius: 8px; }
-.admin-section { display: none; border: 2px dashed #27ae60 !important; padding: 20px; margin-bottom: 20px; }
-input, textarea, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-button { padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-button:hover { background: #219150; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; color: #2c3e50; }
+        .sidebar { height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; z-index: 1000; transition: 0.3s; overflow: hidden; }
+        .sidebar-title { text-align: center; font-size: 22px; font-weight: bold; padding-bottom: 25px; border-bottom: 1px solid #2c3e50; margin-bottom: 15px; }
+        #openBtn { display: block; position: fixed; top: 20px; right: 20px; z-index: 2000; background: #1a252f; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; border: none; }
+        .menu-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342; transition: 0.3s; }
+        .menu-item:hover { background: #34495e; }
+        .page { margin-right: 300px; padding: 30px; display: none; transition: 0.3s; }
+        #home { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; border-right: 8px solid #27ae60; }
+        .editable { border: 1px dashed #ccc; padding: 10px; border-radius: 8px; }
+        .admin-section { display: none; border: 2px dashed #27ae60 !important; padding: 20px; margin-bottom: 20px; }
+        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #219150; }
     </style>
 </head>
 <body>
 
+<!-- القائمة الجانبية -->
 <div class="sidebar" id="mySidebar">
-<button id="closeBtn" style="background:transparent; border:none; color:white; font-size:24px; cursor:pointer; padding:10px;">×</button>
-    <button id="openBtn">☰ القائمة</button>   
+    <button id="closeBtn" style="background:transparent; border:none; color:white; font-size:24px; cursor:pointer; padding:10px;">×</button>
     <div class="sidebar-title">🏞️ منصة الوادي</div>
-<div class="menu-item" id="btn-home">🏠 الرئيسية</div>
-<div class="menu-item" id="btn-announcements">📢 لوحة الإعلانات</div>
-<a href="classes.html" style="text-decoration: none; color: white;">📚 المكتبة الرقمية</a>
-    <div
-        class="menu-item">🏫 إدارة الصفوف</div></a>   
-    <a href="schedule.html" style="text-decoration: none; color: white;">
-    <div class="menu-item">📅 جدول الدروس</div></a>
-    <div class="menu-item" onclick="showPage('library')">📚 المكتبة الرقمية</div>
-    <div class="menu-item" id="authBtn" onclick="handleAuth()">🔐 تسجيل الدخول</div>
+    <div class="menu-item" id="btn-home">🏠 الرئيسية</div>
+    <div class="menu-item" id="btn-announcements">📢 لوحة الإعلانات</div>
+    <div class="menu-item" id="btn-classes">🏫 إدارة الصفوف</div>
+    <div class="menu-item" id="btn-schedule">📅 جدول الدروس</div>
+    <div class="menu-item" id="btn-library">📚 المكتبة الرقمية</div>
+    <div class="menu-item" id="btn-games">🎮 الترفيه والألعاب</div>
+    <div class="menu-item" id="authBtn">🔐 تسجيل الدخول</div>
 </div>
 
-<!-- الرئيسية -->
+<button id="openBtn">☰ القائمة</button>
+
+<!-- الصفحات -->
 <div id="home" class="page">
     <div class="card" style="text-align:center; border-right-color: #34495e;">
         <h3 id="date-display"></h3>
@@ -47,75 +47,48 @@ button:hover { background: #219150; }
     <div class="card"><h1>مرحباً بكم في منصة الوادي</h1></div>
     <div class="card">
         <h3>رؤية المنصة</h3>
-<p id="school-vision" class="editable" onblur="updateInfo('vision', this.innerText)">...</p>  
+        <p id="school-vision" class="editable">...</p>  
     </div>
     <div class="card"><h3>عدد الزوار</h3><h2 id="visitor-count">0</h2></div>
 </div>
 
-<!-- الإعلانات -->
 <div id="announcements" class="page">
     <div class="card admin-section" id="admin-ann" style="border-right-color: #e67e22;">
-        <h3 style="color: #e67e22;">📢 إضافة إعلان جديد</h3>
+        <h3>📢 إضافة إعلان جديد</h3>
         <input type="text" id="ann-title" placeholder="عنوان الإعلان">
         <textarea id="ann-text" placeholder="نص الإعلان..." style="height: 80px;"></textarea>
-        <button onclick="addAnnouncement()" style="background: #e67e22;">نشر الإعلان</button>
+        <button id="publish-ann">نشر الإعلان</button>
     </div>
-    
-    <h2 style="color: #2c3e50;">لوحة إعلانات منصة الوادي</h2>
+    <h2>لوحة إعلانات منصة الوادي</h2>
     <div id="announcements-list"></div>
 </div>
 
-<!-- الصفوف -->
-<div id="classes" class="page">
-    <div class="card admin-section" id="admin-class">
-        <h3>🏫 إضافة صف</h3>
-        <input type="text" id="class-name" placeholder="اسم الصف">
-        <input type="text" id="section-name" placeholder="الشعبة">
-        <button onclick="addClass()">حفظ الصف</button>
-    </div>
-    <div id="classes-list"></div>
-</div>
-
-<!-- الجدول -->
-<div id="schedule" class="page">
-    <div class="card admin-section" id="admin-sch">
-        <h3>📅 إضافة حصة</h3>
-        <input type="text" id="sub-name" placeholder="اسم المادة">
-        <button onclick="addSchedule()">إضافة</button>
-    </div>
-    <div id="schedule-list"></div>
-</div>
-
-<!-- المكتبة -->
-<div id="library" class="page">
-    <div class="card admin-section" id="admin-lib">
-        <h3>📚 إضافة ملف</h3>
-        <input type="text" id="book-name" placeholder="اسم الملف">
-        <button onclick="addBook()">رفع الملف</button>
-    </div>
-    <div id="library-list"></div>
-</div>
+<!-- باقي الصفحات (صفوف، جدول، مكتبة، ترفيه) -->
+<div id="classes" class="page"><h2>إدارة الصفوف</h2><div id="classes-list"></div></div>
+<div id="schedule" class="page"><h2>جدول الدروس</h2><div id="schedule-list"></div></div>
+<div id="library" class="page"><h2>المكتبة الرقمية</h2><div id="library-list"></div></div>
+<div id="games" class="page"><h2>🎮 ركن الترفيه والألعاب</h2><div class="card">ألعاب قيد التطوير...</div></div>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 <script>
     const firebaseConfig = {
-  apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
-  authDomain: "roya-platform-26860.firebaseapp.com",
-  databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
-  projectId: "roya-platform-26860",
-  storageBucket: "roya-platform-26860.firebasestorage.app",
-  messagingSenderId: "897544406776",
-  appId: "1:897544406776:web:aa112013dea672fb141d0d",
-  measurementId: "G-Y88LCNKED2"
-};
+        apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
+        authDomain: "roya-platform-26860.firebaseapp.com",
+        databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
+        projectId: "roya-platform-26860",
+        storageBucket: "roya-platform-26860.firebasestorage.app",
+        messagingSenderId: "897544406776",
+        appId: "1:897544406776:web:aa112013dea672fb141d0d",
+        measurementId: "G-Y88LCNKED2"
+    };
     firebase.initializeApp(firebaseConfig);
-window.database = firebase.database();
+    window.database = firebase.database();
 </script>
-<script src="global.js"></script>
 
-<!-- ثم نربط ملفات الجافا سكريبت الخاصة بكل صفحة -->
+<!-- ملفات الجافا سكريبت -->
+<script src="global.js"></script>
 <script type="module" src="scriot.js"></script>
 <script src="classes.js"></script>
 </body>
