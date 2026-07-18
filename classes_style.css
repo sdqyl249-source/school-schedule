@@ -57,14 +57,13 @@
     padding: 20px; 
 }
 
-.class-card { 
-    background: #1e2633; 
-    border: 2px solid #6366f1; 
-    border-radius: 15px; 
-    padding: 20px; 
-    color: white; 
-    text-align: center; 
-    transition: 0.3s; 
+/* في ملف الـ CSS الخاص بك */
+.class-card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    /* لا تضع width هنا، اترك الـ Grid في الحاوية يتحكم بالعرض */
 }
 
 .class-card:hover { 
