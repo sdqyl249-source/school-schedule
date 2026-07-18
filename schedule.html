@@ -4,77 +4,24 @@
     <meta charset="UTF-8">
     <title>جدول الدروس</title>
     <style>
-    /* الإعدادات العامة */
-    body { 
-        font-family: 'Segoe UI', Tahoma, sans-serif; 
-        background-color: #f0f2f5; 
-        margin: 0; 
-        padding: 20px; 
-        direction: rtl; 
-    }
-
-    /* شريط التنقل */
-    .nav-btns { 
-        display: flex; 
-        gap: 15px; 
-        background: #ffffff; 
-        padding: 15px 25px; 
-        border-radius: 50px; 
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-        margin-bottom: 30px; 
-        justify-content: center;
-        align-items: center;
-    }
-
-    /* تنسيق كارد الجدول */
-    .card { 
-        background: #ffffff; 
-        padding: 25px; 
-        border-radius: 15px; 
-        box-shadow: 0 6px 15px rgba(0,0,0,0.08); 
-        margin-bottom: 25px; 
-        border-right: 5px solid #3498db; /* لمسة جمالية */
-    }
-
-    h3 { margin-top: 0; color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-
-    /* الجدول */
-    table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; }
-    th { background-color: #3498db; color: white; padding: 15px; }
-    td { border: 1px solid #edf2f7; padding: 15px; text-align: center; }
-    .btn { 
-        padding: 10px 20px; 
-        border: none; 
-        border-radius: 8px; 
-        cursor: pointer; 
-        color: white; 
-        font-weight: 600; 
-        text-decoration: none; /* لمنع الخط تحت الروابط */
-        display: inline-block;
-        transition: 0.3s;
-        text-align: center;
-    }
-    .btn:hover { opacity: 0.9; transform: translateY(-2px); }
-    /* تخصيص الألوان */
-    .btn-login { background: var(--primary, #3498db); }
-    .btn-logout { background: var(--danger, #e74c3c); }
-    .btn-print { background: var(--success, #27ae60); }
-    .btn-home { background: #34495e; }
-    .admin-panel { 
-        background: #fff; padding: 25px; border-radius: 15px; 
-        border: 2px dashed #3498db; margin-top: 20px; 
-    }
-    select { padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-left: 10px; }
-</style>
-</style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .nav-btns { display: flex; gap: 15px; background: #ffffff; padding: 15px 25px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 30px; justify-content: center; }
+        .card { background: #ffffff; padding: 25px; border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.08); margin-bottom: 25px; border-right: 5px solid #3498db; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: 600; text-decoration: none; transition: 0.3s; }
+        
+        /* الكلاس الموحد للإخفاء */
+        .admin-only { display: none; }
+        
+        .admin-panel { background: #fff; padding: 25px; border-radius: 15px; border: 2px dashed #3498db; margin-top: 20px; }
+        select { padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-left: 10px; }
+    </style>
 </head>
 <body>
-    <!-- شريط التنقل العلوي المحدث -->
+
+<!-- شريط التنقل -->
 <div class="nav-btns">
-    <button class="btn btn-login" onclick="login()">دخول الإدارة</button>
-    <button class="btn btn-logout" id="logoutBtn" style="display:none;" onclick="logout()">خروج</button>
-    <button class="btn btn-print" onclick="window.print()">🖨️ طباعة الجدول</button>
-    <a href="index.html" class="btn btn-home">🏠 العودة للرئيسية</a>
+    <a href="index.html" class="btn" style="background:#34495e;">🏠 العودة للرئيسية</a>
+    <button class="btn" style="background:#27ae60;" onclick="window.print()">🖨️ طباعة الجدول</button>
 </div>
 
 <!-- محتوى الجدول -->
@@ -83,8 +30,9 @@
     <div id="app"></div>
 </div>
 
-<!-- لوحة التحكم (تظهر للمدير فقط) -->
-<div class="admin-panel" id="adminPanel">
+<!-- لوحة التحكم (تظهر للأستاذ فقط) -->
+<div class="admin-panel admin-only" id="adminPanel">
+    <h3>إدارة الجدول</h3>
     <select id="selG">
         <option value="الأول">الأول</option><option value="الثاني">الثاني</option>
         <option value="الثالث">الثالث</option><option value="الرابع">الرابع</option>
@@ -93,71 +41,26 @@
     <select id="selS">
         <option value="أ">أ</option><option value="ب">ب</option><option value="ج">ج</option>
     </select>
-    <button class="btn" style="background:var(--success)" onclick="addTable()">➕ إضافة جدول</button>
+    
+    <!-- الزر المدمج الجديد -->
+    <button class="btn admin-only" style="background:#27ae60" onclick="addSubject()">+ إضافة صف جديد</button>
+    <button class="btn" style="background:#3498db" onclick="addTable()">➕ إضافة جدول</button>
 </div>
 
 <!-- مكتبات Firebase والسكربت -->
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
-<script src="scriot.js"></script>
-<script>
-    function closeNav() {
-    document.getElementById("mySidebar").style.width = "0";
-    document.getElementById("openBtn").style.display = "block";
-}
-function openNav() {
-    document.getElementById("mySidebar").style.width = "280px";
-    document.getElementById("openBtn").style.display = "none";
-}
-    // عند تحميل الصفحة، تحقق من مستوى المستخدم فوراً
-    document.addEventListener('DOMContentLoaded', () => {
-        const level = localStorage.getItem("userLevel");
-        if (level === "admin") {
-            document.getElementById("adminPanel").style.display = "block";
-            document.getElementById("logoutBtn").style.display = "inline-block";
-        }
-    });
-    // دالة الدخول
-    function login() {
-        const code = prompt("يرجى إدخال رمز الدخول:");
-        if (code === "ahmed") {
-            localStorage.setItem("userLevel", "admin");
-            location.reload();
-        } else if (code === "2026") {
-            localStorage.setItem("userLevel", "member");
-            alert("تم الدخول كعضو");
-            location.reload();
-        } else {
-            localStorage.setItem("userLevel", "visitor");
-            alert("رمز خاطئ!");
-        }
-    }
-    // دالة الخروج
-    function logout() {
-        localStorage.removeItem("userLevel");
-        location.reload();
-    }
-</script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
-    authDomain: "roya-platform-26860.firebaseapp.com",
-    databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
-    projectId: "roya-platform-26860",
-    storageBucket: "roya-platform-26860.firebasestorage.app",
-    messagingSenderId: "897544406776",
-    appId: "1:897544406776:web:aa112013dea672fb141d0d",
-    measurementId: "G-Y88LCNKED2"
-  };
-firebase.initializeApp(firebaseConfig);
-window.database = firebase.database();
-</script>
-<script src="global.js"></script>
 
-<!-- ثم نربط ملفات الجافا سكريبت الخاصة بكل صفحة -->
-<script src="scriot.js"></script>
+<!-- الربط بالملفات -->
+<script type="module" src="scriot.js"></script>
+<script src="global.js"></script>
 <script src="classes.js"></script>
+
+<script>
+    // وظيفة addSubject كمثال
+    function addSubject() {
+        alert("سيتم إضافة الصف الجديد...");
+    }
+</script>
 </body>
 </html>
