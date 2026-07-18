@@ -13,34 +13,28 @@ const app = initializeApp(firebaseConfig);
 window.db = getDatabase(app);
 
 window.addEventListener('DOMContentLoaded', () => {
+    
+    // 1. التحقق من الدخول (الحماية)
+    // نتحقق من وجود currentUser الذي قمت بإنشائه في صفحة الدخول
+    const userJson = localStorage.getItem("currentUser");
 
-    // دالة تسجيل الدخول الموحدة
-    window.handleLogin = function() {
-        const name = document.getElementById("studentName").value;
-        const phone = document.getElementById("studentPhone").value;
-        const role = document.getElementById("userRole").value;
-
-        if (name && phone) {
-            localStorage.setItem("studentName", name);
-            localStorage.setItem("studentPhone", phone);
-            localStorage.setItem("userRole", role);
-            localStorage.setItem("isLoggedIn", "true");
-            location.reload(); // إعادة تحميل الصفحة لإظهار لوحة الصفوف
-        } else {
-            alert("يرجى ملء جميع الحقول!");
-        }
-    };
-
-    // التحقق من حالة الدخول وإظهار القسم المناسب
-    if (localStorage.getItem("isLoggedIn") === "true") {
-        document.getElementById("loginSection").style.display = "none";
-        document.getElementById("classesSection").style.display = "block";
-    } else {
-        document.getElementById("loginSection").style.display = "block";
-        document.getElementById("classesSection").style.display = "none";
+    // إذا لم يكن المستخدم مسجلاً، أعد توجيهه لصفحة الدخول
+    // افترضنا أن اسم صفحة الدخول هو login.html
+    if (!userJson && window.location.pathname !== "/login.html") {
+        window.location.href = "login.html"; 
+        return;
     }
 
-    // الوقت والتاريخ
+    // 2. إظهار قسم إدارة الصفوف إذا كان المستخدم مسجلاً
+    if (userJson) {
+        const loginSection = document.getElementById("loginSection");
+        const classesSection = document.getElementById("classesSection");
+        
+        if (loginSection) loginSection.style.display = "none";
+        if (classesSection) classesSection.style.display = "block";
+    }
+
+    // 3. الوقت والتاريخ
     setInterval(() => {
         const now = new Date();
         const d = document.getElementById('date-display');
