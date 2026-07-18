@@ -151,7 +151,8 @@ window.viewClassLessons = function(classId) {
     onValue(ref(db, 'classes/' + classId), (snapshot) => {
         const c = snapshot.val();
         if(!c) return;
-        const container = document.getElementById("classes-container");
+        // تأكد من استخدام "classesContainer" هنا أيضاً
+        const container = document.getElementById("classesContainer"); 
         container.innerHTML = `<button onclick="location.reload()">العودة</button><h2>دروس: ${c.name}</h2><div id="lessons-list"></div>`;
         c.lessons.forEach((l, i) => {
             const d = document.createElement("div");
