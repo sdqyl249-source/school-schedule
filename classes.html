@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>إدارة الصفوف - منصة الوادي</title>
-    <!-- ربط ملفات التنسيق -->
     <link rel="stylesheet" href="classes_style.css">
+    <style>
+        /* تأكد أن هذا موجود في classes_style.css أيضاً */
+        .admin-only { display: none; }
+    </style>
 </head>
 <body>
 
-    <!-- القائمة الجانبية (يتم استدعاؤها من ملفك الرئيسي أو إدراجها هنا) -->
-    
     <div class="main-content" style="margin-right: 280px; padding: 20px;">
         <h2>إدارة الصفوف 🏫</h2>
 
-        <!-- بوكس إضافة الصف (يظهر للمدير فقط) -->
-        <div id="adminPanel" class="admin-section" style="border: 2px dashed #27ae60; padding: 20px; margin-bottom: 20px; border-radius: 10px;">
+        <!-- تم إضافة الكلاس admin-only هنا ليتحكم فيه ملف scriot.js -->
+        <div id="adminPanel" class="admin-section admin-only" style="border: 2px dashed #27ae60; padding: 20px; margin-bottom: 20px; border-radius: 10px;">
             <h3>إضافة صف جديد 🏫</h3>
             
             <label>اسم الصف:</label>
@@ -36,28 +37,17 @@
                 <option value="هـ">هـ</option>
             </select>
 
-<button id="saveClassBtn" onclick="window.saveClass()" style="...">حفظ الصف</button>
+            <button id="saveClassBtn" onclick="window.saveClass()">حفظ الصف</button>
         </div>
 
-        <!-- المنطقة التي ستظهر فيها بطاقات الصفوف -->
         <div class="dashboard-container" id="classesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 20px;">
-            <!-- سيتم إضافة بطاقات الصفوف هنا برمجياً -->
         </div>
     </div>
-<!-- بقية محتوى الصفحة -->
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="global.js"></script>
+    <!-- تم ترتيب التحميل ليتم التحقق من الصلاحيات فور تحميل الصفحة -->
     <script type="module" src="scriot.js"></script>
-<script type="module" src="classes.js?v=999"></script>
-    <!-- ضع السكربت هنا في الأسفل لضمان تحميل العناصر أولاً -->
-    <script>
-        const user = JSON.parse(localStorage.getItem("currentUser"));
-        const adminPanel = document.getElementById("adminPanel");
-        // التأكد من وجود العنصر قبل محاولة إخفائه لتجنب أي خطأ
-        if (adminPanel && user && user.role !== 'teacher') {
-            adminPanel.style.display = "none";
-        }
-    </script>
-    </body>
+    <script type="module" src="classes.js?v=999"></script>
+</body>
 </html>
