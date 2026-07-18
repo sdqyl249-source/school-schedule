@@ -50,3 +50,15 @@ window.addEventListener('DOMContentLoaded', () => {
         if(t) t.innerText = now.toLocaleTimeString('ar-IQ');
     }, 1000);
 });
+// وظيفة إغلاق القائمة
+function closeSidebar() {
+    document.getElementById("mySidebar").style.width = "0";
+}
+
+// تفعيل لون التمييز بناءً على اسم الصفحة
+window.addEventListener('DOMContentLoaded', () => {
+    let path = window.location.pathname;
+    if (path.includes("index.html")) document.getElementById("nav-index").classList.add("active-nav");
+    if (path.includes("classes.html")) document.getElementById("nav-classes").classList.add("active-nav");
+    // أضف باقي الصفحات بنفس الطريقة
+});
