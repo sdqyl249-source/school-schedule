@@ -1,4 +1,3 @@
-// scriot.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
@@ -12,34 +11,53 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 window.db = getDatabase(app);
 
+// دالة لفتح وإغلاق القائمة بنفس الزر
+function toggleSidebar() {
+    const sidebar = document.getElementById("mySidebar");
+    // إذا كان العرض 280px (مفتوحة) أغلقها، وإلا افتحها
+    if (sidebar.style.width === "280px") {
+        sidebar.style.width = "0";
+    } else {
+        sidebar.style.width = "280px";
+    }
+}
+// جعل الدالة متاحة للزر في ملفات الـ HTML
+window.toggleSidebar = toggleSidebar;
+
 window.addEventListener('DOMContentLoaded', () => {
     
     // 1. التحقق من الدخول (الحماية)
     const userJson = localStorage.getItem("currentUser");
     const user = userJson ? JSON.parse(userJson) : null;
 
-    // إذا لم يكن المستخدم مسجلاً، أعد توجيهه لصفحة الدخول
     if (!user && !window.location.pathname.includes("login.html")) {
         window.location.href = "login.html";
         return;
     }
 
-    // 2. إظهار/إخفاء عناصر الإدارة (إضافة/تعديل/حذف)
-    // تظهر فقط إذا كان المستخدم هو "الأستاذ" (Teacher)
+    // 2. إظهار/إخفاء عناصر الإدارة (الأستاذ فقط)
     if (user && user.role === 'teacher') {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
     } else {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
     }
 
-    // 3. قسم إظهار المحتوى المخصص (في حال كنت تستخدم الـ Section المخفي في index)
-    if (user) {
-        const loginSection = document.getElementById("loginSection");
-        const classesSection = document.getElementById("classesSection");
-        
-        if (loginSection) loginSection.style.display = "none";
-        if (classesSection) classesSection.style.display = "block";
-    }
+    // 3. تفعيل لون التمييز للرابط النشط
+    let path = window.location.pathname;
+    const navMapping = [
+        { file: "index.html", id: "nav-index" },
+        { file: "classes.html", id: "nav-classes" },
+        { file: "schedule.html", id: "nav-schedule" },
+        { file: "library.html", id: "nav-library" },
+        { file: "games.html", id: "nav-games" }
+    ];
+
+    navMapping.forEach(item => {
+        if (path.includes(item.file)) {
+            const element = document.getElementById(item.id);
+            if (element) element.classList.add("active-nav");
+        }
+    });
 
     // 4. الوقت والتاريخ
     setInterval(() => {
@@ -49,16 +67,4 @@ window.addEventListener('DOMContentLoaded', () => {
         if(d) d.innerText = now.toLocaleDateString('ar-IQ');
         if(t) t.innerText = now.toLocaleTimeString('ar-IQ');
     }, 1000);
-});
-// وظيفة إغلاق القائمة
-function closeSidebar() {
-    document.getElementById("mySidebar").style.width = "0";
-}
-
-// تفعيل لون التمييز بناءً على اسم الصفحة
-window.addEventListener('DOMContentLoaded', () => {
-    let path = window.location.pathname;
-    if (path.includes("index.html")) document.getElementById("nav-index").classList.add("active-nav");
-    if (path.includes("classes.html")) document.getElementById("nav-classes").classList.add("active-nav");
-    // أضف باقي الصفحات بنفس الطريقة
 });
