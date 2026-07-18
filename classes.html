@@ -5,8 +5,11 @@
     <title>إدارة الصفوف - منصة الوادي</title>
     <link rel="stylesheet" href="classes_style.css">
     <style>
-        /* تأكد من أن القائمة تظهر بشكل صحيح مع المحتوى */
-        .admin-only { display: none; }
+.sidebar { height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; z-index: 1000; }
+.sidebar-title { text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #2c3e50; }
+.menu-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342; transition: 0.3s; font-size: 16px; }
+.menu-item:hover { background: #34495e; padding-right: 35px; }
+.logout-btn { width: 80%; margin: 20px auto; display: block; padding: 10px; background: #e74c3c; border: none; color: white; border-radius: 5px; cursor: pointer; }        .admin-only { display: none; }
         .main-content { margin-right: 280px; padding: 20px; transition: 0.3s; }
         
         @media screen and (max-width: 768px) {
@@ -17,17 +20,15 @@
 <body>
 
     <!-- القائمة الجانبية -->
-    <div class="sidebar" id="mySidebar" style="height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; z-index: 1000;">
-        <div class="sidebar-title" style="text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 25px;">🏞️ منصة الوادي</div>
-        
-        <div class="menu-item" onclick="location.href='index.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">🏠 الرئيسية</div>
-        <div class="menu-item" onclick="location.href='classes.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">🏫 إدارة الصفوف</div>
-        <div class="menu-item" onclick="location.href='schedule.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">📅 جدول الدروس</div>
-        <div class="menu-item" onclick="location.href='library.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">📚 المكتبة الرقمية</div>
-        <div class="menu-item" onclick="location.href='games.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">🎮 الترفيه والألعاب</div>
-        
-        <button onclick="logout()" style="width: 80%; margin: 20px auto; display: block; padding: 10px; background: #e74c3c; border: none; color: white; border-radius: 5px; cursor: pointer;">تسجيل الخروج</button>
-    </div>
+    <div class="sidebar" id="mySidebar">
+    <div class="sidebar-title">🏞️ منصة الوادي</div>
+    <div class="menu-item" onclick="location.href='index.html'">🏠 الرئيسية</div>
+    <div class="menu-item" onclick="location.href='classes.html'">🏫 إدارة الصفوف</div>
+    <div class="menu-item" onclick="location.href='schedule.html'">📅 جدول الدروس</div>
+    <div class="menu-item" onclick="location.href='library.html'">📚 المكتبة الرقمية</div>
+    <div class="menu-item" onclick="location.href='games.html'">🎮 الترفيه والألعاب</div>
+    <button onclick="logout()" class="logout-btn">تسجيل الخروج</button>
+</div>
 
     <!-- المحتوى الرئيسي -->
     <div class="main-content">
