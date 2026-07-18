@@ -44,30 +44,57 @@
 
 .login-container button:hover { background-color: #219150; }
 
-/* --- 2. تنسيق لوحة تحكم الصفوف (Dark Mode) --- */
+/* --- 2. تنسيق لوحة تحكم الصفوف (التصميم الجريء المختار) --- */
 #classesContainer {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
     padding: 20px;
 }
+
 .class-card {
     background-color: #ffffff;
-    border-left: 6px solid #e74c3c; /* خط عريض جانبي بدلاً من العلوي */
+    border: 1px solid #ddd;
+    border-left: 6px solid #e74c3c; /* الخط الجانبي المميز */
     border-radius: 8px;
     padding: 20px;
     text-align: right; /* للنصوص العربية */
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
 }
 
-.class-card h3 { color: #34495e; }
+/* تأثير التفاعل عند مرور الفأرة */
+.class-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.class-card h3 { 
+    color: #34495e; 
+    margin-top: 0;
+}
+
+.class-card p {
+    color: #666;
+    margin: 10px 0;
+}
 
 .class-card button {
     background: #34495e;
     color: white;
+    border: none;
     padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-left: 5px; /* مسافة بسيطة بين الأزرار */
+    transition: background 0.3s;
 }
-.class-card button:hover { background: #4f46e5; }
+
+.class-card button:hover {
+    background: #2c3e50;
+}
 
 /* --- 3. عناصر عامة --- */
 select {
