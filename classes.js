@@ -76,7 +76,7 @@ window.joinClass = function() {
 
 // عرض صفوف الطالب
 function renderStudentClasses() {
-    const container = document.getElementById("classes-container");
+    const container = document.getElementById("classesContainer"); 
     if (!container) return;
     
     container.innerHTML = `<div style="margin-bottom: 20px;"><button onclick="window.joinClass()">+ انضمام لصف جديد</button></div>`;
@@ -101,13 +101,14 @@ function renderStudentClasses() {
 
 // عرض صفوف الأستاذ (تم تعديلها لتعمل كـ Listener مباشر)
 function renderTeacherClasses() {
-    const container = document.getElementById("classes-container");
+    // تأكد من استخدام "classesContainer" هنا
+    const container = document.getElementById("classesContainer"); 
     if (!container) return;
 
     onValue(ref(db, 'classes/'), (snapshot) => {
         const data = snapshot.val();
-        container.innerHTML = "<h2>صفوفي كأستاذ:</h2>"; // مسح وإعادة رسم القائمة
-        if (data) {
+        container.innerHTML = "<h2>صفوفي كأستاذ:</h2>"; 
+if (data) {
             Object.values(data).forEach(cls => {
                 const card = document.createElement("div");
                 card.className = "class-card";
