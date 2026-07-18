@@ -2,65 +2,79 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>جدول الدروس</title>
+    <title>جدول الدروس - منصة الوادي</title>
+    <link rel="stylesheet" href="classes_style.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
-        .nav-btns { display: flex; gap: 15px; background: #ffffff; padding: 15px 25px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 30px; justify-content: center; }
-        .card { background: #ffffff; padding: 25px; border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.08); margin-bottom: 25px; border-right: 5px solid #3498db; }
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: 600; text-decoration: none; transition: 0.3s; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f0f2f5; margin: 0; }
+        .main-content { margin-right: 280px; padding: 20px; transition: 0.3s; }
         
         /* الكلاس الموحد للإخفاء */
         .admin-only { display: none; }
         
+        .card { background: #ffffff; padding: 25px; border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.08); margin-bottom: 25px; border-right: 5px solid #3498db; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: 600; text-decoration: none; transition: 0.3s; }
         .admin-panel { background: #fff; padding: 25px; border-radius: 15px; border: 2px dashed #3498db; margin-top: 20px; }
         select { padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-left: 10px; }
+
+        @media screen and (max-width: 768px) {
+            .main-content { margin-right: 0; }
+        }
     </style>
 </head>
 <body>
 
-<!-- شريط التنقل -->
-<div class="nav-btns">
-    <a href="index.html" class="btn" style="background:#34495e;">🏠 العودة للرئيسية</a>
-    <button class="btn" style="background:#27ae60;" onclick="window.print()">🖨️ طباعة الجدول</button>
-</div>
-
-<!-- محتوى الجدول -->
-<div class="card">
-    <h3>📅 جدول الدروس المدرسي</h3>
-    <div id="app"></div>
-</div>
-
-<!-- لوحة التحكم (تظهر للأستاذ فقط) -->
-<div class="admin-panel admin-only" id="adminPanel">
-    <h3>إدارة الجدول</h3>
-    <select id="selG">
-        <option value="الأول">الأول</option><option value="الثاني">الثاني</option>
-        <option value="الثالث">الثالث</option><option value="الرابع">الرابع</option>
-        <option value="الخامس">الخامس</option><option value="السادس">السادس</option>
-    </select>
-    <select id="selS">
-        <option value="أ">أ</option><option value="ب">ب</option><option value="ج">ج</option>
-    </select>
+<!-- القائمة الجانبية -->
+<div class="sidebar" id="mySidebar" style="height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; z-index: 1000;">
+    <div class="sidebar-title" style="text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 25px;">🏞️ منصة الوادي</div>
     
-    <!-- الزر المدمج الجديد -->
-    <button class="btn admin-only" style="background:#27ae60" onclick="addSubject()">+ إضافة صف جديد</button>
-    <button class="btn" style="background:#3498db" onclick="addTable()">➕ إضافة جدول</button>
+    <div class="menu-item" onclick="location.href='index.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">🏠 الرئيسية</div>
+    <div class="menu-item" onclick="location.href='classes.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">🏫 إدارة الصفوف</div>
+    <div class="menu-item" onclick="location.href='schedule.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">📅 جدول الدروس</div>
+    <div class="menu-item" onclick="location.href='library.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">📚 المكتبة الرقمية</div>
+    <div class="menu-item" onclick="location.href='games.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">🎮 الترفيه والألعاب</div>
+    
+    <button onclick="logout()" style="width: 80%; margin: 20px auto; display: block; padding: 10px; background: #e74c3c; border: none; color: white; border-radius: 5px; cursor: pointer;">تسجيل الخروج</button>
 </div>
+
+<!-- المحتوى الرئيسي -->
+<div class="main-content">
+    <div class="card">
+        <h3>📅 جدول الدروس المدرسي</h3>
+        <button class="btn" style="background:#27ae60;" onclick="window.print()">🖨️ طباعة الجدول</button>
+        <div id="app"></div>
+    </div>
+
+    <!-- لوحة التحكم (تظهر للأستاذ فقط بفضل class admin-only) -->
+    <div class="admin-panel admin-only" id="adminPanel">
+        <h3>إدارة الجدول</h3>
+        <select id="selG">
+            <option value="الأول">الأول</option><option value="الثاني">الثاني</option>
+            <option value="الثالث">الثالث</option><option value="الرابع">الرابع</option>
+            <option value="الخامس">الخامس</option><option value="السادس">السادس</option>
+        </select>
+        <select id="selS">
+            <option value="أ">أ</option><option value="ب">ب</option><option value="ج">ج</option>
+        </select>
+        
+        <button class="btn admin-only" style="background:#27ae60" onclick="addSubject()">+ إضافة صف جديد</button>
+        <button class="btn" style="background:#3498db" onclick="addTable()">➕ إضافة جدول</button>
+    </div>
+</div>
+
+<script>
+    function logout() {
+        localStorage.removeItem("currentUser");
+        window.location.href = "login.html";
+    }
+    function addSubject() { alert("سيتم إضافة الصف الجديد..."); }
+</script>
 
 <!-- مكتبات Firebase والسكربت -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
-<!-- الربط بالملفات -->
 <script type="module" src="scriot.js"></script>
 <script src="global.js"></script>
 <script src="classes.js"></script>
 
-<script>
-    // وظيفة addSubject كمثال
-    function addSubject() {
-        alert("سيتم إضافة الصف الجديد...");
-    }
-</script>
 </body>
 </html>
