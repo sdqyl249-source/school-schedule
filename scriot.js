@@ -15,18 +15,25 @@ window.db = getDatabase(app);
 window.addEventListener('DOMContentLoaded', () => {
     
     // 1. التحقق من الدخول (الحماية)
-    // نتحقق من وجود currentUser الذي قمت بإنشائه في صفحة الدخول
     const userJson = localStorage.getItem("currentUser");
+    const user = userJson ? JSON.parse(userJson) : null;
 
     // إذا لم يكن المستخدم مسجلاً، أعد توجيهه لصفحة الدخول
-    // افترضنا أن اسم صفحة الدخول هو login.html
-    if (!userJson && window.location.pathname !== "/login.html") {
-        window.location.href = "login.html"; 
+    if (!user && !window.location.pathname.includes("login.html")) {
+        window.location.href = "login.html";
         return;
     }
 
-    // 2. إظهار قسم إدارة الصفوف إذا كان المستخدم مسجلاً
-    if (userJson) {
+    // 2. إظهار/إخفاء عناصر الإدارة (إضافة/تعديل/حذف)
+    // تظهر فقط إذا كان المستخدم هو "الأستاذ" (Teacher)
+    if (user && user.role === 'teacher') {
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+    } else {
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+    }
+
+    // 3. قسم إظهار المحتوى المخصص (في حال كنت تستخدم الـ Section المخفي في index)
+    if (user) {
         const loginSection = document.getElementById("loginSection");
         const classesSection = document.getElementById("classesSection");
         
@@ -34,7 +41,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (classesSection) classesSection.style.display = "block";
     }
 
-    // 3. الوقت والتاريخ
+    // 4. الوقت والتاريخ
     setInterval(() => {
         const now = new Date();
         const d = document.getElementById('date-display');
