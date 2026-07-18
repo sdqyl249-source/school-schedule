@@ -119,22 +119,49 @@ function renderTeacherClasses() {
 }
 
 window.saveClass = function() {
-    console.log("تم الضغط على الزر بنجاح!"); // أضف هذا السطر فوراً
+    console.log("1. تم الضغط على زر الحفظ");
+
     const className = document.getElementById("className").value;
     const classSection = document.getElementById("classSection").value;
-    if (!className || !classSection) { alert("يرجى ملء الحقول!"); return; }
+
+    console.log("2. القيم المستلمة:", { className, classSection });
+
+    if (!className || !classSection) {
+        alert("يرجى اختيار اسم الصف والشعبة!");
+        return;
+    }
 
     const classId = "CLASS-" + Math.floor(100000 + Math.random() * 900000); 
-    set(ref(db, 'classes/' + classId), {
+    console.log("3. الكود المولد:", classId);
+
+    // التحقق من أن db معرفة
+    if (typeof db === 'undefined') {
+        console.error("خطأ: متغير db غير معرف!");
+        return;
+    }
+
+    const newClassData = {
         id: classId,
         name: className,
         section: classSection,
         teacher: "أ. عقيل السعد",
         lessons: [{ title: "مقدمة" }],
         grades: {}
-    }).then(() => { location.reload(); });
-};
+    };
 
+    console.log("4. محاولة الحفظ في Firebase...");
+
+    set(ref(db, 'classes/' + classId), newClassData)
+    .then(() => {
+        console.log("5. تم الحفظ بنجاح!");
+        alert("تم الحفظ!");
+        renderTeacherClasses(); 
+    })
+    .catch((error) => {
+        console.error("6. خطأ Firebase:", error);
+        alert("خطأ: " + error.message);
+    });
+};
 window.viewClassLessons = function(classId) {
     onValue(ref(db, 'classes/' + classId), (snapshot) => {
         const c = snapshot.val();
