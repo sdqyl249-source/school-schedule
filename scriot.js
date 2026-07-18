@@ -11,22 +11,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 window.db = getDatabase(app);
 
-// دالة لفتح وإغلاق القائمة بنفس الزر
-function toggleSidebar() {
+// 1. وظيفة تبديل القائمة (فتح/إغلاق)
+window.toggleSidebar = function() {
     const sidebar = document.getElementById("mySidebar");
-    // إذا كان العرض 280px (مفتوحة) أغلقها، وإلا افتحها
     if (sidebar.style.width === "280px") {
         sidebar.style.width = "0";
     } else {
         sidebar.style.width = "280px";
     }
-}
-// جعل الدالة متاحة للزر في ملفات الـ HTML
-window.toggleSidebar = toggleSidebar;
+};
 
 window.addEventListener('DOMContentLoaded', () => {
     
-    // 1. التحقق من الدخول (الحماية)
+    // 2. التحقق من الدخول (الحماية)
     const userJson = localStorage.getItem("currentUser");
     const user = userJson ? JSON.parse(userJson) : null;
 
@@ -35,14 +32,14 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // 2. إظهار/إخفاء عناصر الإدارة (الأستاذ فقط)
+    // 3. إظهار/إخفاء عناصر الإدارة (الأستاذ فقط)
     if (user && user.role === 'teacher') {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
     } else {
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
     }
 
-    // 3. تفعيل لون التمييز للرابط النشط
+    // 4. تفعيل لون التمييز للرابط النشط (يدعم كافة الصفحات)
     let path = window.location.pathname;
     const navMapping = [
         { file: "index.html", id: "nav-index" },
@@ -59,7 +56,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 4. الوقت والتاريخ
+    // 5. الوقت والتاريخ
     setInterval(() => {
         const now = new Date();
         const d = document.getElementById('date-display');
