@@ -5,16 +5,35 @@
     <title>إدارة الصفوف - منصة الوادي</title>
     <link rel="stylesheet" href="classes_style.css">
     <style>
-        /* تأكد أن هذا موجود في classes_style.css أيضاً */
+        /* تأكد من أن القائمة تظهر بشكل صحيح مع المحتوى */
         .admin-only { display: none; }
+        .main-content { margin-right: 280px; padding: 20px; transition: 0.3s; }
+        
+        @media screen and (max-width: 768px) {
+            .main-content { margin-right: 0; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="main-content" style="margin-right: 280px; padding: 20px;">
+    <!-- القائمة الجانبية -->
+    <div class="sidebar" id="mySidebar" style="height: 100%; width: 280px; position: fixed; top: 0; right: 0; background: #1a252f; color: white; padding-top: 20px; z-index: 1000;">
+        <div class="sidebar-title" style="text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 25px;">🏞️ منصة الوادي</div>
+        
+        <div class="menu-item" onclick="location.href='index.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">🏠 الرئيسية</div>
+        <div class="menu-item" onclick="location.href='classes.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">🏫 إدارة الصفوف</div>
+        <div class="menu-item" onclick="location.href='schedule.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">📅 جدول الدروس</div>
+        <div class="menu-item" onclick="location.href='library.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">📚 المكتبة الرقمية</div>
+        <div class="menu-item" onclick="location.href='games.html'" style="padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #243342;">🎮 الترفيه والألعاب</div>
+        
+        <button onclick="logout()" style="width: 80%; margin: 20px auto; display: block; padding: 10px; background: #e74c3c; border: none; color: white; border-radius: 5px; cursor: pointer;">تسجيل الخروج</button>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="main-content">
         <h2>إدارة الصفوف 🏫</h2>
 
-        <!-- تم إضافة الكلاس admin-only هنا ليتحكم فيه ملف scriot.js -->
+        <!-- بوكس إضافة الصف (يظهر للمدير/الأستاذ فقط) -->
         <div id="adminPanel" class="admin-section admin-only" style="border: 2px dashed #27ae60; padding: 20px; margin-bottom: 20px; border-radius: 10px;">
             <h3>إضافة صف جديد 🏫</h3>
             
@@ -40,9 +59,17 @@
             <button id="saveClassBtn" onclick="window.saveClass()">حفظ الصف</button>
         </div>
 
+        <!-- المنطقة التي ستظهر فيها بطاقات الصفوف -->
         <div class="dashboard-container" id="classesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 20px;">
         </div>
     </div>
+    
+    <script>
+        function logout() {
+            localStorage.removeItem("currentUser");
+            window.location.href = "login.html";
+        }
+    </script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="global.js"></script>
