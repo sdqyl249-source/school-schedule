@@ -18,7 +18,7 @@
         .close-btn { color: white; display: block; text-align: left; }
         .close-btn:hover { color: #ff6b6b; }
 
-        .active-nav { background-color: #2c3e50 !important; border-right: 4px solid #2ecc71; }
+        .active-nav { background-color: #34495e !important; border-right: 4px solid #2ecc71; color: #ffffff; }
         /* المحتوى الرئيسي */
         .main-content { margin-right: 280px; padding: 30px; }
 
@@ -32,7 +32,8 @@
 
 <!-- القائمة الجانبية -->
 <div class="sidebar" id="mySidebar">
-   <span class="close-btn" onclick="closeSidebar()" style="cursor:pointer; padding: 10px 20px; font-size: 20px;">×</span>
+   <!-- زر القائمة (يظهر للجميع) -->
+    <button onclick="toggleSidebar()" style="position: fixed; top: 10px; right: 10px; z-index: 1001; padding: 10px 15px; cursor: pointer;">☰ القائمة</button>
     <div class="sidebar-title">🏞️ منصة الوادي</div>
     <div class="menu-item" onclick="location.href='index.html'">🏠 الرئيسية</div>
     <div class="menu-item" onclick="location.href='classes.html'">🏫 إدارة الصفوف</div>
