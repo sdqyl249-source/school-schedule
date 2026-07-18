@@ -31,15 +31,19 @@
 <body>
 
 <!-- القائمة الجانبية -->
+<!-- زر القائمة (خارج القائمة الجانبية ليبقى ظاهراً دائماً) -->
+<button onclick="toggleSidebar()" style="position: fixed; top: 10px; right: 10px; z-index: 1001; padding: 10px 15px; cursor: pointer; background: #1a252f; color: white; border: none; border-radius: 5px;">☰ القائمة</button>
+
+<!-- القائمة الجانبية -->
 <div class="sidebar" id="mySidebar">
-   <!-- زر القائمة (يظهر للجميع) -->
-    <button onclick="toggleSidebar()" style="position: fixed; top: 10px; right: 10px; z-index: 1001; padding: 10px 15px; cursor: pointer;">☰ القائمة</button>
     <div class="sidebar-title">🏞️ منصة الوادي</div>
-    <div class="menu-item" onclick="location.href='index.html'">🏠 الرئيسية</div>
-    <div class="menu-item" onclick="location.href='classes.html'">🏫 إدارة الصفوف</div>
-    <div class="menu-item" onclick="location.href='schedule.html'">📅 جدول الدروس</div>
-    <div class="menu-item" onclick="location.href='library.html'">📚 المكتبة الرقمية</div>
-    <div class="menu-item" onclick="location.href='games.html'">🎮 الترفيه والألعاب</div>
+    
+    <div class="menu-item" onclick="location.href='index.html'" id="nav-index">🏠 الرئيسية</div>
+    <div class="menu-item" onclick="location.href='classes.html'" id="nav-classes">🏫 إدارة الصفوف</div>
+    <div class="menu-item" onclick="location.href='schedule.html'" id="nav-schedule">📅 جدول الدروس</div>
+    <div class="menu-item" onclick="location.href='library.html'" id="nav-library">📚 المكتبة الرقمية</div>
+    <div class="menu-item" onclick="location.href='games.html'" id="nav-games">🎮 الترفيه والألعاب</div>
+    
     <button onclick="logout()" class="logout-btn">تسجيل الخروج</button>
 </div>
 
