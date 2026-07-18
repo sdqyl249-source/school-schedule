@@ -10,87 +10,37 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-window.db = getDatabase(app); // جعل قاعدة البيانات متاحة عالمياً في كل الملفات
+window.db = getDatabase(app);
 
 window.addEventListener('DOMContentLoaded', () => {
 
-    // 1. وظيفة التنقل بين الصفحات
-    const showPage = (id) => {
-        document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-        const target = document.getElementById(id);
-        if (target) target.style.display = 'block';
-        const sidebar = document.getElementById("mySidebar");
-        if (sidebar) sidebar.style.width = "0";
+    // دالة تسجيل الدخول الموحدة
+    window.handleLogin = function() {
+        const name = document.getElementById("studentName").value;
+        const phone = document.getElementById("studentPhone").value;
+        const role = document.getElementById("userRole").value;
+
+        if (name && phone) {
+            localStorage.setItem("studentName", name);
+            localStorage.setItem("studentPhone", phone);
+            localStorage.setItem("userRole", role);
+            localStorage.setItem("isLoggedIn", "true");
+            location.reload(); // إعادة تحميل الصفحة لإظهار لوحة الصفوف
+        } else {
+            alert("يرجى ملء جميع الحقول!");
+        }
     };
 
-    // دالة حماية الصفحات
-    const setupProtectedButton = (btnId, targetUrl) => {
-        document.getElementById(btnId)?.addEventListener('click', () => {
-            if (localStorage.getItem("admin") === "true") {
-                window.location.href = targetUrl;
-                return;
-            }
-
-            const role = prompt("أهلاً بك في منصة الوادي، اختر صفة الدخول:\n1. أستاذ\n2. طالب");
-            if (role === "1") {
-                const pass = prompt("أدخل رمز الأستاذ:");
-                if (pass === "1234") {
-                    localStorage.setItem("admin", "true");
-                    window.location.href = targetUrl;
-                } else {
-                    alert("رمز الأستاذ خاطئ!");
-                }
-            } else if (role === "2") {
-                const pass = prompt("أدخل رمز الصف:");
-                if (pass === "0000") {
-                    const name = prompt("يرجى إدخال اسمك الثلاثي:");
-                    const phone = prompt("يرجى إدخال رقم هاتفك:");
-                    localStorage.setItem("studentName", name);
-                    localStorage.setItem("studentPhone", phone);
-                    localStorage.setItem("isStudent", "true");
-                    window.location.href = targetUrl;
-                } else {
-                    alert("رمز الصف خاطئ!");
-                }
-            }
-        });
-    };
-
-    setupProtectedButton('btn-classes', 'classes.html');
-    setupProtectedButton('btn-library', 'library.html');
-
-    // 2. ربط الأزرار برمجياً
-    document.getElementById('btn-home')?.addEventListener('click', () => showPage('home'));
-    document.getElementById('btn-announcements')?.addEventListener('click', () => showPage('announcements'));
-    document.getElementById('btn-games')?.addEventListener('click', () => showPage('games'));
-    document.getElementById('btn-schedule')?.addEventListener('click', () => { window.location.href = 'schedule.html'; });
-
-    // 3. التحكم بالسايدبار
-    document.getElementById('openBtn')?.addEventListener('click', () => { document.getElementById("mySidebar").style.width = "280px"; });
-    document.getElementById('closeBtn')?.addEventListener('click', () => { document.getElementById("mySidebar").style.width = "0"; });
-
-    // 4. تسجيل الدخول العام (للإدارة)
-    const authBtn = document.getElementById('authBtn');
-    if (authBtn) {
-        authBtn.addEventListener('click', () => {
-            if (localStorage.getItem("admin") === "true") {
-                if (confirm("أنت مسجل كمدير، هل تريد تسجيل الخروج؟")) {
-                    localStorage.clear();
-                    location.reload();
-                }
-            } else {
-                const pass = prompt("يرجى إدخال كلمة مرور المدير:");
-                if (pass === "1234") {
-                    localStorage.setItem("admin", "true");
-                    location.reload();
-                } else {
-                    alert("كلمة مرور خاطئة!");
-                }
-            }
-        });
+    // التحقق من حالة الدخول وإظهار القسم المناسب
+    if (localStorage.getItem("isLoggedIn") === "true") {
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("classesSection").style.display = "block";
+    } else {
+        document.getElementById("loginSection").style.display = "block";
+        document.getElementById("classesSection").style.display = "none";
     }
 
-    // 5. الوقت والتاريخ
+    // الوقت والتاريخ
     setInterval(() => {
         const now = new Date();
         const d = document.getElementById('date-display');
@@ -98,24 +48,4 @@ window.addEventListener('DOMContentLoaded', () => {
         if(d) d.innerText = now.toLocaleDateString('ar-IQ');
         if(t) t.innerText = now.toLocaleTimeString('ar-IQ');
     }, 1000);
-
-    // إظهار قسم الإدارة
-    if (localStorage.getItem("admin") === "true") {
-        document.querySelectorAll('.admin-section').forEach(el => el.style.display = 'block');
-    }
-    
-    // 6. عرض بيانات الطالب
-    if (localStorage.getItem("isStudent") === "true") {
-        const classesPage = document.getElementById('classes');
-        if (classesPage) {
-            const infoCard = document.createElement('div');
-            infoCard.style.cssText = "background: #e8f5e9; padding: 15px; margin: 10px; border-right: 5px solid #2e7d32; border-radius: 8px; font-weight: bold;";
-            infoCard.innerHTML = `
-                <p>👤 اسم الطالب: ${localStorage.getItem("studentName")}</p>
-                <p>📞 رقم الهاتف: ${localStorage.getItem("studentPhone")}</p>
-                <p>📚 رمز الصف: 0000</p>
-            `;
-            classesPage.prepend(infoCard);
-        }
-    }
 });
