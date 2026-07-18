@@ -47,26 +47,30 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // دالة عرض صفوف الأستاذ
-function renderTeacherClasses() {
+function renderStudentClasses() {
     const container = document.getElementById("classes-container");
     if (!container) return;
     
-    container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
+    container.innerHTML = `<button onclick="window.joinClass()">+ انضمام لصف جديد</button>`;
+
     const classesRef = ref(db, 'classes/');
-    
     onValue(classesRef, (snapshot) => {
         const data = snapshot.val();
-        container.innerHTML = "<h2>صفوفي كأستاذ:</h2>"; // إعادة التعيين
+        const userProfile = JSON.parse(localStorage.getItem("currentUser"));
+        const joinedCodes = userProfile.joinedClasses || [];
+        
         if (data) {
             Object.values(data).forEach(cls => {
-                const card = document.createElement("div");
-                card.className = "class-card";
-                card.innerHTML = `
-                    <h3>${cls.name} - شعبة ${cls.section}</h3>
-                    <p>الرمز: <strong>${cls.id}</strong></p>
-                    <button onclick="viewClassLessons('${cls.id}')">عرض تفاصيل الصف</button>
-                `;
-                container.appendChild(card);
+                if (joinedCodes.includes(cls.id)) {
+                    // تحقق هل البطاقة موجودة مسبقاً لتجنب التكرار
+                    if (!document.getElementById(`card-${cls.id}`)) {
+                        const card = document.createElement("div");
+                        card.id = `card-${cls.id}`; // إعطاء معرف فريد
+                        card.className = "class-card";
+                        card.innerHTML = `<h3>${cls.name}</h3><p>الأستاذ: ${cls.teacher}</p><button onclick="viewClassLessons('${cls.id}')">عرض الدروس</button>`;
+                        container.appendChild(card);
+                    }
+                }
             });
         }
     });
@@ -81,7 +85,7 @@ function showUserWelcome(user) {
 }
 
 window.saveClass = function() {
-    // 1. جلب القيم من العناصر
+    // 1. جلب القيم من عناصر القائمة (select)
     const classNameSelect = document.getElementById("className");
     const classSectionSelect = document.getElementById("classSection");
     
@@ -94,9 +98,9 @@ window.saveClass = function() {
         return;
     }
 
-    // 3. إنشاء كود فريد للصف
-    const classId = "CLASS-" + Math.floor(1000 + Math.random() * 9000);
-    
+    // 3. توليد كود قوي (6 أرقام) لضمان عدم التكرار أو ظهور 0000
+    const classId = "CLASS-" + Math.floor(100000 + Math.random() * 900000); 
+
     const newClassData = {
         id: classId,
         name: className,
@@ -107,25 +111,19 @@ window.saveClass = function() {
     };
 
     // 4. الحفظ في قاعدة البيانات
-    // تأكد من أن متغير db معرف بشكل صحيح في ملفك
     set(ref(db, 'classes/' + classId), newClassData)
     .then(() => {
-        alert("تم الحفظ في سحابة الوادي بنجاح!");
+        alert("تم الحفظ في سحابة الوادي بنجاح! كود الصف هو: " + classId);
         
-        // إعادة عرض البطاقة (تأكد أن هذه الدالة معرفة في نفس الملف)
-        if (typeof renderClassCard === 'function') {
-            renderClassCard(className, classSection, classId);
-        }
-        
-        // إعادة تعيين الحقول (لـ select نفضل اختيار القيمة الأولى)
-        classNameSelect.selectedIndex = 0;
-        classSectionSelect.selectedIndex = 0;
+        // إعادة تحميل الصفحة لتحديث الواجهة وجلب الصف الجديد تلقائياً
+        location.reload(); 
     })
     .catch((error) => {
         console.error("خطأ Firebase:", error);
         alert("حدث خطأ أثناء الحفظ: " + error.message);
     });
 };
+
 function renderClassCard(name, section, id) {
     const container = document.getElementById("classesContainer");
     if (!container) return;
