@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
 // 1. إعدادات Firebase
 const firebaseConfig = {
@@ -101,21 +101,26 @@ function renderStudentClasses() {
 
 // عرض صفوف الأستاذ (تم تعديلها لتعمل كـ Listener مباشر)
 function renderTeacherClasses() {
-    // تأكد من استخدام "classesContainer" هنا
-    const container = document.getElementById("classesContainer"); 
+    const container = document.getElementById("classesContainer");
     if (!container) return;
 
     onValue(ref(db, 'classes/'), (snapshot) => {
         const data = snapshot.val();
-        container.innerHTML = "<h2>صفوفي كأستاذ:</h2>"; 
-if (data) {
+        container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
+        if (data) {
             Object.values(data).forEach(cls => {
                 const card = document.createElement("div");
                 card.className = "class-card";
                 card.style.border = "1px solid #ccc";
                 card.style.padding = "10px";
                 card.style.margin = "10px";
-                card.innerHTML = `<h3>${cls.name} - شعبة ${cls.section}</h3><p>الرمز: ${cls.id}</p><button onclick="window.viewClassLessons('${cls.id}')">عرض التفاصيل</button>`;
+                
+                card.innerHTML = `
+                    <h3>${cls.name} - شعبة ${cls.section}</h3>
+                    <p>الرمز: ${cls.id}</p>
+                    <button onclick="window.viewClassLessons('${cls.id}')">عرض التفاصيل</button>
+                    <button onclick="window.deleteClass('${cls.id}')" style="background-color: #ff4444; color: white;">حذف الصف</button>
+                `;
                 container.appendChild(card);
             });
         }
@@ -160,4 +165,16 @@ window.viewClassLessons = function(classId) {
             container.appendChild(d);
         });
     }, { onlyOnce: true });
+};
+window.deleteClass = function(classId) {
+    if (confirm("هل أنت متأكد من حذف هذا الصف نهائياً؟")) {
+        remove(ref(db, 'classes/' + classId))
+        .then(() => {
+            alert("تم حذف الصف بنجاح!");
+            // لا حاجة لـ reload، الـ onValue سيحدث الشاشة تلقائياً
+        })
+        .catch((error) => {
+            alert("حدث خطأ أثناء الحذف: " + error.message);
+        });
+    }
 };
