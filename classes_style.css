@@ -44,7 +44,7 @@
 
 .login-container button:hover { background-color: #219150; }
 
-/* --- 2. تنسيق لوحة تحكم الصفوف (التصميم الجريء المختار) --- */
+/* --- 2. تنسيق لوحة تحكم الصفوف (النمط المودرن المدمج) --- */
 #classesContainer {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -54,25 +54,32 @@
 
 .class-card {
     background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-left: 6px solid #e74c3c; /* الخط الجانبي المميز */
-    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
     padding: 20px;
-    text-align: right; /* للنصوص العربية */
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: 0.3s;
     position: relative;
+    overflow: hidden; /* لضمان عدم خروج الإطار عن زوايا البطاقة */
 }
 
-/* تأثير التفاعل عند مرور الفأرة */
 .class-card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     transform: translateY(-5px);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+/* الإطار العلوي الأخضر المميز */
+.class-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 6px;
+    background: linear-gradient(90deg, #27ae60, #2ecc71);
 }
 
 .class-card h3 { 
     color: #34495e; 
-    margin-top: 0;
+    margin-top: 10px;
 }
 
 .class-card p {
@@ -87,8 +94,7 @@
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
-    margin-top: 10px;
-    margin-left: 5px; /* مسافة بسيطة بين الأزرار */
+    margin: 5px;
     transition: background 0.3s;
 }
 
