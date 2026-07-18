@@ -139,25 +139,40 @@ function renderClassCard(name, section, id) {
 function renderStudentClasses() {
     const container = document.getElementById("classes-container");
     if (!container) return;
+    
+    // 1. إضافة زر الانضمام في البداية
+    container.innerHTML = `
+        <div style="margin-bottom: 20px;">
+            <button onclick="window.joinClass()" style="background:#3498db; color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">+ انضمام لصف جديد</button>
+        </div>
+    `;
+
+    // 2. جلب البيانات وعرض الصفوف
     const classesRef = ref(db, 'classes/');
     onValue(classesRef, (snapshot) => {
         const data = snapshot.val();
-        container.innerHTML = "";
+        
+        // ملاحظة: لا نمسح الزر هنا، بل نضيف الصفوف بعده
+        // لذا نستخدم createElement لإضافة البطاقات دون مسح محتوى الزر
         if (data) {
             const userProfile = JSON.parse(localStorage.getItem("currentUser"));
             const joinedCodes = userProfile.joinedClasses || [];
+            
             Object.values(data).forEach(cls => {
                 if (joinedCodes.includes(cls.id)) {
                     const card = document.createElement("div");
                     card.className = "class-card";
-                    card.innerHTML = `<h3>${cls.name}</h3><p>الأستاذ: ${cls.teacher}</p><button onclick="viewClassLessons('${cls.id}')">عرض الدروس</button>`;
+                    card.innerHTML = `
+                        <h3>${cls.name}</h3>
+                        <p>الأستاذ: ${cls.teacher}</p>
+                        <button onclick="viewClassLessons('${cls.id}')">عرض الدروس</button>
+                    `;
                     container.appendChild(card);
                 }
             });
         }
     });
 }
-
 window.viewClassLessons = function(classId) {
     const classesRef = ref(db, 'classes/' + classId);
     onValue(classesRef, (snapshot) => {
@@ -185,4 +200,42 @@ window.showStudentGrade = function(classId) {
         const grade = selectedClass.grades[studentName];
         if (grade !== undefined) { alert("مرحباً " + studentName + "، درجتك هي: " + grade); } else { alert("عذراً، لم يتم العثور على درجة بهذا الاسم."); }
     });
+};
+window.joinClass = function() {
+    const code = prompt("أدخل رمز الصف الذي زودك به الأستاذ:");
+    if (!code) return;
+
+    const userProfile = JSON.parse(localStorage.getItem("currentUser"));
+    if (!userProfile) { alert("يجب تسجيل الدخول أولاً!"); return; }
+
+    // 1. التحقق من وجود الصف في قاعدة البيانات قبل إضافته
+    const classRef = ref(db, 'classes/' + code);
+    onValue(classRef, (snapshot) => {
+        const classData = snapshot.val();
+        
+        if (!classData) {
+            alert("عذراً، رمز الصف غير موجود.");
+            return;
+        }
+
+        // 2. تحديث قائمة الصفوف للطالب
+        if (!userProfile.joinedClasses) userProfile.joinedClasses = [];
+        
+        if (userProfile.joinedClasses.includes(code)) {
+            alert("أنت منضم لهذا الصف مسبقاً!");
+            return;
+        }
+
+        userProfile.joinedClasses.push(code);
+
+        // 3. حفظ التحديث في Firebase وفي الجهاز
+        const userRef = ref(db, 'users/' + userProfile.phone);
+        update(userRef, { joinedClasses: userProfile.joinedClasses })
+        .then(() => {
+            localStorage.setItem("currentUser", JSON.stringify(userProfile));
+            alert("تم الانضمام للصف بنجاح!");
+            renderStudentClasses(); // إعادة عرض الصفوف
+        })
+        .catch(err => alert("حدث خطأ: " + err.message));
+    }, { onlyOnce: true }); // نستخدم onlyOnce حتى لا يتكرر التنبيه
 };
