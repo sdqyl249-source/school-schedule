@@ -106,23 +106,20 @@ function renderTeacherClasses() {
 
     onValue(ref(db, 'classes/'), (snapshot) => {
         const data = snapshot.val();
-        container.innerHTML = "<h2>صفوفي كأستاذ:</h2>"; 
+        container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
         
         if (data) {
             Object.values(data).forEach(cls => {
                 const card = document.createElement("div");
-                // تأكد أن الكلاس لا يملك عرضاً ثابتاً يمنع الـ Grid من العمل
-                card.className = "class-card"; 
-                card.style.border = "1px solid #ddd";
-                card.style.padding = "15px";
-                card.style.borderRadius = "8px";
-                card.style.backgroundColor = "#fff";
+                card.className = "class-card"; // هنا نستخدم الكلاس الجديد
                 
                 card.innerHTML = `
-                    <h3>${cls.name} - شعبة ${cls.section}</h3>
-                    <p>الرمز: <strong>${cls.id}</strong></p>
-                    <button onclick="window.viewClassLessons('${cls.id}')">عرض التفاصيل</button>
-                    <button onclick="window.deleteClass('${cls.id}')" style="background-color: #ff4444; color: white; margin-top: 5px;">حذف الصف</button>
+                    <h3>${cls.name}</h3>
+                    <p>شعبة: ${cls.section}</p>
+                    <small>الرمز: ${cls.id}</small>
+                    <br>
+                    <button onclick="window.viewClassLessons('${cls.id}')">عرض</button>
+                    <button onclick="window.deleteClass('${cls.id}')" style="background:#8b0000;">حذف</button>
                 `;
                 container.appendChild(card);
             });
