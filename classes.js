@@ -119,6 +119,7 @@ function renderTeacherClasses() {
 }
 
 window.saveClass = function() {
+    console.log("تم الضغط على الزر بنجاح!"); // أضف هذا السطر فوراً
     const className = document.getElementById("className").value;
     const classSection = document.getElementById("classSection").value;
     if (!className || !classSection) { alert("يرجى ملء الحقول!"); return; }
