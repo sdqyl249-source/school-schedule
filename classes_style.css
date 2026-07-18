@@ -99,7 +99,10 @@
     transform: scale(1.05);
     box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
 }
-
+/* في ملف classes_style.css */
+.admin-only {
+    display: none;
+}
 /* --- 3. عناصر عامة --- */
 select {
     padding: 8px;
