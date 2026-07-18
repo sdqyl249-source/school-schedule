@@ -50,7 +50,7 @@ function showUserWelcome(user) {
     document.body.prepend(infoBox);
 }
 
-// دالة الانضمام (مُعدلة لتكون أكثر استقراراً)
+// دالة الانضمام لصف (للطالب)
 window.joinClass = function() {
     const code = prompt("أدخل رمز الصف:");
     if (!code) return;
@@ -69,20 +69,19 @@ window.joinClass = function() {
         update(ref(db, 'users/' + userProfile.phone), { joinedClasses: userProfile.joinedClasses })
         .then(() => {
             localStorage.setItem("currentUser", JSON.stringify(userProfile));
-            location.reload(); 
+            renderStudentClasses(); // تحديث الواجهة مباشرة
         });
     }, { onlyOnce: true });
 };
 
-// عرض صفوف الطالب (نسخة واحدة ومصححة)
+// عرض صفوف الطالب
 function renderStudentClasses() {
     const container = document.getElementById("classes-container");
     if (!container) return;
     
     container.innerHTML = `<div style="margin-bottom: 20px;"><button onclick="window.joinClass()">+ انضمام لصف جديد</button></div>`;
 
-    const classesRef = ref(db, 'classes/');
-    onValue(classesRef, (snapshot) => {
+    onValue(ref(db, 'classes/'), (snapshot) => {
         const data = snapshot.val();
         const userProfile = JSON.parse(localStorage.getItem("currentUser"));
         const joinedCodes = userProfile.joinedClasses || [];
@@ -100,31 +99,32 @@ function renderStudentClasses() {
     });
 }
 
-// عرض صفوف الأستاذ
+// عرض صفوف الأستاذ (تم تعديلها لتعمل كـ Listener مباشر)
 function renderTeacherClasses() {
     const container = document.getElementById("classes-container");
     if (!container) return;
-    container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
+
     onValue(ref(db, 'classes/'), (snapshot) => {
         const data = snapshot.val();
+        container.innerHTML = "<h2>صفوفي كأستاذ:</h2>"; // مسح وإعادة رسم القائمة
         if (data) {
             Object.values(data).forEach(cls => {
                 const card = document.createElement("div");
                 card.className = "class-card";
-                card.innerHTML = `<h3>${cls.name} - ${cls.section}</h3><p>الرمز: ${cls.id}</p><button onclick="window.viewClassLessons('${cls.id}')">عرض التفاصيل</button>`;
+                card.style.border = "1px solid #ccc";
+                card.style.padding = "10px";
+                card.style.margin = "10px";
+                card.innerHTML = `<h3>${cls.name} - شعبة ${cls.section}</h3><p>الرمز: ${cls.id}</p><button onclick="window.viewClassLessons('${cls.id}')">عرض التفاصيل</button>`;
                 container.appendChild(card);
             });
         }
     });
 }
 
+// دالة حفظ الصف (بدون إعادة تحميل الصفحة)
 window.saveClass = function() {
-    console.log("1. تم الضغط على زر الحفظ");
-
     const className = document.getElementById("className").value;
     const classSection = document.getElementById("classSection").value;
-
-    console.log("2. القيم المستلمة:", { className, classSection });
 
     if (!className || !classSection) {
         alert("يرجى اختيار اسم الصف والشعبة!");
@@ -132,39 +132,24 @@ window.saveClass = function() {
     }
 
     const classId = "CLASS-" + Math.floor(100000 + Math.random() * 900000); 
-    console.log("3. الكود المولد:", classId);
 
-    // التحقق من أن db معرفة
-    if (typeof db === 'undefined') {
-        console.error("خطأ: متغير db غير معرف!");
-        return;
-    }
-
-    const newClassData = {
+    set(ref(db, 'classes/' + classId), {
         id: classId,
         name: className,
         section: classSection,
         teacher: "أ. عقيل السعد",
         lessons: [{ title: "مقدمة" }],
         grades: {}
-    };
-
-    console.log("4. محاولة الحفظ في Firebase...");
-
-    set(ref(db, 'classes/' + classId), newClassData)
-    .then(() => {
-        console.log("5. تم الحفظ بنجاح!");
-        alert("تم الحفظ!");
-        renderTeacherClasses(); 
-    })
-    .catch((error) => {
-        console.error("6. خطأ Firebase:", error);
-        alert("خطأ: " + error.message);
+    }).then(() => {
+        alert("تم الحفظ بنجاح!");
+        // لا حاجة لـ location.reload() لأن renderTeacherClasses يعمل كـ Listener
     });
 };
+
 window.viewClassLessons = function(classId) {
     onValue(ref(db, 'classes/' + classId), (snapshot) => {
         const c = snapshot.val();
+        if(!c) return;
         const container = document.getElementById("classes-container");
         container.innerHTML = `<button onclick="location.reload()">العودة</button><h2>دروس: ${c.name}</h2><div id="lessons-list"></div>`;
         c.lessons.forEach((l, i) => {
