@@ -155,25 +155,32 @@ window.viewClassLessons = function(classId) {
     onValue(ref(db, 'classes/' + classId), (snapshot) => {
         const c = snapshot.val();
         if(!c) return;
-        // تأكد من استخدام "classesContainer" هنا أيضاً
+
         const container = document.getElementById("classesContainer"); 
-        container.innerHTML = `<button onclick="location.reload()">العودة</button><h2>دروس: ${c.name}</h2><div id="lessons-list"></div>`;
-        c.lessons.forEach((l, i) => {
-            const d = document.createElement("div");
-            d.innerHTML = `<h4>الدرس ${i + 1}: ${l.title}</h4>`;
-            container.appendChild(d);
-        });
+        
+        // تغيير هيكل العرض ليتناسب مع الواجهة
+        container.innerHTML = `
+            <div style="width: 100%; text-align: right; margin-bottom: 20px;">
+                <button onclick="location.reload()" style="padding: 10px 20px; cursor: pointer;">العودة للقائمة</button>
+            </div>
+            <h2>دروس: ${c.name}</h2>
+            <div id="lessons-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; width: 100%;"></div>
+        `;
+
+        const lessonsList = document.getElementById("lessons-list");
+        
+        if (c.lessons && Array.isArray(c.lessons)) {
+            c.lessons.forEach((l, i) => {
+                const d = document.createElement("div");
+                d.className = "class-card"; // استخدام نفس كلاس البطاقة
+                d.innerHTML = `
+                    <h3>الدرس ${i + 1}: ${l.title}</h3>
+                    <p>المحتوى: ${l.description || 'لا يوجد وصف'}</p>
+                `;
+                lessonsList.appendChild(d);
+            });
+        } else {
+            lessonsList.innerHTML = "<p>لا توجد دروس مضافة لهذا الصف.</p>";
+        }
     }, { onlyOnce: true });
-};
-window.deleteClass = function(classId) {
-    if (confirm("هل أنت متأكد من حذف هذا الصف نهائياً؟")) {
-        remove(ref(db, 'classes/' + classId))
-        .then(() => {
-            alert("تم حذف الصف بنجاح!");
-            // لا حاجة لـ reload، الـ onValue سيحدث الشاشة تلقائياً
-        })
-        .catch((error) => {
-            alert("حدث خطأ أثناء الحذف: " + error.message);
-        });
-    }
 };
