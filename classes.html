@@ -50,6 +50,23 @@
 
 <!-- 3. ثالثاً: ملف الصفوف (مرة واحدة فقط!) -->
 <script type="module" src="classes.js" defer></script>
+    <!-- بقية محتوى الصفحة -->
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="global.js"></script>
+    <script type="module" src="scriot.js"></script>
+    <script type="module" src="classes.js" defer></script>
+
+    <!-- ضع السكربت هنا في الأسفل لضمان تحميل العناصر أولاً -->
+    <script>
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        const adminPanel = document.getElementById("adminPanel");
+        // التأكد من وجود العنصر قبل محاولة إخفائه لتجنب أي خطأ
+        if (adminPanel && user && user.role !== 'teacher') {
+            adminPanel.style.display = "none";
+        }
+    </script>
+</body>
+</html>
     </body>
 </html>
