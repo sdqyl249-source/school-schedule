@@ -1,18 +1,19 @@
-import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase, ref, set, onValue, update, remove, push, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+// (لاحظ أننا استغنينا عن getAnalytics لأننا نحتاج فقط Database)
 
-// 1. إعدادات Firebase - ضع بياناتك الحقيقية هنا
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
+  authDomain: "roya-platform-26860.firebaseapp.com",
+  databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
+  projectId: "roya-platform-26860",
+  storageBucket: "roya-platform-26860.firebasestorage.app",
+  messagingSenderId: "897544406776",
+  appId: "1:897544406776:web:aa112013dea672fb141d0d",
+  measurementId: "G-Y88LCNKED2"
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 window.currentActiveChatClassId = "";
