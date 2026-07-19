@@ -52,36 +52,46 @@ function showUserWelcome(user) {
 
 // دالة الانضمام لصف (للطالب)
 window.joinClass = function() {
-    const classId = prompt("أدخل رمز الصف:");
+    const classId = prompt("أدخل رمز الصف (4 أرقام فقط):");
+    
+    // 1. التحقق من أن المدخل ليس فارغاً
     if (!classId) return;
 
-    // اطلب كلمة المرور من المستخدم
-    const password = prompt("أدخل كلمة مرور الصف:");
+    // 2. التحقق من أن الرمز يتكون من 4 أرقام فقط باستخدام Regex
+    const isFourDigits = /^\d{4}$/.test(classId);
+    if (!isFourDigits) {
+        alert("خطأ: يجب أن يتكون رمز الصف من 4 أرقام فقط!");
+        return;
+    }
 
     const userProfile = JSON.parse(localStorage.getItem("currentUser"));
+    if (!userProfile) { alert("يجب تسجيل الدخول أولاً!"); return; }
+
     const classRef = ref(db, 'classes/' + classId);
     
-    // استخدام get بدلاً من onValue لمرة واحدة فقط وبشكل أسرع
     get(classRef).then((snapshot) => {
-        const classData = snapshot.val();
-        
-        if (!classData) { alert("رمز الصف غير موجود."); return; }
-
-        // هنا نقوم بالمقارنة (التأكد من كلمة المرور)
-        if (classData.password !== password) {
-            alert("كلمة مرور الصف غير صحيحة!");
+        if (!snapshot.exists()) {
+            alert("رمز الصف غير موجود.");
             return;
         }
 
         if (!userProfile.joinedClasses) userProfile.joinedClasses = [];
-        if (userProfile.joinedClasses.includes(classId)) { alert("منضم مسبقاً!"); return; }
+        
+        if (userProfile.joinedClasses.includes(classId)) {
+            alert("أنت منضم لهذا الصف مسبقاً!");
+            return;
+        }
 
         userProfile.joinedClasses.push(classId);
-        update(ref(db, 'users/' + userProfile.phone), { joinedClasses: userProfile.joinedClasses })
-        .then(() => {
+        
+        update(ref(db, 'users/' + userProfile.phone), { 
+            joinedClasses: userProfile.joinedClasses 
+        }).then(() => {
             localStorage.setItem("currentUser", JSON.stringify(userProfile));
             renderStudentClasses();
-            alert("تم الانضمام بنجاح!");
+            alert("تم الانضمام للصف بنجاح!");
+        }).catch((error) => {
+            alert("حدث خطأ أثناء الانضمام: " + error.message);
         });
     });
 };
