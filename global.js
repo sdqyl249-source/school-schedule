@@ -1,4 +1,5 @@
-// global.js - احذف كل شيء قبله، ابدأ بهذا:
+// global.js
+
 document.addEventListener('DOMContentLoaded', function() {
     const isLoginPage = window.location.pathname.endsWith("login.html");
     if (isLoginPage) return; 
@@ -17,7 +18,17 @@ function applyPermissions(role) {
         document.querySelectorAll(".admin-only").forEach(el => el.style.display = 'none');
     }
 }
-window.database.ref('users/' + phone).set(userProfile).then(() => {
+
+// قمنا بتحويل الكود الخاص بالـ ref إلى دالة ليتم استدعاؤها لاحقاً
+window.createNewUser = function(phone, fullName, userProfile) {
+    if (!window.database) {
+        console.error("قاعدة البيانات غير متوفرة حالياً");
+        return;
+    }
+    window.database.ref('users/' + phone).set(userProfile).then(() => {
         alert("أهلاً بك يا " + fullName + "، تم إنشاء حسابك بنجاح.");
         window.location.href = "index.html";
+    }).catch(error => {
+        console.error("خطأ في إنشاء المستخدم:", error);
     });
+};
