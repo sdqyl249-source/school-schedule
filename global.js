@@ -21,4 +21,3 @@ window.database.ref('users/' + phone).set(userProfile).then(() => {
         alert("أهلاً بك يا " + fullName + "، تم إنشاء حسابك بنجاح.");
         window.location.href = "index.html";
     });
-};
