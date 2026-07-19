@@ -110,3 +110,31 @@ select {
     border-radius: 5px;
     border: 1px solid #ccc;
 }
+.chat-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 400px; /* أو حسب الرغبة */
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    padding: 5px;
+}
+
+.chat-input-area {
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input-area input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
