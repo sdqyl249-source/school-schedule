@@ -1,20 +1,11 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
-    authDomain: "roya-platform-26860.firebaseapp.com",
-    databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
-    projectId: "roya-platform-26860"
-};
-
-const app = initializeApp(firebaseConfig);
-window.db = getDatabase(app);
+// scriot.js - النسخة النهائية المصححة
 
 // 1. وظيفة تبديل القائمة (فتح/إغلاق)
 window.toggleSidebar = function() {
     const sidebar = document.getElementById("mySidebar");
-    // التحقق مما إذا كان العرض 280px أو إذا كان فارغاً (أو غير محدد)
+    if (!sidebar) return;
+    
+    // التحقق من الحالة الحالية للتبديل
     if (sidebar.style.width === "280px") {
         sidebar.style.width = "0";
     } else {
@@ -34,10 +25,12 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     // 3. إظهار/إخفاء عناصر الإدارة (الأستاذ فقط)
+    // نستخدم display = '' لإعادة العناصر لنمطها الأصلي في CSS
+    const adminElements = document.querySelectorAll('.admin-only');
     if (user && user.role === 'teacher') {
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+        adminElements.forEach(el => el.style.display = '');
     } else {
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+        adminElements.forEach(el => el.style.display = 'none');
     }
 
     // 4. تفعيل لون التمييز للرابط النشط (يدعم كافة الصفحات)
