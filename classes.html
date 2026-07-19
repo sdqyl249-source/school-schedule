@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <title>إدارة الصفوف - منصة الوادي</title>
     <link rel="stylesheet" href="classes_style.css">
+    <style>
+        /* إضافة تنسيق سريع للدردشة */
+        #chatSection { display: none; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
+        .chat-wrapper { display: flex; flex-direction: column; height: 400px; border: 1px solid #ddd; border-radius: 10px; padding: 10px; background-color: #f9f9f9; }
+        .chat-messages { flex-grow: 1; overflow-y: auto; margin-bottom: 10px; padding: 5px; border-bottom: 1px solid #ccc; }
+        .chat-input-area { display: flex; gap: 10px; }
+        .chat-input-area input { flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
+    </style>
 </head>
 <body>
-
-    
 
     <!-- المحتوى الرئيسي -->
     <div class="main-content">
@@ -42,6 +48,21 @@
         <!-- المنطقة التي ستظهر فيها بطاقات الصفوف -->
         <div class="dashboard-container" id="classesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 20px;">
         </div>
+
+        <!-- قسم الدردشة (مخفي افتراضياً، يظهر عند الدخول لصف) -->
+        <div id="chatSection">
+            <h3 id="currentChatTitle">غرفة الدردشة</h3>
+            <div class="chat-wrapper">
+                <div id="chat-messages" class="chat-messages">
+                    <!-- الرسائل ستظهر هنا -->
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="message-input" placeholder="اكتب رسالتك هنا...">
+                    <button id="send-btn">إرسال ✉️</button>
+                </div>
+            </div>
+            <button onclick="document.getElementById('chatSection').style.display='none'">إغلاق الدردشة</button>
+        </div>
     </div>
     
     <script>
@@ -53,7 +74,6 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="global.js"></script>
-    <!-- تم ترتيب التحميل ليتم التحقق من الصلاحيات فور تحميل الصفحة -->
     <script type="module" src="scriot.js"></script>
     <script type="module" src="classes.js?v=999"></script>
 </body>
