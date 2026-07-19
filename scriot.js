@@ -14,6 +14,7 @@ window.db = getDatabase(app);
 // 1. وظيفة تبديل القائمة (فتح/إغلاق)
 window.toggleSidebar = function() {
     const sidebar = document.getElementById("mySidebar");
+    // التحقق مما إذا كان العرض 280px أو إذا كان فارغاً (أو غير محدد)
     if (sidebar.style.width === "280px") {
         sidebar.style.width = "0";
     } else {
