@@ -28,12 +28,37 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (userProfile.role === 'teacher') {
             renderTeacherClasses();
         }
+
+        // --- ربط زر الإرسال هنا ---
+        const sendBtn = document.getElementById("send-btn");
+        const messageInput = document.getElementById("message-input");
+
+        if (sendBtn) {
+            sendBtn.onclick = () => {
+                const text = messageInput.value.trim();
+                // نستخدم المتغير العالمي الذي سنحدثه عند فتح الدردشة
+                if (text !== "" && window.currentActiveChatClassId !== "") {
+                    window.sendMessage(window.currentActiveChatClassId);
+                } else if (window.currentActiveChatClassId === "") {
+                    alert("يرجى اختيار صف أولاً!");
+                }
+            };
+
+            // إمكانية الإرسال بالضغط على Enter
+            messageInput.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") sendBtn.click();
+            });
+        }
+        // -------------------------
+
     } else {
         alert("يرجى تسجيل الدخول أولاً!");
+        window.location.href = "login.html"; // توجيه لصفحة الدخول
     }
 });
-window.currentActiveChatClassId = "";
 
+// متغير عالمي لحفظ الصف المفتوح حالياً
+window.currentActiveChatClassId = "";
 window.loadMessages = function(classId) {
     window.currentActiveChatClassId = classId;
     const chatRef = ref(db, 'chat/' + classId);
