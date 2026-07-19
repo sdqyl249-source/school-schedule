@@ -9,18 +9,18 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f2f5; }
         
         /* تنسيق القائمة الجانبية */
-       .sidebar{height:100vh;width:280px;position:fixed;top:0;right:0;background:linear-gradient(180deg,#ffffff,#dfe9f3);padding:20px;box-shadow:0 4px 25px rgba(0,0,0,0.1);transition:width 0.4s cubic-bezier(0.25,0.8,0.25,1);overflow:hidden;z-index:1000;display:flex;flex-direction:column;}
-.sidebar-title{color:#2c3e50;font-size:20px;font-weight:bold;padding-bottom:20px;border-bottom:2px solid rgba(41,128,185,0.2);margin-bottom:20px;text-align:center;}
-.menu-item{color:#2c3e50;background:rgba(255,255,255,0.2);border-radius:12px;margin:10px 0;padding:12px 18px;text-align:center;transition:0.3s ease-in-out;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;}
+.sidebar{height:100vh;width:0;position:fixed;top:0;right:0;background:linear-gradient(180deg,#ffffff,#dfe9f3);box-shadow:0 4px 25px rgba(0,0,0,0.1);transition:width 0.4s cubic-bezier(0.25,0.8,0.25,1);overflow:hidden;z-index:1000;display:flex;flex-direction:column;padding:20px 0;}
+.sidebar-title{color:#2c3e50;font-size:20px;font-weight:bold;padding-bottom:20px;border-bottom:2px solid rgba(41,128,185,0.2);margin-bottom:20px;text-align:center;white-space:nowrap;}
+.menu-item{color:#2c3e50;background:rgba(255,255,255,0.2);border-radius:12px;margin:10px 15px;padding:12px 18px;text-align:center;transition:0.3s;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;white-space:nowrap;}
 .menu-item:hover{background:rgba(255,255,255,0.4);box-shadow:0 0 12px #74b9ff;transform:translateY(-3px);}
-.active-nav{background:rgba(255,255,255,0.6)!important;font-weight:bold;color:#2980b9!important;box-shadow:0 0 15px #74b9ff;border-left:4px solid #2980b9;}
-.logout-btn{margin-top:auto;padding:12px;background:rgba(231,76,60,0.1);color:#c0392b;border:1px solid rgba(231,76,60,0.2);border-radius:12px;cursor:pointer;transition:0.3s;font-weight:bold;}
+.active-nav{background:rgba(255,255,255,0.6)!important;font-weight:bold;color:#2980b9!important;box-shadow:0 0 15px #74b9ff;border-right:4px solid #2980b9;}
+.logout-btn{margin-top:auto;padding:12px;background:rgba(231,76,60,0.1);color:#c0392b;border:1px solid rgba(231,76,60,0.2);border-radius:12px;cursor:pointer;transition:0.3s;font-weight:bold;width:80%;margin:20px auto;}
 .logout-btn:hover{background:#e74c3c;color:white;}
-.toggle-btn{position:fixed;top:20px;right:20px;z-index:1002;padding:12px 20px;cursor:pointer;background:#ffffff;color:#2c3e50;border:none;border-radius:50px;box-shadow:0 4px 15px rgba(0,0,0,0.1);font-weight:bold;transition:0.3s ease;}
+.toggle-btn{position:fixed;top:20px;right:20px;z-index:1002;padding:12px 20px;cursor:pointer;background:#ffffff;color:#2c3e50;border:none;border-radius:50px;box-shadow:0 4px 15px rgba(0,0,0,0.1);font-weight:bold;transition:0.3s;}
 .toggle-btn:hover{background:#74b9ff;color:white;transform:scale(1.1);}
-.main-content{margin-right:280px;padding:30px;transition:0.4s cubic-bezier(0.25,0.8,0.25,1);}
-@media screen and (max-width:768px){.sidebar{width:0;}.main-content{margin-right:0;}
-    </style>
+.main-content{margin-right:0;padding:30px;transition:0.4s cubic-bezier(0.25,0.8,0.25,1);}
+@media screen and (max-width:768px){.main-content{margin-right:0;}}
+</style>
 </head>
 <body>
 
