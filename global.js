@@ -1,27 +1,41 @@
-// global.js - النسخة الموحدة
+// global.js - النسخة النهائية الموحدة
 
-window.onload = function() {
-    // 1. التحقق من الصفحة الحالية لتجنب الحلقة المفرغة في صفحة التسجيل
+// 1. تهيئة Firebase (يجب أن تسبق كل شيء)
+const firebaseConfig = {
+    apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
+    authDomain: "roya-platform-26860.firebaseapp.com",
+    databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
+    projectId: "roya-platform-26860",
+    storageBucket: "roya-platform-26860.firebasestorage.app",
+    messagingSenderId: "897544406776",
+    appId: "1:897544406776:web:aa112013dea672fb141d0d"
+};
+
+// تهيئة قاعدة البيانات لتصبح متاحة عالمياً
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+window.database = firebase.database();
+
+// 2. التحقق من الدخول وتطبيق الصلاحيات عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    // استثناء صفحة تسجيل الدخول
     const isLoginPage = window.location.pathname.endsWith("login.html");
-    if (isLoginPage) {
-        return; 
-    }
+    if (isLoginPage) return; 
 
-    // 2. التحقق من وجود المستخدم في التخزين الموحد
+    // التحقق من وجود المستخدم
     const userString = localStorage.getItem("currentUser");
     
     if (!userString) {
-        // إذا لم يجد بيانات، يعيد المستخدم لصفحة تسجيل الدخول
         alert("يرجى تسجيل الدخول أولاً للوصول إلى المنصة.");
         window.location.href = "login.html";
     } else {
-        // إذا كان مسجلاً، نقوم باستخراج البيانات وتطبيق الصلاحيات
         const userProfile = JSON.parse(userString);
         console.log("أهلاً بك يا " + userProfile.name + "، دورك هو: " + userProfile.role);
         
         applyPermissions(userProfile.role);
     }
-};
+});
 
 // دالة تطبيق الصلاحيات (إخفاء أدوات الأستاذ عن الطلاب)
 function applyPermissions(role) {
@@ -34,8 +48,8 @@ function applyPermissions(role) {
     }
 }
 
-// دالة تسجيل المستخدم (تُستدعى من صفحة login.html)
-function registerUser(fullName, phone, role) {
+// دالة تسجيل المستخدم (تُستدعى عند إنشاء حساب جديد في login.html)
+window.registerUser = function(fullName, phone, role) {
     const userProfile = {
         name: fullName,
         phone: phone,
@@ -44,5 +58,10 @@ function registerUser(fullName, phone, role) {
     };
     
     localStorage.setItem("currentUser", JSON.stringify(userProfile));
-    alert("أهلاً بك يا " + fullName + "، تم إنشاء حسابك بنجاح.");
-}
+    
+    // حفظ البيانات في قاعدة البيانات أيضاً
+    window.database.ref('users/' + phone).set(userProfile).then(() => {
+        alert("أهلاً بك يا " + fullName + "، تم إنشاء حسابك بنجاح.");
+        window.location.href = "index.html";
+    });
+};
