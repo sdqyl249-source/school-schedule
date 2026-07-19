@@ -59,11 +59,11 @@
         localStorage.removeItem("currentUser");
         window.location.href = "login.html";
     }
-</script>
-
-<!-- Firebase SDK -->
+<!-- 1. مكتبات Firebase الأساسية -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+<!-- 2. تهيئة Firebase (الكود الخاص بك) -->
 <script>
     const firebaseConfig = {
         apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
@@ -77,7 +77,10 @@
     firebase.initializeApp(firebaseConfig);
     window.database = firebase.database();
 </script>
+
+<!-- 3. ملفاتك الخاصة بالترتيب (يجب أن تكون بعد التهيئة) -->
 <script src="global.js"></script>
-<script type="module" src="scriot.js"></script>
+<script src="scriot.js"></script>
+<script src="classes.js?v=999"></script>
 </body>
 </html>
