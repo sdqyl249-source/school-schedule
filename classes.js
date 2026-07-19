@@ -1,91 +1,68 @@
-
 window.currentActiveChatClassId = "";
 
-// 1. تشغيل عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     console.log("تم تحميل ملف classes.js بنجاح");
     
     let userString = localStorage.getItem("currentUser");
-    
-    if (!userString) {
-        console.warn("لا يوجد مستخدم في LocalStorage");
-        return;
-    }
+    if (!userString) return;
 
     try {
         const userProfile = JSON.parse(userString);
-        console.log("بيانات المستخدم:", userProfile);
-        
         loadUserDataFromCloud(userProfile.phone);
         showUserWelcome(userProfile);
         
-        // التحقق من الدور بدقة (بإضافة trim و toLowerCase لتجنب أخطاء المسافات)
         const role = userProfile.role ? userProfile.role.trim().toLowerCase() : "";
-        
-        if (role === 'student') {
-            console.log("تشغيل واجهة الطالب");
-            renderStudentClasses();
-        } else if (role === 'teacher') {
-            console.log("تشغيل واجهة الأستاذ");
-            renderTeacherClasses();
-        } else {
-            console.warn("دور المستخدم غير معرف أو غير مطابق:", role);
-        }
+        if (role === 'student') renderStudentClasses();
+        else if (role === 'teacher') renderTeacherClasses();
 
-        // ربط زر الإرسال
+        // ربط الأزرار مع فحص الأمان
         const sendBtn = document.getElementById("send-btn");
         const input = document.getElementById("message-input");
-        if (sendBtn) {
+        if (sendBtn && input) {
             sendBtn.onclick = () => {
                 if (window.currentActiveChatClassId) window.sendMessage(window.currentActiveChatClassId);
             };
-            if (input) {
-                input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendBtn.click(); });
-            }
+            input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendBtn.click(); });
         }
 
-        // ربط زر حفظ الصف
         const saveBtn = document.getElementById("saveClassBtn");
-        if (saveBtn) {
-            saveBtn.addEventListener("click", window.saveClass);
-            console.log("تم ربط زر الحفظ بنجاح");
-        } else {
-            console.warn("لم يتم العثور على زر الحفظ (saveClassBtn)");
-        }
+        if (saveBtn) saveBtn.addEventListener("click", window.saveClass);
 
     } catch (e) {
-        console.error("خطأ في معالجة بيانات المستخدم:", e);
+        console.error("خطأ في تهيئة الصفحة:", e);
     }
 });
-// 2. وظائف الدردشة المتوافقة مع Compat
+
+// دوال الدردشة
 window.loadMessages = function(classId) {
     window.currentActiveChatClassId = classId;
-    document.getElementById('chatSection').style.display = 'block';
-    document.getElementById('currentChatTitle').innerText = "غرفة دردشة الصف: " + classId;
+    const chatSection = document.getElementById('chatSection');
+    const chatTitle = document.getElementById('currentChatTitle');
     const chatBox = document.getElementById("chat-messages");
-    chatBox.innerHTML = "جاري التحميل...";
-
-    const chatRef = window.database.ref('chat/' + classId);
     
-    chatRef.on('value', (snapshot) => {
-        chatBox.innerHTML = "";
-        const messages = snapshot.val();
-        if (messages) {
-            Object.values(messages).forEach(msg => {
-                chatBox.innerHTML += `<div style="margin-bottom: 5px;"><strong>${msg.sender}:</strong> ${msg.text}</div>`;
-            });
-            chatBox.scrollTop = chatBox.scrollHeight;
-        } else {
-            chatBox.innerHTML = "لا توجد رسائل بعد.";
-        }
-    });
+    if (chatSection) chatSection.style.display = 'block';
+    if (chatTitle) chatTitle.innerText = "غرفة دردشة الصف: " + classId;
+    if (chatBox) {
+        chatBox.innerHTML = "جاري التحميل...";
+        window.database.ref('chat/' + classId).on('value', (snapshot) => {
+            chatBox.innerHTML = "";
+            const messages = snapshot.val();
+            if (messages) {
+                Object.values(messages).forEach(msg => {
+                    chatBox.innerHTML += `<div style="margin-bottom: 5px;"><strong>${msg.sender}:</strong> ${msg.text}</div>`;
+                });
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } else {
+                chatBox.innerHTML = "لا توجد رسائل بعد.";
+            }
+        });
+    }
 };
 
 window.sendMessage = function(classId) {
     const input = document.getElementById("message-input");
-    if (!input.value.trim()) return;
+    if (!input || !input.value.trim()) return;
     const user = JSON.parse(localStorage.getItem("currentUser"));
-    
     window.database.ref('chat/' + classId).push({
         sender: user.name,
         text: input.value.trim(),
@@ -93,32 +70,16 @@ window.sendMessage = function(classId) {
     }).then(() => input.value = "");
 };
 
-// 3. وظائف الصفوف
-window.joinClass = function() {
-    const classId = prompt("أدخل رمز الصف (4 أرقام):");
-    if (!classId || !/^\d{4}$/.test(classId)) return alert("يجب إدخال 4 أرقام!");
-
-    const userProfile = JSON.parse(localStorage.getItem("currentUser"));
-    window.database.ref('classes/' + classId).once('value').then((snapshot) => {
-        if (!snapshot.exists()) return alert("الرمز غير موجود.");
-        if (userProfile.joinedClasses?.includes(classId)) return alert("منضم مسبقاً!");
-
-        const updatedClasses = [...(userProfile.joinedClasses || []), classId];
-        window.database.ref('users/' + userProfile.phone).update({ joinedClasses: updatedClasses }).then(() => {
-            userProfile.joinedClasses = updatedClasses;
-            localStorage.setItem("currentUser", JSON.stringify(userProfile));
-            renderStudentClasses();
-        });
-    });
-};
-
+// دوال إدارة الصفوف
 function renderStudentClasses() {
     const container = document.getElementById("classesContainer");
-    container.innerHTML = `<button onclick="window.joinClass()">+ انضمام لصف جديد</button>`;
+    if (!container) return;
     
+    container.innerHTML = `<button onclick="window.joinClass()">+ انضمام لصف جديد</button>`;
     window.database.ref('classes/').on('value', (snapshot) => {
         const data = snapshot.val();
-        const joined = JSON.parse(localStorage.getItem("currentUser")).joinedClasses || [];
+        const user = JSON.parse(localStorage.getItem("currentUser"));
+        const joined = user.joinedClasses || [];
         if (data) {
             Object.values(data).forEach(cls => {
                 if (joined.includes(cls.id)) {
@@ -136,6 +97,8 @@ function renderStudentClasses() {
 
 function renderTeacherClasses() {
     const container = document.getElementById("classesContainer");
+    if (!container) return;
+
     window.database.ref('classes/').on('value', (snapshot) => {
         container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
         const data = snapshot.val();
@@ -145,7 +108,7 @@ function renderTeacherClasses() {
                 card.className = "class-card";
                 card.innerHTML = `<h3>${cls.name}</h3><small>الرمز: ${cls.id}</small><br>
                                   <button onclick="window.viewClassLessons('${cls.id}')">عرض</button>
-                                  <button onclick="window.deleteClass('${cls.id}')" style="background:#8b0000;">حذف</button>`;
+                                  <button onclick="window.deleteClass('${cls.id}')" style="background:#8b0000; color:white;">حذف</button>`;
                 container.appendChild(card);
             });
         }
@@ -153,49 +116,25 @@ function renderTeacherClasses() {
 }
 
 window.saveClass = function() {
-    const name = document.getElementById("className").value;
-    const section = document.getElementById("classSection").value;
+    const name = document.getElementById("className")?.value;
+    const section = document.getElementById("classSection")?.value;
+    if (!name || !section) return alert("يرجى اختيار اسم الصف والشعبة");
+    
     const id = Math.floor(1000 + Math.random() * 9000).toString();
-    window.database.ref('classes/' + id).set({ id, name, section, teacher: "أ. عقيل السعد", lessons: [{ title: "مقدمة" }] })
+    window.database.ref('classes/' + id).set({ id, name, section, lessons: [{ title: "مقدمة" }] })
     .then(() => alert("تم الحفظ!"));
 };
 
-window.deleteClass = function(classId) {
-    if (confirm("حذف الصف؟")) window.database.ref('classes/' + classId).remove();
-};
-
-window.viewClassLessons = function(classId) {
-    window.database.ref('classes/' + classId).once('value').then((snapshot) => {
-        const c = snapshot.val();
-        const container = document.getElementById("classesContainer");
-        container.innerHTML = `<button onclick="location.reload()">العودة</button><h2>دروس: ${c.name}</h2><div id="lessons-list"></div>`;
-        c.lessons?.forEach((l, i) => {
-            document.getElementById("lessons-list").innerHTML += `<div>الدرس ${i + 1}: ${l.title}</div>`;
-        });
-    });
-};
-
 function loadUserDataFromCloud(phone) {
-    // التأكد من وجود window.database أولاً
-    if (!window.database) {
-        console.error("قاعدة البيانات غير مهيأة!");
-        return;
-    }
-
+    if (!window.database) return;
     window.database.ref('users/' + phone).on('value', (s) => { 
-        const userData = s.val();
-        if (userData) {
-            // تحديث الـ localStorage بالبيانات الأحدث من السحابة
-            localStorage.setItem("currentUser", JSON.stringify(userData));
-            console.log("تم تحديث بيانات المستخدم من السحابة بنجاح.");
-        }
-    }, (error) => {
-        console.error("خطأ في جلب بيانات المستخدم:", error);
+        if(s.val()) localStorage.setItem("currentUser", JSON.stringify(s.val())); 
     });
 }
 
 function showUserWelcome(user) {
+    const header = document.querySelector('h1') || document.body;
     const infoBox = document.createElement('div');
     infoBox.innerHTML = `<h3>مرحباً بك يا ${user.name}</h3>`;
-    document.body.prepend(infoBox);
+    header.parentNode.insertBefore(infoBox, header.nextSibling);
 }
