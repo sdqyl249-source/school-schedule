@@ -21,6 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendBtn.click(); });
         }
+
+        // ربط زر حفظ الصف بشكل صحيح
+        const saveBtn = document.getElementById("saveClassBtn");
+        if (saveBtn) saveBtn.addEventListener("click", window.saveClass);
     }
 });
 
@@ -32,7 +36,6 @@ window.loadMessages = function(classId) {
     const chatBox = document.getElementById("chat-messages");
     chatBox.innerHTML = "جاري التحميل...";
 
-    // نستخدم window.database المعرف في الـ HTML
     const chatRef = window.database.ref('chat/' + classId);
     
     chatRef.on('value', (snapshot) => {
