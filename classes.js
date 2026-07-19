@@ -205,3 +205,11 @@ window.viewClassLessons = function(classId) {
         }
     }, { onlyOnce: true });
 };
+window.deleteClass = function(classId) {
+    if (confirm("هل أنت متأكد من حذف الصف؟ ستُحذف جميع البيانات المرتبطة به.")) {
+        remove(ref(db, 'classes/' + classId)).then(() => {
+            alert("تم حذف الصف بنجاح.");
+            renderStudentClasses(); // إعادة تحميل القائمة
+        });
+    }
+};
