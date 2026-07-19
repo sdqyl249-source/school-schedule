@@ -52,28 +52,39 @@ function showUserWelcome(user) {
 
 // دالة الانضمام لصف (للطالب)
 window.joinClass = function() {
-    const code = prompt("أدخل رمز الصف:");
-    if (!code) return;
+    const classId = prompt("أدخل رمز الصف:");
+    if (!classId) return;
+
+    // اطلب كلمة المرور من المستخدم
+    const password = prompt("أدخل كلمة مرور الصف:");
 
     const userProfile = JSON.parse(localStorage.getItem("currentUser"));
-    const classRef = ref(db, 'classes/' + code);
+    const classRef = ref(db, 'classes/' + classId);
     
-    onValue(classRef, (snapshot) => {
+    // استخدام get بدلاً من onValue لمرة واحدة فقط وبشكل أسرع
+    get(classRef).then((snapshot) => {
         const classData = snapshot.val();
+        
         if (!classData) { alert("رمز الصف غير موجود."); return; }
 
-        if (!userProfile.joinedClasses) userProfile.joinedClasses = [];
-        if (userProfile.joinedClasses.includes(code)) { alert("منضم مسبقاً!"); return; }
+        // هنا نقوم بالمقارنة (التأكد من كلمة المرور)
+        if (classData.password !== password) {
+            alert("كلمة مرور الصف غير صحيحة!");
+            return;
+        }
 
-        userProfile.joinedClasses.push(code);
+        if (!userProfile.joinedClasses) userProfile.joinedClasses = [];
+        if (userProfile.joinedClasses.includes(classId)) { alert("منضم مسبقاً!"); return; }
+
+        userProfile.joinedClasses.push(classId);
         update(ref(db, 'users/' + userProfile.phone), { joinedClasses: userProfile.joinedClasses })
         .then(() => {
             localStorage.setItem("currentUser", JSON.stringify(userProfile));
-            renderStudentClasses(); // تحديث الواجهة مباشرة
+            renderStudentClasses();
+            alert("تم الانضمام بنجاح!");
         });
-    }, { onlyOnce: true });
+    });
 };
-
 // عرض صفوف الطالب
 function renderStudentClasses() {
     const container = document.getElementById("classesContainer"); 
