@@ -176,8 +176,21 @@ window.viewClassLessons = function(classId) {
 };
 
 function loadUserDataFromCloud(phone) {
+    // التأكد من وجود window.database أولاً
+    if (!window.database) {
+        console.error("قاعدة البيانات غير مهيأة!");
+        return;
+    }
+
     window.database.ref('users/' + phone).on('value', (s) => { 
-        if(s.val()) localStorage.setItem("currentUser", JSON.stringify(s.val())); 
+        const userData = s.val();
+        if (userData) {
+            // تحديث الـ localStorage بالبيانات الأحدث من السحابة
+            localStorage.setItem("currentUser", JSON.stringify(userData));
+            console.log("تم تحديث بيانات المستخدم من السحابة بنجاح.");
+        }
+    }, (error) => {
+        console.error("خطأ في جلب بيانات المستخدم:", error);
     });
 }
 
