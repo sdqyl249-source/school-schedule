@@ -1,4 +1,4 @@
-// --- ملف classes.js المعدل ليعمل مع Firebase Compat ---
+
 window.currentActiveChatClassId = "";
 
 // 1. تشغيل عند تحميل الصفحة
