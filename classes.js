@@ -3,14 +3,34 @@ window.currentActiveChatClassId = "";
 
 // 1. تشغيل عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("تم تحميل ملف classes.js بنجاح");
+    
     let userString = localStorage.getItem("currentUser");
-    if (userString) {
+    
+    if (!userString) {
+        console.warn("لا يوجد مستخدم في LocalStorage");
+        return;
+    }
+
+    try {
         const userProfile = JSON.parse(userString);
+        console.log("بيانات المستخدم:", userProfile);
+        
         loadUserDataFromCloud(userProfile.phone);
         showUserWelcome(userProfile);
         
-        if (userProfile.role === 'student') renderStudentClasses();
-        else if (userProfile.role === 'teacher') renderTeacherClasses();
+        // التحقق من الدور بدقة (بإضافة trim و toLowerCase لتجنب أخطاء المسافات)
+        const role = userProfile.role ? userProfile.role.trim().toLowerCase() : "";
+        
+        if (role === 'student') {
+            console.log("تشغيل واجهة الطالب");
+            renderStudentClasses();
+        } else if (role === 'teacher') {
+            console.log("تشغيل واجهة الأستاذ");
+            renderTeacherClasses();
+        } else {
+            console.warn("دور المستخدم غير معرف أو غير مطابق:", role);
+        }
 
         // ربط زر الإرسال
         const sendBtn = document.getElementById("send-btn");
@@ -19,15 +39,24 @@ document.addEventListener('DOMContentLoaded', () => {
             sendBtn.onclick = () => {
                 if (window.currentActiveChatClassId) window.sendMessage(window.currentActiveChatClassId);
             };
-            input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendBtn.click(); });
+            if (input) {
+                input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendBtn.click(); });
+            }
         }
 
-        // ربط زر حفظ الصف بشكل صحيح
+        // ربط زر حفظ الصف
         const saveBtn = document.getElementById("saveClassBtn");
-        if (saveBtn) saveBtn.addEventListener("click", window.saveClass);
+        if (saveBtn) {
+            saveBtn.addEventListener("click", window.saveClass);
+            console.log("تم ربط زر الحفظ بنجاح");
+        } else {
+            console.warn("لم يتم العثور على زر الحفظ (saveClassBtn)");
+        }
+
+    } catch (e) {
+        console.error("خطأ في معالجة بيانات المستخدم:", e);
     }
 });
-
 // 2. وظائف الدردشة المتوافقة مع Compat
 window.loadMessages = function(classId) {
     window.currentActiveChatClassId = classId;
