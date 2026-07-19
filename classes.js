@@ -52,6 +52,8 @@ function showUserWelcome(user) {
 
 // دالة الانضمام لصف (للطالب)
 window.joinClass = function() {
+document.getElementById('chatSection').style.display = 'block';
+document.getElementById('currentChatTitle').innerText = "غرفة دردشة الصف: " + classId;
     const classId = prompt("أدخل رمز الصف (4 أرقام فقط):");
     
     // 1. التحقق من أن المدخل ليس فارغاً
