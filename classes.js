@@ -1,24 +1,7 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getDatabase } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-// (لاحظ أننا استغنينا عن getAnalytics لأننا نحتاج فقط Database)
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
-  authDomain: "roya-platform-26860.firebaseapp.com",
-  databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
-  projectId: "roya-platform-26860",
-  storageBucket: "roya-platform-26860.firebasestorage.app",
-  messagingSenderId: "897544406776",
-  appId: "1:897544406776:web:aa112013dea672fb141d0d",
-  measurementId: "G-Y88LCNKED2"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
+// --- ملف classes.js المعدل ليعمل مع Firebase Compat ---
 window.currentActiveChatClassId = "";
 
-// 2. التحميل عند بدء التشغيل
+// 1. تشغيل عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     let userString = localStorage.getItem("currentUser");
     if (userString) {
@@ -38,13 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendBtn.click(); });
         }
-    } else {
-        alert("يرجى تسجيل الدخول!");
-        window.location.href = "login.html";
     }
 });
 
-// 3. وظائف الدردشة
+// 2. وظائف الدردشة المتوافقة مع Compat
 window.loadMessages = function(classId) {
     window.currentActiveChatClassId = classId;
     document.getElementById('chatSection').style.display = 'block';
@@ -52,7 +32,10 @@ window.loadMessages = function(classId) {
     const chatBox = document.getElementById("chat-messages");
     chatBox.innerHTML = "جاري التحميل...";
 
-    onValue(ref(db, 'chat/' + classId), (snapshot) => {
+    // نستخدم window.database المعرف في الـ HTML
+    const chatRef = window.database.ref('chat/' + classId);
+    
+    chatRef.on('value', (snapshot) => {
         chatBox.innerHTML = "";
         const messages = snapshot.val();
         if (messages) {
@@ -70,25 +53,26 @@ window.sendMessage = function(classId) {
     const input = document.getElementById("message-input");
     if (!input.value.trim()) return;
     const user = JSON.parse(localStorage.getItem("currentUser"));
-    push(ref(db, 'chat/' + classId), {
+    
+    window.database.ref('chat/' + classId).push({
         sender: user.name,
         text: input.value.trim(),
-        timestamp: serverTimestamp()
+        timestamp: firebase.database.ServerValue.TIMESTAMP
     }).then(() => input.value = "");
 };
 
-// 4. وظائف الصفوف (الطلاب)
+// 3. وظائف الصفوف
 window.joinClass = function() {
     const classId = prompt("أدخل رمز الصف (4 أرقام):");
     if (!classId || !/^\d{4}$/.test(classId)) return alert("يجب إدخال 4 أرقام!");
 
     const userProfile = JSON.parse(localStorage.getItem("currentUser"));
-    get(ref(db, 'classes/' + classId)).then((snapshot) => {
+    window.database.ref('classes/' + classId).once('value').then((snapshot) => {
         if (!snapshot.exists()) return alert("الرمز غير موجود.");
         if (userProfile.joinedClasses?.includes(classId)) return alert("منضم مسبقاً!");
 
         const updatedClasses = [...(userProfile.joinedClasses || []), classId];
-        update(ref(db, 'users/' + userProfile.phone), { joinedClasses: updatedClasses }).then(() => {
+        window.database.ref('users/' + userProfile.phone).update({ joinedClasses: updatedClasses }).then(() => {
             userProfile.joinedClasses = updatedClasses;
             localStorage.setItem("currentUser", JSON.stringify(userProfile));
             renderStudentClasses();
@@ -99,7 +83,8 @@ window.joinClass = function() {
 function renderStudentClasses() {
     const container = document.getElementById("classesContainer");
     container.innerHTML = `<button onclick="window.joinClass()">+ انضمام لصف جديد</button>`;
-    onValue(ref(db, 'classes/'), (snapshot) => {
+    
+    window.database.ref('classes/').on('value', (snapshot) => {
         const data = snapshot.val();
         const joined = JSON.parse(localStorage.getItem("currentUser")).joinedClasses || [];
         if (data) {
@@ -117,10 +102,9 @@ function renderStudentClasses() {
     });
 }
 
-// 5. وظائف الأستاذ
 function renderTeacherClasses() {
     const container = document.getElementById("classesContainer");
-    onValue(ref(db, 'classes/'), (snapshot) => {
+    window.database.ref('classes/').on('value', (snapshot) => {
         container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
         const data = snapshot.val();
         if (data) {
@@ -139,29 +123,30 @@ function renderTeacherClasses() {
 window.saveClass = function() {
     const name = document.getElementById("className").value;
     const section = document.getElementById("classSection").value;
-    const id = Math.floor(1000 + Math.random() * 9000).toString(); // رمز 4 أرقام
-    set(ref(db, 'classes/' + id), { id, name, section, teacher: "أ. عقيل السعد", lessons: [{ title: "مقدمة" }] })
+    const id = Math.floor(1000 + Math.random() * 9000).toString();
+    window.database.ref('classes/' + id).set({ id, name, section, teacher: "أ. عقيل السعد", lessons: [{ title: "مقدمة" }] })
     .then(() => alert("تم الحفظ!"));
 };
 
 window.deleteClass = function(classId) {
-    if (confirm("حذف الصف؟")) remove(ref(db, 'classes/' + classId));
+    if (confirm("حذف الصف؟")) window.database.ref('classes/' + classId).remove();
 };
 
-// 6. دوال مساعدة
 window.viewClassLessons = function(classId) {
-    onValue(ref(db, 'classes/' + classId), (snapshot) => {
+    window.database.ref('classes/' + classId).once('value').then((snapshot) => {
         const c = snapshot.val();
         const container = document.getElementById("classesContainer");
         container.innerHTML = `<button onclick="location.reload()">العودة</button><h2>دروس: ${c.name}</h2><div id="lessons-list"></div>`;
         c.lessons?.forEach((l, i) => {
             document.getElementById("lessons-list").innerHTML += `<div>الدرس ${i + 1}: ${l.title}</div>`;
         });
-    }, { onlyOnce: true });
+    });
 };
 
 function loadUserDataFromCloud(phone) {
-    onValue(ref(db, 'users/' + phone), (s) => { if(s.val()) localStorage.setItem("currentUser", JSON.stringify(s.val())); });
+    window.database.ref('users/' + phone).on('value', (s) => { 
+        if(s.val()) localStorage.setItem("currentUser", JSON.stringify(s.val())); 
+    });
 }
 
 function showUserWelcome(user) {
