@@ -23,6 +23,9 @@
         .page-header h1 { margin: 0 0 10px 0; font-size: 26px; }
         .page-header p { margin: 0; opacity: 0.95; font-size: 15px; }
 
+        /* مساحة إعلانات البانر التلقائية من الإنترنت */
+        .ad-banner-box { background: #fff; border: 2px dashed #cbd5e0; padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 20px; color: #a0aec0; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+
         /* تبويبات الألعاب */
         .games-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 25px; justify-content: center; }
         .game-tab { background: white; border: 2px solid #cbd5e0; padding: 12px 22px; border-radius: 12px; cursor: pointer; font-weight: bold; color: #4a5568; transition: 0.3s; white-space: nowrap; font-size: 15px; }
@@ -57,6 +60,11 @@
 
         .game-score { font-size: 16px; font-weight: bold; color: #38a169; margin-top: 15px; }
         .action-game-btn { background: #38a169; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+
+        /* نافذة إعلان بيني تلقائي من النت */
+        .ad-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
+        .ad-modal-content { background: white; padding: 25px; border-radius: 12px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .ad-close-btn { background: #e53e3e; color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -83,6 +91,12 @@
             <p>تعلم بمتعة: ألعاب الحروف والقراءة، مسابقات العلوم والرياضيات، ولعبة البازل الذكية</p>
         </div>
 
+        <!-- 📢 مكان إعلان البانر التلقائي من الإنترنت -->
+        <div class="ad-banner-box">
+            <!-- ضع هنا كود الإعلان من شبكة الإعلانات (مثل Google AdSense) ليجلب الإعلان تلقائياً -->
+            <span>[مساحة إعلانية تلقائية من الإنترنت - Banner Ad]</span>
+        </div>
+
         <!-- تبويبات الألعاب -->
         <div class="games-tabs">
             <div class="game-tab active" onclick="switchGameTab('lettersGame', this)">🔤 تعليم الحروف والقراءة</div>
@@ -98,12 +112,10 @@
             <div class="letter-card-box">
                 <div id="targetLetter" class="big-letter">أ</div>
                 <div id="targetWordHint" class="word-hint">كلمة تبدأ بهذا الحرف؟</div>
-                <div class="options-grid" id="letterOptionsGrid">
-                    <!-- خيارات الإجابة -->
-                </div>
+                <div class="options-grid" id="letterOptionsGrid"></div>
             </div>
             <div class="game-score" id="letterScoreText">النقاط: 0 ⭐</div>
-            <button onclick="nextLetterRound()" class="action-game-btn">السؤال التالي ➡️</button>
+            <button onclick="triggerProfitAd(nextLetterRound)" class="action-game-btn">السؤال التالي ➡️</button>
         </div>
 
         <!-- 2. مسابقات العلوم والرياضيات -->
@@ -113,12 +125,10 @@
             
             <div class="quiz-box">
                 <div class="quiz-question" id="quizQuestionText">جاري تحميل السؤال...</div>
-                <div class="quiz-options" id="quizOptionsContainer">
-                    <!-- الخيارات -->
-                </div>
+                <div class="quiz-options" id="quizOptionsContainer"></div>
             </div>
             <div class="game-score" id="quizScoreText" style="margin-top: 15px;">النتيجة الصحيحة: 0 نقاط 🏆</div>
-            <button onclick="nextQuizQuestion()" class="action-game-btn" id="nextQuizBtn" style="display:none;">السؤال التالي ➡️</button>
+            <button onclick="triggerProfitAd(nextQuizQuestion)" class="action-game-btn" id="nextQuizBtn" style="display:none;">السؤال التالي ➡️</button>
         </div>
 
         <!-- 3. لعبة البازل -->
@@ -126,11 +136,21 @@
             <h2>🧩 لعبة البازل والتركيز الذكي</h2>
             <p style="color: #718096; margin-bottom: 10px;">رتب الأرقام أو الأجزاء بالتسلسل الصحيح من 1 إلى 8:</p>
             
-            <div class="puzzle-grid" id="puzzleBoard">
-                <!-- لوحة البازل -->
-            </div>
+            <div class="puzzle-grid" id="puzzleBoard"></div>
             <div class="game-score" id="puzzleStatus">حرك القطع لترتيبها! 🎯</div>
             <button onclick="resetPuzzle()" class="action-game-btn">إعادة ترتيب اللعبة 🔄</button>
+        </div>
+    </div>
+
+    <!-- نافذة إعلان بيني تفاعلي من النت -->
+    <div class="ad-modal" id="profitAdModal">
+        <div class="ad-modal-content">
+            <h3 style="color: #d69e2e; margin-top:0;">🌟 إعلان داعم للمنصة</h3>
+            <div style="background: #edf2f7; padding: 20px; border-radius: 8px; margin: 15px 0; color: #4a5568; font-size: 14px;">
+                <!-- يمكن وضع كود إعلان بيني من شبكة الإعلانات هنا ليجلب الإعلان تلقائياً -->
+                [جارِ عرض الإعلان من الإنترنت لتوليد الأرباح...]
+            </div>
+            <button onclick="closeProfitAd()" class="ad-close-btn">إغلاق ومتابعة اللعب ✖</button>
         </div>
     </div>
 
@@ -152,7 +172,20 @@
             tabEl.classList.add('active');
         }
 
-        // --- 1. منطق لعبة الحروف والقراءة ---
+        let pendingAction = null;
+        function triggerProfitAd(actionCallback) {
+            pendingAction = actionCallback;
+            document.getElementById('profitAdModal').style.display = 'flex';
+        }
+
+        function closeProfitAd() {
+            document.getElementById('profitAdModal').style.display = 'none';
+            if (pendingAction) {
+                pendingAction();
+                pendingAction = null;
+            }
+        }
+
         const lettersData = [
             { letter: 'أ', hint: 'حيوان مفترس قوي 🦁', correct: 'أسد', options: ['أسد', 'تفاحة', 'قلم', 'كرة'] },
             { letter: 'ب', hint: 'نأكل منها كل صباح 🍯', correct: 'بطة', options: ['تفاحة', 'بطة', 'مسطرة', 'أسد'] },
@@ -172,7 +205,6 @@
             const grid = document.getElementById('letterOptionsGrid');
             grid.innerHTML = "";
             
-            // خلط الخيارات
             const shuffled = [...data.options].sort(() => Math.random() - 0.5);
             shuffled.forEach(opt => {
                 const btn = document.createElement('button');
@@ -183,9 +215,9 @@
                         alert("إجابة صحيحة وصائبة! أحسنت 🌟");
                         letterScore += 10;
                         document.getElementById('letterScoreText').innerText = `النقاط: ${letterScore} ⭐`;
-                        nextLetterRound();
+                        triggerProfitAd(nextLetterRound);
                     } else {
-                        alert("حاول مرة أخرى يا قهرمان!");
+                        alert("حاول مرة أخرى يا بطل!");
                     }
                 };
                 grid.appendChild(btn);
@@ -197,11 +229,10 @@
             loadLetterRound();
         }
 
-        // --- 2. منطق مسابقات العلوم والرياضيات ---
         const quizData = [
             { q: 'كم عدد أيام الأسبوع؟', options: ['5 أيام', '7 أيام', '10 أيام'], correct: 1 },
             { q: 'ما هو الكوكب الذي نعيش عليه؟', options: ['المريخ', 'الأرض', 'المشتري'], correct: 1 },
-            { q: 'كم الناتح الحسابي لـ: 5 + 3 ؟', options: ['7', '8', '9'], correct: 1 },
+            { q: 'كم الناتج الحسابي لـ: 5 + 3 ؟', options: ['7', '8', '9'], correct: 1 },
             { q: 'أي من الحيوانات التالية يعتبر من الطيور؟', options: ['القطة', 'العصفور', 'السمكة'], correct: 1 },
             { q: 'ما هي عاصمة العراق؟', options: ['بغداد', 'البصرة', 'الموصل'], correct: 0 }
         ];
@@ -221,7 +252,7 @@
                 div.innerText = optText;
                 div.onclick = function() {
                     const allOpts = container.querySelectorAll('.quiz-opt');
-                    allOpts.forEach(o => o.style.pointerEvents = 'none'); // تعطيل النقر المتكرر
+                    allOpts.forEach(o => o.style.pointerEvents = 'none');
 
                     if (idx === qObj.correct) {
                         div.classList.add('correct');
@@ -249,7 +280,6 @@
             }
         }
 
-        // --- 3. لعبة البازل الذكية ---
         let puzzleArray = [1, 2, 3, 4, 5, 6, 7, '', 8];
 
         function renderPuzzle() {
@@ -265,11 +295,9 @@
         }
 
         function movePuzzlePiece(idx) {
-            // التحقق من إمكانية الحركة (المربعات المجاورة للفارغ)
             const emptyIdx = puzzleArray.indexOf('');
             const validMoves = [emptyIdx - 1, emptyIdx + 1, emptyIdx - 3, emptyIdx + 3];
             
-            // منع الانتقال الخاطئ بين الأسطر أفقياً
             if (emptyIdx === 2 && idx === 3) return;
             if (emptyIdx === 3 && idx === 2) return;
             if (emptyIdx === 5 && idx === 6) return;
@@ -296,7 +324,6 @@
             }
         }
 
-        // التهيئة الأولية عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', () => {
             loadLetterRound();
             loadQuizQuestion();
