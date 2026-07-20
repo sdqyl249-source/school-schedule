@@ -5,7 +5,8 @@
     <title>إدارة الصفوف - منصة الوادي</title>
     <link rel="stylesheet" href="classes_style.css">
     <style>
-        /* إضافة تنسيق سريع للدردشة */
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f2f5; }
+        .main-content { padding: 30px; }
         #chatSection { display: none; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
         .chat-wrapper { display: flex; flex-direction: column; height: 400px; border: 1px solid #ddd; border-radius: 10px; padding: 10px; background-color: #f9f9f9; }
         .chat-messages { flex-grow: 1; overflow-y: auto; margin-bottom: 10px; padding: 5px; border-bottom: 1px solid #ccc; }
@@ -15,12 +16,10 @@
 </head>
 <body>
 
-    <!-- المحتوى الرئيسي -->
     <div class="main-content">
         <h2>إدارة الصفوف 🏫</h2>
 
-        <!-- بوكس إضافة الصف (يظهر للمدير/الأستاذ فقط) -->
-        <div id="adminPanel" class="admin-section admin-only" style="border: 2px dashed #27ae60; padding: 20px; margin-bottom: 20px; border-radius: 10px;">
+        <div id="adminPanel" class="admin-section admin-only" style="border: 2px dashed #27ae60; padding: 20px; margin-bottom: 20px; border-radius: 10px; background: #fff;">
             <h3>إضافة صف جديد 🏫</h3>
             
             <label>اسم الصف:</label>
@@ -42,21 +41,16 @@
                 <option value="هـ">هـ</option>
             </select>
 
-            <!-- الزر بدون onclick -->
             <button id="saveClassBtn">حفظ الصف</button>
         </div>
 
-        <!-- المنطقة التي ستظهر فيها بطاقات الصفوف -->
-        <div class="dashboard-container" id="classesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 20px;">
+        <div class="dashboard-container" id="classesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
         </div>
 
-        <!-- قسم الدردشة (مخفي افتراضياً، يظهر عند الدخول لصف) -->
         <div id="chatSection">
             <h3 id="currentChatTitle">غرفة الدردشة</h3>
             <div class="chat-wrapper">
-                <div id="chat-messages" class="chat-messages">
-                    <!-- الرسائل ستظهر هنا -->
-                </div>
+                <div id="chat-messages" class="chat-messages"></div>
                 <div class="chat-input-area">
                     <input type="text" id="message-input" placeholder="اكتب رسالتك هنا...">
                     <button id="send-btn">إرسال ✉️</button>
@@ -65,23 +59,12 @@
             <button onclick="document.getElementById('chatSection').style.display='none'">إغلاق الدردشة</button>
         </div>
     </div>
-    
-    <script>
-        function logout() {
-            localStorage.removeItem("currentUser");
-            window.location.href = "login.html";
-        }
-    </script>
-    
-  <!-- في نهاية ملف الـ HTML، اجعل الترتيب هكذا بالضبط -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
-<!-- هذا الملف يهيئ الـ window.database أولاً -->
-<script src="global.js"></script>
-
-<!-- هذه السكربتات الآن ستجد window.database جاهزة -->
-<script src="scriot.js"></script>
-<script src="classes.js?v=999"></script>
+    <!-- الترتيب الإجباري والصحيح للسكربتات -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="global.js"></script>
+    <script src="scriot.js"></script>
+    <script src="classes.js?v=1000"></script>
 </body>
 </html>
