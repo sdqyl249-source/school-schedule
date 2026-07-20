@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (role === 'student') renderStudentClasses();
         else if (role === 'teacher') renderTeacherClasses();
 
-        // ربط الأزرار مع فحص الأمان
         const sendBtn = document.getElementById("send-btn");
         const input = document.getElementById("message-input");
         if (sendBtn && input) {
@@ -44,6 +43,7 @@ window.loadMessages = function(classId) {
     if (chatTitle) chatTitle.innerText = "غرفة دردشة الصف: " + classId;
     if (chatBox) {
         chatBox.innerHTML = "جاري التحميل...";
+        if (typeof window.database === 'undefined') return;
         window.database.ref('chat/' + classId).on('value', (snapshot) => {
             chatBox.innerHTML = "";
             const messages = snapshot.val();
@@ -61,7 +61,7 @@ window.loadMessages = function(classId) {
 
 window.sendMessage = function(classId) {
     const input = document.getElementById("message-input");
-    if (!input || !input.value.trim()) return;
+    if (!input || !input.value.trim() || typeof window.database === 'undefined') return;
     const user = JSON.parse(localStorage.getItem("currentUser"));
     window.database.ref('chat/' + classId).push({
         sender: user.name,
@@ -70,8 +70,7 @@ window.sendMessage = function(classId) {
     }).then(() => input.value = "");
 };
 
-// دوال إدارة الصفوف
-// تحديث دالة renderStudentClasses لتكون آمنة مثل زميلتها
+// دوال عرض الصفوف (مؤمنة ضد خطأ undefined)
 function renderStudentClasses() {
     const container = document.getElementById("classesContainer");
     if (!container) return;
@@ -101,7 +100,42 @@ function renderStudentClasses() {
     });
 }
 
-// تحديث دالة loadUserDataFromCloud لتكون آمنة
+function renderTeacherClasses() {
+    const container = document.getElementById("classesContainer");
+    if (!container) return;
+
+    if (typeof window.database === 'undefined') {
+        setTimeout(renderTeacherClasses, 100); 
+        return;
+    }
+
+    window.database.ref('classes/').on('value', (snapshot) => {
+        container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
+        const data = snapshot.val();
+        if (data) {
+            Object.values(data).forEach(cls => {
+                const card = document.createElement("div");
+                card.className = "class-card";
+                card.innerHTML = `<h3>${cls.name}</h3><small>الرمز: ${cls.id}</small><br>
+                                  <button onclick="window.viewClassLessons('${cls.id}')">عرض</button>
+                                  <button onclick="window.deleteClass('${cls.id}')" style="background:#8b0000; color:white;">حذف</button>`;
+                container.appendChild(card);
+            });
+        }
+    });
+}
+
+// دوال مساعدة
+window.saveClass = function() {
+    const name = document.getElementById("className")?.value;
+    const section = document.getElementById("classSection")?.value;
+    if (!name || !section || typeof window.database === 'undefined') return alert("خطأ في البيانات أو اتصال القاعدة");
+    
+    const id = Math.floor(1000 + Math.random() * 9000).toString();
+    window.database.ref('classes/' + id).set({ id, name, section, lessons: [{ title: "مقدمة" }] })
+    .then(() => alert("تم الحفظ!"));
+};
+
 function loadUserDataFromCloud(phone) {
     if (typeof window.database === 'undefined') {
         setTimeout(() => loadUserDataFromCloud(phone), 500);
@@ -111,60 +145,6 @@ function loadUserDataFromCloud(phone) {
         if(s.val()) localStorage.setItem("currentUser", JSON.stringify(s.val())); 
     });
 }
-function renderTeacherClasses() {
-    const container = document.getElementById("classesContainer");
-    if (!container) return;
-
-    // فحص ذكي: إذا لم تكن موجودة، انتظر 100 مللي ثانية وأعد المحاولة
-    if (typeof window.database === 'undefined' || window.database === null) {
-        console.warn("جاري انتظار تهيئة Firebase...");
-        setTimeout(renderTeacherClasses, 100); 
-        return;
-    }
-
-    // الآن نضمن أنها موجودة
-    window.database.ref('classes/').on('value', (snapshot) => {
-        container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
-        const data = snapshot.val();
-        if (data) {
-            Object.values(data).forEach(cls => {
-                const card = document.createElement("div");
-                card.className = "class-card";
-                card.innerHTML = `<h3>${cls.name}</h3><small>الرمز: ${cls.id}</small><br>
-                                  <button onclick="window.viewClassLessons('${cls.id}')">عرض</button>
-                                  <button onclick="window.deleteClass('${cls.id}')" style="background:#8b0000; color:white;">حذف</button>`;
-                container.appendChild(card);
-            });
-        }
-    });
-}
-
-    // الآن نضمن أن window.database موجودة
-    window.database.ref('classes/').on('value', (snapshot) => {
-        container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
-        const data = snapshot.val();
-        if (data) {
-            Object.values(data).forEach(cls => {
-                const card = document.createElement("div");
-                card.className = "class-card";
-                card.innerHTML = `<h3>${cls.name}</h3><small>الرمز: ${cls.id}</small><br>
-                                  <button onclick="window.viewClassLessons('${cls.id}')">عرض</button>
-                                  <button onclick="window.deleteClass('${cls.id}')" style="background:#8b0000; color:white;">حذف</button>`;
-                container.appendChild(card);
-            });
-        }
-    });
-}
-
-window.saveClass = function() {
-    const name = document.getElementById("className")?.value;
-    const section = document.getElementById("classSection")?.value;
-    if (!name || !section) return alert("يرجى اختيار اسم الصف والشعبة");
-    
-    const id = Math.floor(1000 + Math.random() * 9000).toString();
-    window.database.ref('classes/' + id).set({ id, name, section, lessons: [{ title: "مقدمة" }] })
-    .then(() => alert("تم الحفظ!"));
-};
 
 function showUserWelcome(user) {
     const header = document.querySelector('h1') || document.body;
