@@ -99,13 +99,14 @@ function renderTeacherClasses() {
     const container = document.getElementById("classesContainer");
     if (!container) return;
 
-    // إضافة فحص التأكد من وجود قاعدة البيانات
-    if (!window.database) {
-        console.error("قاعدة البيانات غير مهيأة بعد، سنحاول مرة أخرى...");
-        setTimeout(renderTeacherClasses, 500); // محاولة ثانية بعد نصف ثانية
+    // نمط التحقق الآمن
+    if (typeof window.database === 'undefined') {
+        console.warn("قاعدة البيانات لم تجهز بعد، سننتظر...");
+        setTimeout(renderTeacherClasses, 500); // إعادة المحاولة بعد 500 مللي ثانية
         return;
     }
 
+    // الآن نضمن أن window.database موجودة
     window.database.ref('classes/').on('value', (snapshot) => {
         container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
         const data = snapshot.val();
