@@ -1,7 +1,307 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الألعاب والترفيه التعليمي - منصة الوادي</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f2f5; color: #2d3748; }
+        
+        /* القائمة الجانبية */
+        .sidebar { height: 100vh; width: 0; position: fixed; top: 0; right: 0; background: linear-gradient(180deg, #ffffff, #dfe9f3); box-shadow: 0 4px 25px rgba(0,0,0,0.1); transition: width 0.4s; overflow-x: hidden; z-index: 1000; display: flex; flex-direction: column; padding: 20px 0; }
+        .sidebar-title { color: #2c3e50; font-size: 20px; font-weight: bold; padding-bottom: 20px; border-bottom: 2px solid rgba(41, 128, 185, 0.2); margin-bottom: 10px; text-align: center; white-space: nowrap; }
+        .menu-item { color: #2c3e50; background: rgba(255, 255, 255, 0.2); border-radius: 12px; margin: 8px 15px; padding: 12px 18px; text-align: center; transition: 0.3s; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-weight: 500; }
+        .menu-item:hover { background: rgba(255, 255, 255, 0.6); box-shadow: 0 0 12px #74b9ff; transform: translateY(-2px); }
+        .logout-btn { margin-top: auto; padding: 12px; background: rgba(231, 76, 60, 0.1); color: #c0392b; border: 1px solid rgba(231, 76, 60, 0.2); border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; width: 80%; margin: 20px auto; }
+        .logout-btn:hover { background: #e74c3c; color: white; }
+        .toggle-btn { position: fixed; top: 20px; right: 20px; z-index: 1002; padding: 12px 20px; cursor: pointer; background: #ffffff; color: #2c3e50; border: none; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-weight: bold; }
+        
+        .main-content { margin-right: 0; padding: 30px; transition: 0.4s; max-width: 1200px; margin: 0 auto; box-sizing: border-box; }
+        
+        /* ترويسة الصفحة */
+        .page-header { background: linear-gradient(135deg, #d69e2e, #b7791f); color: white; padding: 25px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(214, 158, 46, 0.2); text-align: center; }
+        .page-header h1 { margin: 0 0 10px 0; font-size: 26px; }
+        .page-header p { margin: 0; opacity: 0.95; font-size: 15px; }
 
-<script>
-    function logout() {
-        localStorage.removeItem("currentUser");
-        window.location.href = "login.html";
-    }
-</script>
+        /* تبويبات الألعاب */
+        .games-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 25px; justify-content: center; }
+        .game-tab { background: white; border: 2px solid #cbd5e0; padding: 12px 22px; border-radius: 12px; cursor: pointer; font-weight: bold; color: #4a5568; transition: 0.3s; white-space: nowrap; font-size: 15px; }
+        .game-tab.active { background: #d69e2e; color: white; border-color: #d69e2e; box-shadow: 0 4px 12px rgba(214, 158, 46, 0.3); }
+
+        /* حاويات الألعاب */
+        .game-container { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; display: none; text-align: center; }
+        .game-container.active { display: block; }
+        .game-container h2 { color: #2d3748; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        /* أسلوب لعبة الحروف والقراءة */
+        .letter-card-box { background: #f7fafc; border: 2px solid #cbd5e0; border-radius: 14px; padding: 25px; max-width: 450px; margin: 0 auto 20px auto; }
+        .big-letter { font-size: 70px; color: #3182ce; font-weight: bold; margin: 10px 0; }
+        .word-hint { font-size: 22px; color: #2d3748; margin-bottom: 20px; font-weight: bold; }
+        .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px; }
+        .opt-btn { background: #3182ce; color: white; border: none; padding: 12px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .opt-btn:hover { background: #2b6cb0; }
+
+        /* أسلوب المسابقات العلمية والرياضيات */
+        .quiz-box { max-width: 550px; margin: 0 auto; text-align: right; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .quiz-question { font-size: 18px; font-weight: bold; color: #2d3748; margin-bottom: 15px; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+        .quiz-opt { background: white; border: 2px solid #cbd5e0; padding: 12px 15px; border-radius: 8px; cursor: pointer; font-weight: 500; text-align: right; transition: 0.2s; }
+        .quiz-opt:hover { border-color: #3182ce; background: #ebf8ff; }
+        .quiz-opt.correct { background: #38a169; color: white; border-color: #38a169; }
+        .quiz-opt.wrong { background: #e53e3e; color: white; border-color: #e53e3e; }
+
+        /* أسلوب لعبة البازل (Puzzle) */
+        .puzzle-grid { display: grid; grid-template-columns: repeat(3, 90px); gap: 6px; justify-content: center; margin: 20px auto; background: #cbd5e0; padding: 6px; border-radius: 10px; width: fit-content; }
+        .puzzle-piece { width: 90px; height: 90px; background: #3182ce; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border-radius: 6px; cursor: pointer; user-select: none; transition: 0.2s; }
+        .puzzle-piece.empty { background: #e2e8f0; cursor: default; }
+
+        .game-score { font-size: 16px; font-weight: bold; color: #38a169; margin-top: 15px; }
+        .action-game-btn { background: #38a169; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <button class="toggle-btn" onclick="document.getElementById('mySidebar').style.width = '260px';">☰ القائمة</button>
+
+    <!-- القائمة الجانبية -->
+    <div class="sidebar" id="mySidebar">
+        <div class="sidebar-title">🏞️ منصة الوادي</div>
+        <div class="menu-item" onclick="location.href='index.html'">🏠 الرئيسية</div>
+        <div class="menu-item" onclick="location.href='classes.html'">🏫 إدارة الصفوف والدردشة</div>
+        <div class="menu-item" onclick="location.href='schedule.html'">⏰ الحصص والجداول</div>
+        <div class="menu-item" onclick="location.href='games.html'">🎮 الألعاب والترفيه</div>
+        <div class="menu-item" onclick="location.href='library.html'">📚 المكتبة الرقمية</div>
+        <button onclick="localStorage.removeItem('currentUser'); window.location.href='login.html';" class="logout-btn">تسجيل الخروج</button>
+    </div>
+    
+    <div onclick="document.getElementById('mySidebar').style.width = '0';" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999; display:none;" id="sidebarOverlay"></div>
+
+    <div class="main-content">
+        <!-- ترويسة الصفحة -->
+        <div class="page-header">
+            <h1>🎮 الألعاب والترفيه التعليمي للمرحلة الابتدائية</h1>
+            <p>تعلم بمتعة: ألعاب الحروف والقراءة، مسابقات العلوم والرياضيات، ولعبة البازل الذكية</p>
+        </div>
+
+        <!-- تبويبات الألعاب -->
+        <div class="games-tabs">
+            <div class="game-tab active" onclick="switchGameTab('lettersGame', this)">🔤 تعليم الحروف والقراءة</div>
+            <div class="game-tab" onclick="switchGameTab('quizGame', this)">🧠 مسابقات العلوم والرياضيات</div>
+            <div class="game-tab" onclick="switchGameTab('puzzleGame', this)">🧩 لعبة البازل الذكية</div>
+        </div>
+
+        <!-- 1. لعبة الحروف والقراءة -->
+        <div class="game-container active" id="lettersGame">
+            <h2>🔤 لعبة تحدي الحروف والتهجي المبكر</h2>
+            <p style="color: #718096; margin-bottom: 20px;">اختر الكلمة الصحيحة التي تبدأ أو تطابق الحرف الظاهر:</p>
+            
+            <div class="letter-card-box">
+                <div id="targetLetter" class="big-letter">أ</div>
+                <div id="targetWordHint" class="word-hint">كلمة تبدأ بهذا الحرف؟</div>
+                <div class="options-grid" id="letterOptionsGrid">
+                    <!-- خيارات الإجابة -->
+                </div>
+            </div>
+            <div class="game-score" id="letterScoreText">النقاط: 0 ⭐</div>
+            <button onclick="nextLetterRound()" class="action-game-btn">السؤال التالي ➡️</button>
+        </div>
+
+        <!-- 2. مسابقات العلوم والرياضيات -->
+        <div class="game-container" id="quizGame">
+            <h2>🧠 مسابقات العلوم والرياضيات المبسطة</h2>
+            <p style="color: #718096; margin-bottom: 20px;">اختبر معلوماتك العامة والرياضية بأسلوب ممتع:</p>
+            
+            <div class="quiz-box">
+                <div class="quiz-question" id="quizQuestionText">جاري تحميل السؤال...</div>
+                <div class="quiz-options" id="quizOptionsContainer">
+                    <!-- الخيارات -->
+                </div>
+            </div>
+            <div class="game-score" id="quizScoreText" style="margin-top: 15px;">النتيجة الصحيحة: 0 نقاط 🏆</div>
+            <button onclick="nextQuizQuestion()" class="action-game-btn" id="nextQuizBtn" style="display:none;">السؤال التالي ➡️</button>
+        </div>
+
+        <!-- 3. لعبة البازل -->
+        <div class="game-container" id="puzzleGame">
+            <h2>🧩 لعبة البازل والتركيز الذكي</h2>
+            <p style="color: #718096; margin-bottom: 10px;">رتب الأرقام أو الأجزاء بالتسلسل الصحيح من 1 إلى 8:</p>
+            
+            <div class="puzzle-grid" id="puzzleBoard">
+                <!-- لوحة البازل -->
+            </div>
+            <div class="game-score" id="puzzleStatus">حرك القطع لترتيبها! 🎯</div>
+            <button onclick="resetPuzzle()" class="action-game-btn">إعادة ترتيب اللعبة 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('.toggle-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('mySidebar').style.width = '260px';
+            document.getElementById('sidebarOverlay').style.display = 'block';
+        });
+        document.getElementById('sidebarOverlay').addEventListener('click', () => {
+            document.getElementById('mySidebar').style.width = '0';
+            document.getElementById('sidebarOverlay').style.display = 'none';
+        });
+
+        function switchGameTab(gameId, tabEl) {
+            document.querySelectorAll('.game-container').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.game-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(gameId).classList.add('active');
+            tabEl.classList.add('active');
+        }
+
+        // --- 1. منطق لعبة الحروف والقراءة ---
+        const lettersData = [
+            { letter: 'أ', hint: 'حيوان مفترس قوي 🦁', correct: 'أسد', options: ['أسد', 'تفاحة', 'قلم', 'كرة'] },
+            { letter: 'ب', hint: 'نأكل منها كل صباح 🍯', correct: 'بطة', options: ['تفاحة', 'بطة', 'مسطرة', 'أسد'] },
+            { letter: 'ت', hint: 'فاكهة حمراء ولذيذة 🍎', correct: 'تفاحة', options: ['تفاحة', 'جمل', 'سكة', 'شمس'] },
+            { letter: 'ج', hint: 'سفينة الصحراء 🐪', correct: 'جمل', options: ['قمر', 'جمل', 'وردة', 'كلب'] },
+            { letter: 'د', hint: 'حيوان أليف يحب اللعب 🐕', correct: 'دجاجة', options: ['دجاجة', 'أسد', 'فيل', 'نمر'] },
+            { letter: 'س', hint: 'تنير السماء ليلاً 🌙', correct: 'سماء', options: ['قلم', 'سماء', 'سمكة', 'بحر'] }
+        ];
+        let currentLetterIdx = 0;
+        let letterScore = 0;
+
+        function loadLetterRound() {
+            const data = lettersData[currentLetterIdx];
+            document.getElementById('targetLetter').innerText = data.letter;
+            document.getElementById('targetWordHint').innerText = data.hint;
+            
+            const grid = document.getElementById('letterOptionsGrid');
+            grid.innerHTML = "";
+            
+            // خلط الخيارات
+            const shuffled = [...data.options].sort(() => Math.random() - 0.5);
+            shuffled.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (opt === data.correct) {
+                        alert("إجابة صحيحة وصائبة! أحسنت 🌟");
+                        letterScore += 10;
+                        document.getElementById('letterScoreText').innerText = `النقاط: ${letterScore} ⭐`;
+                        nextLetterRound();
+                    } else {
+                        alert("حاول مرة أخرى يا قهرمان!");
+                    }
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function nextLetterRound() {
+            currentLetterIdx = (currentLetterIdx + 1) % lettersData.length;
+            loadLetterRound();
+        }
+
+        // --- 2. منطق مسابقات العلوم والرياضيات ---
+        const quizData = [
+            { q: 'كم عدد أيام الأسبوع؟', options: ['5 أيام', '7 أيام', '10 أيام'], correct: 1 },
+            { q: 'ما هو الكوكب الذي نعيش عليه؟', options: ['المريخ', 'الأرض', 'المشتري'], correct: 1 },
+            { q: 'كم الناتح الحسابي لـ: 5 + 3 ؟', options: ['7', '8', '9'], correct: 1 },
+            { q: 'أي من الحيوانات التالية يعتبر من الطيور؟', options: ['القطة', 'العصفور', 'السمكة'], correct: 1 },
+            { q: 'ما هي عاصمة العراق؟', options: ['بغداد', 'البصرة', 'الموصل'], correct: 0 }
+        ];
+        let currentQuizIdx = 0;
+        let quizScore = 0;
+
+        function loadQuizQuestion() {
+            const qObj = quizData[currentQuizIdx];
+            document.getElementById('quizQuestionText').innerText = qObj.q;
+            const container = document.getElementById('quizOptionsContainer');
+            container.innerHTML = "";
+            document.getElementById('nextQuizBtn').style.display = 'none';
+
+            qObj.options.forEach((optText, idx) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-opt';
+                div.innerText = optText;
+                div.onclick = function() {
+                    const allOpts = container.querySelectorAll('.quiz-opt');
+                    allOpts.forEach(o => o.style.pointerEvents = 'none'); // تعطيل النقر المتكرر
+
+                    if (idx === qObj.correct) {
+                        div.classList.add('correct');
+                        quizScore += 10;
+                        document.getElementById('quizScoreText').innerText = `النتيجة الصحيحة: ${quizScore} نقاط 🏆`;
+                    } else {
+                        div.classList.add('wrong');
+                        allOpts[qObj.correct].classList.add('correct');
+                    }
+                    document.getElementById('nextQuizBtn').style.display = 'inline-block';
+                };
+                container.appendChild(div);
+            });
+        }
+
+        function nextQuizQuestion() {
+            currentQuizIdx++;
+            if (currentQuizIdx < quizData.length) {
+                loadQuizQuestion();
+            } else {
+                alert(`أكملت جميع الأسئلة بنجاح! مجموع نقاطك: ${quizScore}`);
+                currentQuizIdx = 0;
+                quizScore = 0;
+                loadQuizQuestion();
+            }
+        }
+
+        // --- 3. لعبة البازل الذكية ---
+        let puzzleArray = [1, 2, 3, 4, 5, 6, 7, '', 8];
+
+        function renderPuzzle() {
+            const board = document.getElementById('puzzleBoard');
+            board.innerHTML = "";
+            puzzleArray.forEach((val, idx) => {
+                const piece = document.createElement('div');
+                piece.className = val === '' ? 'puzzle-piece empty' : 'puzzle-piece';
+                piece.innerText = val;
+                piece.onclick = () => movePuzzlePiece(idx);
+                board.appendChild(piece);
+            });
+        }
+
+        function movePuzzlePiece(idx) {
+            // التحقق من إمكانية الحركة (المربعات المجاورة للفارغ)
+            const emptyIdx = puzzleArray.indexOf('');
+            const validMoves = [emptyIdx - 1, emptyIdx + 1, emptyIdx - 3, emptyIdx + 3];
+            
+            // منع الانتقال الخاطئ بين الأسطر أفقياً
+            if (emptyIdx === 2 && idx === 3) return;
+            if (emptyIdx === 3 && idx === 2) return;
+            if (emptyIdx === 5 && idx === 6) return;
+            if (emptyIdx === 6 && idx === 5) return;
+
+            if (validMoves.includes(idx)) {
+                puzzleArray[emptyIdx] = puzzleArray[idx];
+                puzzleArray[idx] = '';
+                renderPuzzle();
+                checkPuzzleWin();
+            }
+        }
+
+        function resetPuzzle() {
+            puzzleArray = [1, 3, 2, 4, '', 6, 7, 5, 8].sort(() => Math.random() - 0.5);
+            renderPuzzle();
+            document.getElementById('puzzleStatus').innerText = "حرك القطع لترتيبها تنازلياً! 🎯";
+        }
+
+        function checkPuzzleWin() {
+            const winningStr = "1,2,3,4,5,6,7,8,";
+            if (puzzleArray.join(',') === winningStr) {
+                document.getElementById('puzzleStatus').innerText = "🎉 مبروك! لقد رتبت البازل بنجاح تام!";
+            }
+        }
+
+        // التهيئة الأولية عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLetterRound();
+            loadQuizQuestion();
+            resetPuzzle();
+        });
+    </script>
+</body>
+</html>
