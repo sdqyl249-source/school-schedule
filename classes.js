@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (role === 'student') renderStudentClasses();
         else if (role === 'teacher') renderTeacherClasses();
 
+        // ربط الأزرار
         const sendBtn = document.getElementById("send-btn");
         const input = document.getElementById("message-input");
         if (sendBtn && input) {
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// دوال الدردشة
+// --- دوال الدردشة ---
 window.loadMessages = function(classId) {
     window.currentActiveChatClassId = classId;
     const chatSection = document.getElementById('chatSection');
@@ -41,9 +42,8 @@ window.loadMessages = function(classId) {
     
     if (chatSection) chatSection.style.display = 'block';
     if (chatTitle) chatTitle.innerText = "غرفة دردشة الصف: " + classId;
-    if (chatBox) {
+    if (chatBox && window.database) {
         chatBox.innerHTML = "جاري التحميل...";
-        if (typeof window.database === 'undefined') return;
         window.database.ref('chat/' + classId).on('value', (snapshot) => {
             chatBox.innerHTML = "";
             const messages = snapshot.val();
@@ -61,7 +61,7 @@ window.loadMessages = function(classId) {
 
 window.sendMessage = function(classId) {
     const input = document.getElementById("message-input");
-    if (!input || !input.value.trim() || typeof window.database === 'undefined') return;
+    if (!input || !input.value.trim() || !window.database) return;
     const user = JSON.parse(localStorage.getItem("currentUser"));
     window.database.ref('chat/' + classId).push({
         sender: user.name,
@@ -70,15 +70,11 @@ window.sendMessage = function(classId) {
     }).then(() => input.value = "");
 };
 
-// دوال عرض الصفوف (مؤمنة ضد خطأ undefined)
+// --- دوال الصفوف ---
 function renderStudentClasses() {
     const container = document.getElementById("classesContainer");
     if (!container) return;
-
-    if (typeof window.database === 'undefined') {
-        setTimeout(renderStudentClasses, 500);
-        return;
-    }
+    if (!window.database) { setTimeout(renderStudentClasses, 500); return; }
     
     container.innerHTML = `<button onclick="window.joinClass()">+ انضمام لصف جديد</button>`;
     window.database.ref('classes/').on('value', (snapshot) => {
@@ -103,11 +99,7 @@ function renderStudentClasses() {
 function renderTeacherClasses() {
     const container = document.getElementById("classesContainer");
     if (!container) return;
-
-    if (typeof window.database === 'undefined') {
-        setTimeout(renderTeacherClasses, 100); 
-        return;
-    }
+    if (!window.database) { setTimeout(renderTeacherClasses, 500); return; }
 
     window.database.ref('classes/').on('value', (snapshot) => {
         container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
@@ -125,11 +117,17 @@ function renderTeacherClasses() {
     });
 }
 
-// دوال مساعدة
+// --- دوال مساعدة إضافية لمنع الخطأ ---
+window.joinClass = function() { alert("دالة الانضمام للصف قيد التطوير"); };
+window.viewClassLessons = function(id) { alert("عرض دروس الصف: " + id); };
+window.deleteClass = function(id) { 
+    if(confirm("حذف الصف؟") && window.database) window.database.ref('classes/' + id).remove(); 
+};
+
 window.saveClass = function() {
     const name = document.getElementById("className")?.value;
     const section = document.getElementById("classSection")?.value;
-    if (!name || !section || typeof window.database === 'undefined') return alert("خطأ في البيانات أو اتصال القاعدة");
+    if (!name || !section || !window.database) return alert("خطأ في البيانات أو اتصال القاعدة");
     
     const id = Math.floor(1000 + Math.random() * 9000).toString();
     window.database.ref('classes/' + id).set({ id, name, section, lessons: [{ title: "مقدمة" }] })
@@ -137,10 +135,7 @@ window.saveClass = function() {
 };
 
 function loadUserDataFromCloud(phone) {
-    if (typeof window.database === 'undefined') {
-        setTimeout(() => loadUserDataFromCloud(phone), 500);
-        return;
-    }
+    if (!window.database) { setTimeout(() => loadUserDataFromCloud(phone), 500); return; }
     window.database.ref('users/' + phone).on('value', (s) => { 
         if(s.val()) localStorage.setItem("currentUser", JSON.stringify(s.val())); 
     });
