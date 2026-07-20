@@ -7,12 +7,7 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f2f5; }
         .main-content { padding: 30px; }
-        #chatSection { display: none; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
-        .chat-wrapper { display: flex; flex-direction: column; height: 400px; border: 1px solid #ddd; border-radius: 10px; padding: 10px; background-color: #f9f9f9; }
-        .chat-messages { flex-grow: 1; overflow-y: auto; margin-bottom: 10px; padding: 5px; border-bottom: 1px solid #ccc; }
-        .chat-input-area { display: flex; gap: 10px; }
-        .chat-input-area input { flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
-        .class-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .class-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -20,98 +15,66 @@
     <div class="main-content">
         <h2>إدارة الصفوف 🏫</h2>
 
-        <div id="adminPanel" class="admin-section" style="border: 2px dashed #27ae60; padding: 20px; margin-bottom: 20px; border-radius: 10px; background: #fff;">
+        <div style="border: 2px dashed #27ae60; padding: 20px; margin-bottom: 20px; border-radius: 10px; background: #fff;">
             <h3>إضافة صف جديد 🏫</h3>
             <label>اسم الصف:</label>
             <select id="className">
                 <option value="الاول">الاول</option>
                 <option value="الثاني">الثاني</option>
                 <option value="الثالث">الثالث</option>
-                <option value="الرابع">الرابع</option>
-                <option value="الخامس">الخامس</option>
-                <option value="السادس">السادس</option>
             </select>
-
             <label>الشعبة:</label>
             <select id="classSection">
                 <option value="أ">أ</option>
                 <option value="ب">ب</option>
-                <option value="ج">ج</option>
-                <option value="د">د</option>
-                <option value="هـ">هـ</option>
             </select>
-
             <button id="saveClassBtn" style="padding: 8px 15px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">حفظ الصف</button>
         </div>
 
-        <div class="dashboard-container" id="classesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
-        </div>
+        <div id="classesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;"></div>
     </div>
 
-    <!-- 1. تحميل مكتبات Firebase من الإنترنت مباشرة -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <!-- استخدام إصدار توافقي موثوق ومستقر جداً -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-    <!-- 2. كود التشغيل والاتصال المباشر (بدون ملفات خارجية قد تسبب مشاكل في الكيت) -->
     <script>
-        // إعدادات الاتصال بـ Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
-            databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
-            projectId: "roya-platform-26860",
-            storageBucket: "roya-platform-26860.appspot.com",
-            messagingSenderId: "897544406776",
-            appId: "1:897544406776:web:aa112013dea672fb141d0d"
-        };
+        console.log("0. بدأ تحميل الصفحة...");
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        
-        // تعريف قاعدة البيانات عالمياً
-        window.database = firebase.database();
-        console.log("تم تعريف window.database بنجاح داخل الملف مباشرة.");
-
-        // تشغيل كود الصفحة فور تحميل الـ DOM
-        document.addEventListener('DOMContentLoaded', () => {
-            let userString = localStorage.getItem("currentUser");
-            if (!userString) {
-                console.warn("تنبيه: لا يوجد مستخدم مسجل الدخول في localStorage.");
-                return;
-            }
-
-            const userProfile = JSON.parse(userString);
+        // فحص هل المكتبة وصلت أصلاً للمتصفح؟
+        if (typeof firebase === 'undefined') {
+            console.error("خطأ خطير: لم يتمكن المتصفح من تحميل مكتبة Firebase من الإنترنت. تأكد من اتصال الإنترنت أو أن الشبكة لا تحظر الروابط الخارجية.");
+        } else {
+            console.log("1. مكتبة Firebase تم تحميلها بنجاح.");
             
-            // رسالة الترحيب
-            const header = document.querySelector('h2');
-            if (header) {
-                const infoBox = document.createElement('div');
-                infoBox.innerHTML = `<h3>مرحباً بك يا ${user.name || userProfile.name}</h3>`;
-                header.parentNode.insertBefore(infoBox, header.nextSibling);
-            }
+            const firebaseConfig = {
+                apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
+                databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
+                projectId: "roya-platform-26860",
+                storageBucket: "roya-platform-26860.appspot.com",
+                messagingSenderId: "897544406776",
+                appId: "1:897544406776:web:aa112013dea672fb141d0d"
+            };
 
-            // عرض صفوف الأستاذ
-            const container = document.getElementById("classesContainer");
-            if (container && window.database) {
-                window.database.ref('classes/').on('value', (snapshot) => {
-                    container.innerHTML = "<h2>صفوفي المتاحة:</h2>";
-                    const data = snapshot.val();
-                    if (data) {
-                        Object.values(data).forEach(cls => {
-                            const card = document.createElement("div");
-                            card.className = "class-card";
-                            card.innerHTML = `<h3>${cls.name} - شعبة ${cls.section}</h3><small>الرمز: ${cls.id}</small><br>
-                                              <button onclick="deleteClass('${cls.id}')" style="background:#8b0000; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; margin-top:5px;">حذف</button>`;
-                            container.appendChild(card);
-                        });
-                    }
-                });
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                window.database = firebase.database();
+                console.log("2. نجاح تام! قاعدة البيانات أصبحت جاهزة:", window.database);
+            } catch (err) {
+                console.error("فشل في تهيئة Firebase:", err);
             }
+        }
 
-            // زر حفظ الصف
+        document.addEventListener('DOMContentLoaded', () => {
             const saveBtn = document.getElementById("saveClassBtn");
             if (saveBtn) {
                 saveBtn.onclick = function() {
+                    if (!window.database) {
+                        alert("لا يمكن الحفظ، قاعدة البيانات غير متصلة (undefined).");
+                        return;
+                    }
                     const name = document.getElementById("className").value;
                     const section = document.getElementById("classSection").value;
                     const id = Math.floor(1000 + Math.random() * 9000).toString();
@@ -119,25 +82,15 @@
                     window.database.ref('classes/' + id).set({
                         id: id,
                         name: name,
-                        section: section,
-                        lessons: [{ title: "مقدمة" }]
+                        section: section
                     }).then(() => {
-                        alert("تم حفظ الصف بنجاح!");
+                        alert("تم حفظ الصف بنجاح في قاعدة البيانات!");
                     }).catch((err) => {
-                        alert("خطأ أثناء الحفظ: " + err.message);
+                        alert("خطأ في قاعدة البيانات: " + err.message);
                     });
                 };
             }
         });
-
-        // دالة الحذف العامة
-        window.deleteClass = function(id) {
-            if (confirm("هل أنت متأكد من حذف هذا الصف؟")) {
-                window.database.ref('classes/' + id).remove()
-                    .then(() => alert("تم الحذف بنجاح"))
-                    .catch((err) => alert("خطأ في الحذف: " + err.message));
-            }
-        };
     </script>
 </body>
 </html>
