@@ -115,12 +115,29 @@ function renderTeacherClasses() {
     const container = document.getElementById("classesContainer");
     if (!container) return;
 
-    // نمط التحقق الآمن
-    if (typeof window.database === 'undefined') {
-        console.warn("قاعدة البيانات لم تجهز بعد، سننتظر...");
-        setTimeout(renderTeacherClasses, 500); // إعادة المحاولة بعد 500 مللي ثانية
+    // فحص ذكي: إذا لم تكن موجودة، انتظر 100 مللي ثانية وأعد المحاولة
+    if (typeof window.database === 'undefined' || window.database === null) {
+        console.warn("جاري انتظار تهيئة Firebase...");
+        setTimeout(renderTeacherClasses, 100); 
         return;
     }
+
+    // الآن نضمن أنها موجودة
+    window.database.ref('classes/').on('value', (snapshot) => {
+        container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
+        const data = snapshot.val();
+        if (data) {
+            Object.values(data).forEach(cls => {
+                const card = document.createElement("div");
+                card.className = "class-card";
+                card.innerHTML = `<h3>${cls.name}</h3><small>الرمز: ${cls.id}</small><br>
+                                  <button onclick="window.viewClassLessons('${cls.id}')">عرض</button>
+                                  <button onclick="window.deleteClass('${cls.id}')" style="background:#8b0000; color:white;">حذف</button>`;
+                container.appendChild(card);
+            });
+        }
+    });
+}
 
     // الآن نضمن أن window.database موجودة
     window.database.ref('classes/').on('value', (snapshot) => {
