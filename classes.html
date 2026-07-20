@@ -19,13 +19,17 @@
         
         .main-content { margin-right: 0; padding: 30px; transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
         
-        /* تنسيق قسم الدردشة والبطاقات */
-        #chatSection { display: none; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px; }
-        .chat-wrapper { display: flex; flex-direction: column; height: 400px; border: 1px solid #ddd; border-radius: 10px; padding: 10px; background-color: #f9f9f9; }
-        .chat-messages { flex-grow: 1; overflow-y: auto; margin-bottom: 10px; padding: 5px; border-bottom: 1px solid #ccc; }
+        /* البطاقات والدردشة */
+        .class-card { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); transition: 0.3s; }
+        .class-card:hover { transform: translateY(-3px); }
+        .class-card button { padding: 6px 12px; margin-left: 5px; margin-top: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        
+        #chatSection { display: none; margin-top: 30px; border-top: 2px solid #ccc; padding-top: 20px; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .chat-wrapper { display: flex; flex-direction: column; height: 350px; border: 1px solid #ddd; border-radius: 8px; padding: 10px; background-color: #fcfcfc; }
+        .chat-messages { flex-grow: 1; overflow-y: auto; margin-bottom: 10px; padding: 8px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 8px; }
         .chat-input-area { display: flex; gap: 10px; }
-        .chat-input-area input { flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
-        .class-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .chat-input-area input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+        .msg-bubble { background: #e3f2fd; padding: 8px 12px; border-radius: 8px; max-width: 70%; word-break: break-word; }
     </style>
 </head>
 <body>
@@ -33,28 +37,25 @@
     <!-- زر فتح القائمة الجانبية -->
     <button class="toggle-btn" onclick="document.getElementById('mySidebar').style.width = '250px';">☰ القائمة</button>
 
-    <!-- القائمة الجانبية الكاملة -->
+    <!-- القائمة الجانبية -->
     <div class="sidebar" id="mySidebar">
         <div class="sidebar-title">🏞️ منصة الوادي</div>
         <div class="menu-item" onclick="location.href='index.html'">🏠 الرئيسية</div>
         <div class="menu-item" onclick="location.href='classes.html'">🏫 إدارة الصفوف</div>
-        <!-- يمكنك إضافة باقي الأقسام هنا عند الحاجة -->
         <button onclick="localStorage.removeItem('currentUser'); window.location.href='login.html';" class="logout-btn">تسجيل الخروج</button>
     </div>
     
-    <!-- إغلاق القائمة عند النقر خارجها -->
     <div onclick="document.getElementById('mySidebar').style.width = '0';" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999; display:none;" id="sidebarOverlay"></div>
 
     <!-- المحتوى الرئيسي -->
     <div class="main-content">
         <h2>إدارة الصفوف 🏫</h2>
 
-        <!-- بوكس إضافة الصف -->
-        <div id="adminPanel" class="admin-section" style="border: 2px dashed #27ae60; padding: 20px; margin-bottom: 20px; border-radius: 10px; background: #fff;">
+        <!-- بوكس إضافة صف جديد -->
+        <div id="adminPanel" style="border: 2px dashed #27ae60; padding: 20px; margin-bottom: 25px; border-radius: 10px; background: #fff;">
             <h3>إضافة صف جديد 🏫</h3>
-            
             <label>اسم الصف:</label>
-            <select id="className">
+            <select id="className" style="padding: 6px; margin-left: 10px;">
                 <option value="الاول">الاول</option>
                 <option value="الثاني">الثاني</option>
                 <option value="الثالث">الثالث</option>
@@ -64,7 +65,7 @@
             </select>
 
             <label>الشعبة:</label>
-            <select id="classSection">
+            <select id="classSection" style="padding: 6px; margin-left: 10px;">
                 <option value="أ">أ</option>
                 <option value="ب">ب</option>
                 <option value="ج">ج</option>
@@ -72,36 +73,36 @@
                 <option value="هـ">هـ</option>
             </select>
 
-            <button id="saveClassBtn" style="padding: 8px 15px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">حفظ الصف</button>
+            <button id="saveClassBtn" style="padding: 8px 18px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">حفظ الصف</button>
         </div>
 
-        <!-- وعاء عرض الصفوف -->
+        <!-- وعاء عرض بطاقات الصفوف -->
         <div class="dashboard-container" id="classesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
         </div>
 
-        <!-- قسم الدردشة -->
+        <!-- قسم الدردشة الخاصة بالصف -->
         <div id="chatSection">
-            <h3 id="currentChatTitle">غرفة الدردشة</h3>
+            <h3 id="currentChatTitle">غرفة الدردشة للصف: <span></span></h3>
             <div class="chat-wrapper">
                 <div id="chat-messages" class="chat-messages"></div>
                 <div class="chat-input-area">
                     <input type="text" id="message-input" placeholder="اكتب رسالتك هنا...">
-                    <button id="send-btn">إرسال ✉️</button>
+                    <button id="send-btn" style="background: #2980b9; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">إرسال ✉️</button>
                 </div>
             </div>
-            <button onclick="document.getElementById('chatSection').style.display='none'" style="margin-top:10px; padding:5px 10px;">إغلاق الدردشة</button>
+            <button onclick="document.getElementById('chatSection').style.display='none'" style="margin-top: 12px; background: #7f8c8d; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer;">إغلاق الدردشة</button>
         </div>
     </div>
 
-    <!-- مكتبات Firebase الأساسية -->
+    <!-- مكتبات Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
-    <!-- كود التشغيل والتحكم الآمن -->
     <script>
-        // إظهار وإخفاء أداة تفعيل السايدبار
+        // التحكم بالقائمة الجانبية
         document.querySelector('.toggle-btn').addEventListener('click', (e) => {
             e.stopPropagation();
+            document.getElementById('mySidebar').style.width = '250px';
             document.getElementById('sidebarOverlay').style.display = 'block';
         });
         document.getElementById('sidebarOverlay').addEventListener('click', () => {
@@ -123,24 +124,22 @@
             firebase.initializeApp(firebaseConfig);
         }
         window.database = firebase.database();
+        let activeChatId = "";
+        let chatListener = null;
 
         document.addEventListener('DOMContentLoaded', () => {
-            let userString = localStorage.getItem("currentUser");
-            if (userString) {
-                try {
-                    const userProfile = JSON.parse(userString);
+            let currentUser = null;
+            try {
+                currentUser = JSON.parse(localStorage.getItem("currentUser"));
+                if (currentUser) {
                     const header = document.querySelector('h2');
-                    if (header) {
-                        const infoBox = document.createElement('div');
-                        infoBox.innerHTML = `<h4 style="color: #2980b9;">مرحباً بك يا ${userProfile.name} (${userProfile.role || 'مستخدم'})</h4>`;
-                        header.parentNode.insertBefore(infoBox, header.nextSibling);
-                    }
-                } catch(e) {
-                    console.error("خطأ في تحليل بيانات المستخدم");
+                    const infoBox = document.createElement('div');
+                    infoBox.innerHTML = `<h4 style="color: #2980b9; margin-bottom: 20px;">مرحباً بك يا ${currentUser.name}</h4>`;
+                    header.parentNode.insertBefore(infoBox, header.nextSibling);
                 }
-            }
+            } catch(e) {}
 
-            // جلب الصفوف وعرضها
+            // جلب وعرض الصفوف مع أزرار (الخصائص، التعديل، الدردشة، الحذف)
             const container = document.getElementById("classesContainer");
             if (container && window.database) {
                 window.database.ref('classes/').on('value', (snapshot) => {
@@ -150,15 +149,22 @@
                         Object.values(data).forEach(cls => {
                             const card = document.createElement("div");
                             card.className = "class-card";
-                            card.innerHTML = `<h3>${cls.name} - شعبة ${cls.section}</h3><small>الرمز: ${cls.id}</small><br>
-                                              <button onclick="deleteClass('${cls.id}')" style="background:#8b0000; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; margin-top:8px;">حذف</button>`;
+                            card.innerHTML = `
+                                <h3>${cls.name} - شعبة ${cls.section}</h3>
+                                <small style="color: #7f8c8d;">رمز الصف: ${cls.id}</small><br>
+                                <div style="margin-top: 10px;">
+                                    <button onclick="window.viewLessons('${cls.id}', '${cls.name}')" style="background: #3498db; color: white;">الخصائص والدروس</button>
+                                    <button onclick="window.openChat('${cls.id}', '${cls.name} - شعبة ${cls.section}')" style="background: #9b59b6; color: white;">💬 الدردشة</button>
+                                    <button onclick="window.editClass('${cls.id}', '${cls.name}', '${cls.section}')" style="background: #f39c12; color: white;">✏️ تعديل</button>
+                                    <button onclick="window.deleteClass('${cls.id}')" style="background: #e74c3c; color: white;">🗑️ حذف</button>
+                                </div>`;
                             container.appendChild(card);
                         });
                     }
                 });
             }
 
-            // زر الحفظ
+            // زر حفظ صف جديد
             const saveBtn = document.getElementById("saveClassBtn");
             if (saveBtn) {
                 saveBtn.onclick = function() {
@@ -170,7 +176,7 @@
                         id: id,
                         name: name,
                         section: section,
-                        lessons: [{ title: "مقدمة" }]
+                        lessons: [{ title: "الدرس الإفتراضي الأول" }]
                     }).then(() => {
                         alert("تم حفظ الصف بنجاح!");
                     }).catch((err) => {
@@ -178,16 +184,103 @@
                     });
                 };
             }
+
+            // إرسال رسالة في الدردشة
+            const sendBtn = document.getElementById("send-btn");
+            const input = document.getElementById("message-input");
+            if (sendBtn && input) {
+                sendBtn.onclick = () => sendChatMessage(currentUser);
+                input.addEventListener("keypress", (e) => { if (e.key === "Enter") sendBtn.click(); });
+            }
         });
 
-        // دالة الحذف
+        // 1. وظيفة عرض خصائص الصف والدروس
+        window.viewLessons = function(id, name) {
+            window.database.ref('classes/' + id + '/lessons').once('value').then(snapshot => {
+                const lessons = snapshot.val();
+                let msg = `خصائص الصف: ${name}\nالرمز: ${id}\n\nالدروس المتاحة:\n`;
+                if (lessons) {
+                    lessons.forEach((l, idx) => {
+                        msg += `- ${idx + 1}: ${l.title}\n`;
+                    });
+                } else {
+                    msg += "لا توجد دروس مضافة بعد.";
+                }
+                alert(msg);
+            });
+        };
+
+        // 2. وظيفة تعديل اسم الصف أو الشعبة
+        window.editClass = function(id, oldName, oldSection) {
+            const newName = prompt("تعديل اسم الصف:", oldName);
+            if (!newName) return;
+            const newSection = prompt("تعديل الشعبة:", oldSection);
+            if (!newSection) return;
+
+            window.database.ref('classes/' + id).update({
+                name: newName,
+                section: newSection
+            }).then(() => {
+                alert("تم تحديث بيانات الصف بنجاح!");
+            }).catch(err => alert("خطأ في التعديل: " + err.message));
+        };
+
+        // 3. وظيفة حذف الصف
         window.deleteClass = function(id) {
-            if (confirm("هل أنت متأكد من حذف هذا الصف؟")) {
+            if (confirm("هل أنت متأكد من حذف هذا الصف نهائياً؟")) {
                 window.database.ref('classes/' + id).remove()
                     .then(() => alert("تم الحذف بنجاح"))
                     .catch((err) => alert("خطأ في الحذف: " + err.message));
             }
         };
+
+        // 4. فتح دردشة الصف
+        window.openChat = function(classId, className) {
+            activeChatId = classId;
+            document.getElementById('currentChatTitle').querySelector('span').innerText = className;
+            document.getElementById('chatSection').style.display = 'block';
+            
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.innerHTML = "جاري تحميل الرسائل...";
+
+            // إلغاء الاستماع للدردشة السابقة إن وجدت لمنع التداخل
+            if (chatListener) {
+                window.database.ref('chats/' + activeChatId).off('value', chatListener);
+            }
+
+            // الاستماع لرسائل هذا الصف حصرياً
+            chatListener = window.database.ref('chats/' + classId).on('value', snapshot => {
+                messagesContainer.innerHTML = "";
+                const msgs = snapshot.val();
+                if (msgs) {
+                    Object.values(msgs).forEach(m => {
+                        const bubble = document.createElement('div');
+                        bubble.className = 'msg-bubble';
+                        bubble.innerHTML = `<strong>${m.sender}:</strong> ${m.text}`;
+                        messagesContainer.appendChild(bubble);
+                    });
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                } else {
+                    messagesContainer.innerHTML = "<p style='color: #888; text-align:center;'>لا توجد رسائل بعد. كن أول المراسلتين!</p>";
+                }
+            });
+        };
+
+        // إرسال الرسالة إلى قاعدة البيانات
+        function sendChatMessage(user) {
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            if (!text || !activeChatId) return;
+
+            const senderName = user ? user.name : "مستخدم";
+            window.database.ref('chats/' + activeChatId).push({
+                text: text,
+                sender: senderName,
+                timestamp: Date.now()
+            }).then(() => {
+                input.value = "";
+            }).catch(err => alert("فشل إرسال الرسالة: " + err.message));
+        }
     </script>
 </body>
 </html>
