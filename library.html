@@ -1,7 +1,325 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المكتبة الرقمية - منصة الوادي</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f2f5; color: #2d3748; }
+        
+        /* القائمة الجانبية */
+        .sidebar { height: 100vh; width: 0; position: fixed; top: 0; right: 0; background: linear-gradient(180deg, #ffffff, #dfe9f3); box-shadow: 0 4px 25px rgba(0,0,0,0.1); transition: width 0.4s; overflow-x: hidden; z-index: 1000; display: flex; flex-direction: column; padding: 20px 0; }
+        .sidebar-title { color: #2c3e50; font-size: 20px; font-weight: bold; padding-bottom: 20px; border-bottom: 2px solid rgba(41, 128, 185, 0.2); margin-bottom: 10px; text-align: center; white-space: nowrap; }
+        .menu-item { color: #2c3e50; background: rgba(255, 255, 255, 0.2); border-radius: 12px; margin: 8px 15px; padding: 12px 18px; text-align: center; transition: 0.3s; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-weight: 500; }
+        .menu-item:hover { background: rgba(255, 255, 255, 0.6); box-shadow: 0 0 12px #74b9ff; transform: translateY(-2px); }
+        .logout-btn { margin-top: auto; padding: 12px; background: rgba(231, 76, 60, 0.1); color: #c0392b; border: 1px solid rgba(231, 76, 60, 0.2); border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; width: 80%; margin: 20px auto; }
+        .logout-btn:hover { background: #e74c3c; color: white; }
+        .toggle-btn { position: fixed; top: 20px; right: 20px; z-index: 1002; padding: 12px 20px; cursor: pointer; background: #ffffff; color: #2c3e50; border: none; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-weight: bold; }
+        
+        .main-content { margin-right: 0; padding: 30px; transition: 0.4s; max-width: 1200px; margin: 0 auto; box-sizing: border-box; }
+        
+        /* ترويسة المكتبة */
+        .library-header { background: linear-gradient(135deg, #2b6cb0, #3182ce); color: white; padding: 25px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(49, 130, 206, 0.2); text-align: center; }
+        .library-header h1 { margin: 0 0 10px 0; font-size: 26px; }
+        .library-header p { margin: 0; opacity: 0.9; font-size: 15px; }
 
-<script>
-    function logout() {
-        localStorage.removeItem("currentUser");
-        window.location.href = "login.html";
-    }
-</script>
+        /* تبويبات الصفوف الدراسية والقصص */
+        .grades-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 25px; }
+        .grade-tab { background: white; border: 2px solid #e2e8f0; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; color: #4a5568; transition: 0.3s; white-space: nowrap; }
+        .grade-tab.active { background: #3182ce; color: white; border-color: #3182ce; box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3); }
+
+        /* قسم رفع الملفات للإدارة والأستاذ */
+        .admin-upload-card { background: white; padding: 20px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 2px dashed #cbd5e0; margin-bottom: 25px; display: none; }
+        .admin-upload-card h3 { margin-top: 0; color: #2b6cb0; display: flex; align-items: center; gap: 8px; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #4a5568; }
+        .form-group select, .form-group input { width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .upload-btn { background: #38a169; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; }
+        .upload-btn:hover { background: #2f855a; }
+
+        /* شبكة المواد الدراسية كبطاقات ملونة ومنسقة بألوان متوسطة */
+        .subjects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .subject-card { border-radius: 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; color: white; }
+        
+        /* تدرجات ألوان متوسطة (لا خفيفة ولا غامقة) */
+        .card-bg-1 { background: linear-gradient(135deg, #3182ce, #2b6cb0); }
+        .card-bg-2 { background: linear-gradient(135deg, #38a169, #276749); }
+        .card-bg-3 { background: linear-gradient(135deg, #d69e2e, #b7791f); }
+        .card-bg-4 { background: linear-gradient(135deg, #805ad5, #553c9a); }
+        .card-bg-5 { background: linear-gradient(135deg, #319795, #285e61); }
+        .card-bg-6 { background: linear-gradient(135deg, #e53e3e, #9b2c2c); }
+        .card-bg-7 { background: linear-gradient(135deg, #dd6b20, #c05621); }
+
+        .subject-header { padding: 18px 20px; font-weight: bold; font-size: 18px; border-bottom: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 10px; }
+        .files-list { padding: 15px; max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: rgba(0, 0, 0, 0.05); }
+        
+        /* عناصر الملفات */
+        .file-item { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 255, 255, 0.4); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; color: #2d3748; transition: 0.2s; }
+        .file-item:hover { background: #ffffff; }
+        .file-info { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+        .file-name { font-size: 14px; font-weight: 600; color: #2b6cb0; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; }
+        .file-name:hover { text-decoration: underline; }
+        .file-actions { display: flex; gap: 8px; align-items: center; }
+        .download-btn { background: #3182ce; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; text-decoration: none; font-weight: bold; }
+        .download-btn:hover { background: #2b6cb0; }
+        .delete-file-btn { background: none; border: none; color: #e53e3e; cursor: pointer; font-size: 14px; font-weight: bold; }
+
+        .no-files { color: rgba(255, 255, 255, 0.8); text-align: center; font-size: 13px; padding: 15px; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+    <button class="toggle-btn" onclick="document.getElementById('mySidebar').style.width = '260px';">☰ القائمة</button>
+
+    <!-- القائمة الجانبية -->
+    <div class="sidebar" id="mySidebar">
+        <div class="sidebar-title">🏞️ منصة الوادي</div>
+        <div class="menu-item" onclick="location.href='index.html'">🏠 الرئيسية</div>
+        <div class="menu-item" onclick="location.href='classes.html'">🏫 إدارة الصفوف والدردشة</div>
+        <div class="menu-item" onclick="location.href='schedule.html'">⏰ الحصص والجداول</div>
+        <div class="menu-item" onclick="location.href='games.html'">🎮 الألعاب والترفيه</div>
+        <div class="menu-item" onclick="location.href='library.html'">📚 المكتبة الرقمية</div>
+        <button onclick="localStorage.removeItem('currentUser'); window.location.href='login.html';" class="logout-btn">تسجيل الخروج</button>
+    </div>
+    
+    <div onclick="document.getElementById('mySidebar').style.width = '0';" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999; display:none;" id="sidebarOverlay"></div>
+
+    <div class="main-content">
+        <!-- ترويسة المكتبة -->
+        <div class="library-header">
+            <h1>📚 المكتبة الرقمية والملفات التعليمية</h1>
+            <p>تصفح كتب وملازم وقصص المرحلة الابتدائية بصيغة PDF منظمة ببطاقات لكل صف ومادة</p>
+        </div>
+
+        <!-- تبويبات الصفوف الدراسية وقسم القصص -->
+        <div class="grades-tabs" id="gradesTabsContainer">
+            <div class="grade-tab active" onclick="switchGrade('grade1', this)">الصف الأول الابتدائي</div>
+            <div class="grade-tab" onclick="switchGrade('grade2', this)">الصف الثاني الابتدائي</div>
+            <div class="grade-tab" onclick="switchGrade('grade3', this)">الصف الثالث الابتدائي</div>
+            <div class="grade-tab" onclick="switchGrade('grade4', this)">الصف الرابع الابتدائي</div>
+            <div class="grade-tab" onclick="switchGrade('grade5', this)">الصف الخامس الابتدائي</div>
+            <div class="grade-tab" onclick="switchGrade('grade6', this)">الصف السادس الابتدائي</div>
+            <div class="grade-tab" onclick="switchGrade('stories', this)" style="border-color: #dd6b20; color: #dd6b20;">📖 قسم القصص والمطالعة</div>
+        </div>
+
+        <!-- بطاقة رفع الملفات (تظهر فقط للأستاذ والمدير) -->
+        <div class="admin-upload-card" id="adminUploadCard">
+            <h3>📤 رفع ملف PDF جديد للمكتبة</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>اختر القسم أو الصف:</label>
+                    <select id="uploadGrade">
+                        <option value="grade1">الصف الأول الابتدائي</option>
+                        <option value="grade2">الصف الثاني الابتدائي</option>
+                        <option value="grade3">الصف الثالث الابتدائي</option>
+                        <option value="grade4">الصف الرابع الابتدائي</option>
+                        <option value="grade5">الصف الخامس الابتدائي</option>
+                        <option value="grade6">الصف السادس الابتدائي</option>
+                        <option value="stories">قسم القصص والمطالعة</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>اختر المادة (أو نوع القصة):</label>
+                    <select id="uploadSubject">
+                        <option value="arabic">اللغة العربية</option>
+                        <option value="math">الرياضيات</option>
+                        <option value="science">العلوم</option>
+                        <option value="islamic">التربية الإسلامية</option>
+                        <option value="english">اللغة الإنجليزية</option>
+                        <option value="social">الاجتماعيات</option>
+                        <option value="story_item">قصة أطفال مصورة</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>عنوان أو اسم الملزمة/القصة:</label>
+                    <input type="text" id="uploadTitle" placeholder="مثال: قصة الأرنب الذكي - الفصل الأول">
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label>اختر ملف الـ PDF من الجهاز:</label>
+                <input type="file" id="uploadFilePdf" accept="application/pdf">
+            </div>
+            <button onclick="window.uploadLibraryFile()" class="upload-btn">بدء رفع الملف للمكتبة 🚀</button>
+        </div>
+
+        <!-- شبكة المواد (تظهر كبطاقات ملونة ومنسقة) -->
+        <div class="subjects-grid" id="subjectsGridContainer">
+            <!-- يتم تعبئتها ديناميكياً -->
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <script>
+        document.querySelector('.toggle-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('mySidebar').style.width = '260px';
+            document.getElementById('sidebarOverlay').style.display = 'block';
+        });
+        document.getElementById('sidebarOverlay').addEventListener('click', () => {
+            document.getElementById('mySidebar').style.width = '0';
+            document.getElementById('sidebarOverlay').style.display = 'none';
+        });
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
+            databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
+            projectId: "roya-platform-26860",
+            storageBucket: "roya-platform-26860.appspot.com",
+            messagingSenderId: "897544406776",
+            appId: "1:897544406776:web:aa112013dea672fb141d0d"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        window.database = firebase.database();
+        
+        let currentSelectedGrade = 'grade1';
+        let isAdmin = false;
+
+        const subjectsList = [
+            { id: 'arabic', name: '📖 اللغة العربية' },
+            { id: 'math', name: '🔢 الرياضيات' },
+            { id: 'science', name: '🔬 العلوم' },
+            { id: 'islamic', name: '☪️ التربية الإسلامية' },
+            { id: 'english', name: '🔤 اللغة الإنجليزية' },
+            { id: 'social', name: '🌍 الاجتماعيات' }
+        ];
+
+        const storiesList = [
+            { id: 'story_item', name: '📖 قصص الأطفال والمطالعة الممتعة' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+                if (currentUser) {
+                    const role = currentUser.role ? currentUser.role.trim().toLowerCase() : "";
+                    if (role === 'teacher' || role === 'admin' || role === 'المدير' || role === 'الأستاذ') {
+                        isAdmin = true;
+                        document.getElementById('adminUploadCard').style.display = 'block';
+                    }
+                }
+            } catch(e) {}
+
+            renderSubjectsUI();
+            listenToLibraryData();
+        });
+
+        window.switchGrade = function(gradeKey, tabElement) {
+            currentSelectedGrade = gradeKey;
+            document.querySelectorAll('.grade-tab').forEach(tab => tab.classList.remove('active'));
+            tabElement.classList.add('active');
+            renderSubjectsUI();
+            listenToLibraryData();
+        };
+
+        function renderSubjectsUI() {
+            const grid = document.getElementById('subjectsGridContainer');
+            grid.innerHTML = "";
+            
+            const activeList = currentSelectedGrade === 'stories' ? storiesList : subjectsList;
+            const colorClasses = ['card-bg-1', 'card-bg-2', 'card-bg-3', 'card-bg-4', 'card-bg-5', 'card-bg-6', 'card-bg-7'];
+
+            activeList.forEach((sub, index) => {
+                const bgClass = colorClasses[index % colorClasses.length];
+                const card = document.createElement('div');
+                card.className = `subject-card ${bgClass}`;
+                card.innerHTML = `
+                    <div class="subject-header">${sub.name}</div>
+                    <div class="files-list" id="files_${currentSelectedGrade}_${sub.id}">
+                        <div class="no-files">جاري التحميل...</div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function listenToLibraryData() {
+            window.database.ref(`library/${currentSelectedGrade}`).on('value', snap => {
+                const data = snap.val() || {};
+                const activeList = currentSelectedGrade === 'stories' ? storiesList : subjectsList;
+
+                activeList.forEach(sub => {
+                    const container = document.getElementById(`files_${currentSelectedGrade}_${sub.id}`);
+                    if (!container) return;
+                    
+                    const subFiles = data[sub.id] || {};
+                    container.innerHTML = "";
+                    
+                    const keys = Object.keys(subFiles);
+                    if (keys.length === 0) {
+                        container.innerHTML = `<div class="no-files">لا توجد ملفات مرفوعة حالياً.</div>`;
+                        return;
+                    }
+
+                    keys.forEach(fileId => {
+                        const fileObj = subFiles[fileId];
+                        const div = document.createElement('div');
+                        div.className = 'file-item';
+                        
+                        let deleteBtnHTML = isAdmin ? `<button onclick="window.deleteLibraryFile('${currentSelectedGrade}', '${sub.id}', '${fileId}')" class="delete-file-btn" title="حذف الملف">✕</button>` : '';
+
+                        div.innerHTML = `
+                            <div class="file-info">
+                                <span>📄</span>
+                                <a href="${fileObj.fileData}" download="${fileObj.title}.pdf" class="file-name" title="${fileObj.title}">${fileObj.title}</a>
+                            </div>
+                            <div class="file-actions">
+                                <a href="${fileObj.fileData}" download="${fileObj.title}.pdf" class="download-btn">تحميل PDF</a>
+                                ${deleteBtnHTML}
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    });
+                });
+            });
+        }
+
+        window.uploadLibraryFile = function() {
+            const grade = document.getElementById('uploadGrade').value;
+            const subject = document.getElementById('uploadSubject').value;
+            const title = document.getElementById('uploadTitle').value.trim();
+            const fileInput = document.getElementById('uploadFilePdf');
+            const file = fileInput.files[0];
+
+            if (!title || !file) {
+                alert("يرجى إدخال عنوان الملزمة/القصة واختيار ملف PDF من الجهاز.");
+                return;
+            }
+
+            if (file.type !== "application/pdf" && !file.name.endsWith('.pdf')) {
+                alert("يرجى اختيار ملف بصيغة PDF حصرياً.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                const base64Data = reader.result;
+                window.database.ref(`library/${grade}/${subject}`).push({
+                    title: title,
+                    fileData: base64Data,
+                    timestamp: Date.now()
+                }).then(() => {
+                    document.getElementById('uploadTitle').value = "";
+                    fileInput.value = "";
+                    alert("تم رفع الملف بنجاح إلى المكتبة الرقمية!");
+                }).catch(err => {
+                    alert("فشل الرفع: " + err.message);
+                });
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.deleteLibraryFile = function(grade, subject, fileId) {
+            if (confirm("هل أنت متأكد من حذف هذا الملف نهائياً من المكتبة؟")) {
+                window.database.ref(`library/${grade}/${subject}/${fileId}`).remove().then(() => {
+                    alert("تم حذف الملف بنجاح.");
+                });
+            }
+        };
+    </script>
+</body>
+</html>
