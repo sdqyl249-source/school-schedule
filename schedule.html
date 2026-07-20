@@ -2,56 +2,383 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>جدول الدروس - منصة الوادي</title>
-    <link rel="stylesheet" href="classes_style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الجدول الدراسي - منصة الوادي</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f0f2f5; margin: 0; }
-        .main-content { margin-right: 280px; padding: 20px; transition: 0.3s; }
-        .admin-only { display: none; }
-        .card { background: #ffffff; padding: 25px; border-radius: 15px; box-shadow: 0 6px 15px rgba(0,0,0,0.08); margin-bottom: 25px; border-right: 5px solid #3498db; }
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: 600; text-decoration: none; transition: 0.3s; }
-        .admin-panel { background: #fff; padding: 25px; border-radius: 15px; border: 2px dashed #3498db; margin-top: 20px; }
-        select { padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-left: 10px; }
-        @media screen and (max-width: 768px) { .main-content { margin-right: 0; } }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f2f5; color: #2d3748; }
+        
+        /* القائمة الجانبية */
+        .sidebar { height: 100vh; width: 0; position: fixed; top: 0; right: 0; background: linear-gradient(180deg, #ffffff, #dfe9f3); box-shadow: 0 4px 25px rgba(0,0,0,0.1); transition: width 0.4s; overflow-x: hidden; z-index: 1000; display: flex; flex-direction: column; padding: 20px 0; }
+        .sidebar-title { color: #2c3e50; font-size: 20px; font-weight: bold; padding-bottom: 20px; border-bottom: 2px solid rgba(41, 128, 185, 0.2); margin-bottom: 10px; text-align: center; white-space: nowrap; }
+        .menu-item { color: #2c3e50; background: rgba(255, 255, 255, 0.2); border-radius: 12px; margin: 8px 15px; padding: 12px 18px; text-align: center; transition: 0.3s; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-weight: 500; }
+        .menu-item:hover { background: rgba(255, 255, 255, 0.6); box-shadow: 0 0 12px #74b9ff; transform: translateY(-2px); }
+        .logout-btn { margin-top: auto; padding: 12px; background: rgba(231, 76, 60, 0.1); color: #c0392b; border: 1px solid rgba(231, 76, 60, 0.2); border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; width: 80%; margin: 20px auto; }
+        .logout-btn:hover { background: #e74c3c; color: white; }
+        .toggle-btn { position: fixed; top: 20px; right: 20px; z-index: 1002; padding: 12px 20px; cursor: pointer; background: #ffffff; color: #2c3e50; border: none; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-weight: bold; }
+        
+        .main-content { margin-right: 0; padding: 30px; transition: 0.4s; max-width: 1300px; margin: 0 auto; box-sizing: border-box; }
+        
+        /* ترويسة الصفحة */
+        .page-header { background: linear-gradient(135deg, #319795, #285e61); color: white; padding: 25px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(49, 151, 149, 0.2); text-align: center; }
+        .page-header h1 { margin: 0 0 10px 0; font-size: 26px; }
+        .page-header p { margin: 0; opacity: 0.95; font-size: 15px; }
+
+        /* شريط التحكم والفلترة */
+        .controls-bar { background: white; padding: 20px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+        .control-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .control-group label { font-weight: bold; font-size: 14px; color: #4a5568; }
+        .control-group select, .control-group button { padding: 10px 15px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 14px; outline: none; }
+        .control-group select { background: white; cursor: pointer; }
+        
+        .print-btn { background: #3182ce; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .print-btn:hover { background: #2b6cb0; }
+        .home-btn { background: #718096; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-flex; align-items: center; }
+        .home-btn:hover { background: #4a5568; }
+
+        /* أزرار الإدارة للمدير فقط */
+        .admin-controls { display: none; background: #fffaf0; border: 2px dashed #dd6b20; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
+        .admin-controls button { background: #dd6b20; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; margin: 5px; }
+        .admin-controls button:hover { background: #c05621; }
+
+        /* جدول الحصص */
+        .schedule-table-container { background: white; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; text-align: center; }
+        th, td { border: 1px solid #e2e8f0; padding: 12px; font-size: 14px; }
+        th { background: #edf2f7; color: #2d3748; font-weight: bold; }
+        tr:nth-child(even) { background: #f8fafc; }
+
+        /* خلية الجدول للتعديل أو العرض */
+        .cell-content { display: flex; flex-direction: column; gap: 6px; }
+        .cell-select, .cell-input { width: 100%; padding: 6px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
+        .cell-view-subject { font-weight: bold; color: #2b6cb0; font-size: 15px; }
+        .cell-view-teacher { font-size: 13px; color: #718096; background: #edf2f7; padding: 3px 6px; border-radius: 4px; display: inline-block; }
+
+        .save-schedule-btn { background: #38a169; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; display: none; margin: 20px auto; display: block; }
+        .save-schedule-btn:hover { background: #2f855a; }
+
+        /* تنسيق خاص للطباعة (PDF) */
+        @media print {
+            body { background: white; }
+            .sidebar, .toggle-btn, .admin-controls, .controls-bar button, .save-schedule-btn, .cell-select, .cell-input { display: none !important; }
+            .main-content { margin: 0; padding: 0; max-width: 100%; }
+            .schedule-table-container { box-shadow: none; border: 1px solid #000; }
+            th { background: #eee !important; color: #000 !important; -webkit-print-color-adjust: exact; }
+        }
     </style>
 </head>
 <body>
 
-<div class="main-content">
-    <div class="card">
-        <h3>📅 جدول الدروس المدرسي</h3>
-        <button class="btn" style="background:#27ae60;" onclick="window.print()">🖨️ طباعة الجدول</button>
-        <div id="app"></div>
+    <button class="toggle-btn" onclick="document.getElementById('mySidebar').style.width = '260px';">☰ القائمة</button>
+
+    <!-- القائمة الجانبية -->
+    <div class="sidebar" id="mySidebar">
+        <div class="sidebar-title">🏞️ منصة الوادي</div>
+        <div class="menu-item" onclick="location.href='index.html'">🏠 الرئيسية</div>
+        <div class="menu-item" onclick="location.href='classes.html'">🏫 إدارة الصفوف والدردشة</div>
+        <div class="menu-item" onclick="location.href='schedule.html'">⏰ الحصص والجداول</div>
+        <div class="menu-item" onclick="location.href='games.html'">🎮 الألعاب والترفيه</div>
+        <div class="menu-item" onclick="location.href='library.html'">📚 المكتبة الرقمية</div>
+        <button onclick="localStorage.removeItem('currentUser'); window.location.href='login.html';" class="logout-btn">تسجيل الخروج</button>
+    </div>
+    
+    <div onclick="document.getElementById('mySidebar').style.width = '0';" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999; display:none;" id="sidebarOverlay"></div>
+
+    <div class="main-content">
+        <!-- ترويسة الصفحة -->
+        .
+        <div class="page-header">
+            <h1>⏰ الجدول الدراسي الأسبوعي</h1>
+            <p>عرض وتنظيم الحصص الدراسية اليومية حسب الصف والشعبة (من الأحد إلى الخميس)</p>
+        </div>
+
+        <!-- لوحة تحكم المدير لإضافة الصفوف والشعب والحصص -->
+        <div class="admin-controls" id="adminControlsPanel">
+            <h4 style="margin: 0 0 10px 0; color: #c05621;">⚙️ لوحة تحكم المدير (تعديل هيكل الجدول)</h4>
+            <button onclick="window.addGrade()">+ إضافة صف دراسي</button>
+            <button onclick="window.removeGrade()">- حذف صف دراسي</button>
+            <button onclick="window.addSection()">+ إضافة شعبة</button>
+            <button onclick="window.removeSection()">- حذف شعبة</button>
+            <button onclick="window.addPeriod()">+ إضافة حصة دراسية</button>
+            <button onclick="window.removePeriod()">- حذف حصة دراسية</button>
+        </div>
+
+        <!-- شريط الفلترة وأزرار الطباعة والعودة -->
+        <div class="controls-bar">
+            <div class="control-group">
+                <label>اختر الصف:</label>
+                <select id="filterGrade" onchange="renderScheduleTable()">
+                    <!-- يتم تعبئتها ديناميكياً -->
+                </select>
+
+                <label>اختر الشعبة:</label>
+                <select id="filterSection" onchange="renderScheduleTable()">
+                    <!-- يتم تعبئتها ديناميكياً -->
+                </select>
+            </div>
+
+            <div class="control-group">
+                <a href="index.html" class="home-btn" style="padding: 10px 15px; border-radius: 8px;">🏠 العودة للرئيسية</a>
+                <button onclick="window.print()" class="print-btn" style="padding: 10px 15px; border-radius: 8px;">🖨️ طباعة الجدول (PDF)</button>
+            </div>
+        </div>
+
+        <!-- جدول الحصص الأسبوعي -->
+        <div class="schedule-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>اليوم / الحصة</th>
+                        <th>الحصة الأولى</th>
+                        <th>الحصة الثانية</th>
+                        <th>الحصة الثالثة</th>
+                        <th>الحصة الرابعة</th>
+                    </tr>
+                </thead>
+                <tbody id="scheduleTableBody">
+                    <!-- يتم بناء الجدول ديناميكياً -->
+                </tbody>
+            </table>
+        </div>
+
+        <button onclick="window.saveScheduleData()" class="save-schedule-btn" id="saveScheduleBtn">حفظ تعديلات الجدول 💾</button>
     </div>
 
-    <div class="admin-panel admin-only" id="adminPanel">
-        <h3>إدارة الجدول</h3>
-        <select id="selG">
-            <option value="الأول">الأول</option><option value="الثاني">الثاني</option>
-            <option value="الثالث">الثالث</option><option value="الرابع">الرابع</option>
-            <option value="الخامس">الخامس</option><option value="السادس">السادس</option>
-        </select>
-        <select id="selS">
-            <option value="أ">أ</option><option value="ب">ب</option><option value="ج">ج</option>
-        </select>
-        <button class="btn admin-only" style="background:#27ae60" onclick="addSubject()">+ إضافة صف جديد</button>
-        <button class="btn" style="background:#3498db" onclick="addTable()">➕ إضافة جدول</button>
-    </div>
-</div>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
-<script>
-    function logout() {
-        localStorage.removeItem("currentUser");
-        window.location.href = "login.html";
-    }
-    function addSubject() { alert("سيتم إضافة الصف الجديد..."); }
-</script>
+    <script>
+        document.querySelector('.toggle-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('mySidebar').style.width = '260px';
+            document.getElementById('sidebarOverlay').style.display = 'block';
+        });
+        document.getElementById('sidebarOverlay').addEventListener('click', () => {
+            document.getElementById('mySidebar').style.width = '0';
+            document.getElementById('sidebarOverlay').style.display = 'none';
+        });
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-<script type="module" src="scriot.js"></script>
-<script src="global.js"></script>
-<script src="classes.js"></script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
+            databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
+            projectId: "roya-platform-26860",
+            storageBucket: "roya-platform-26860.appspot.com",
+            messagingSenderId: "897544406776",
+            appId: "1:897544406776:web:aa112013dea672fb141d0d"
+        };
 
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        window.database = firebase.database();
+
+        let isManager = false;
+        let isTeacher = false;
+        
+        // الهيكل الافتراضي: 5 أيام، الصفوف 1-6، الشعب أ، ب، ج، 4 حصص
+        const daysOfWeek = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
+        let gradesList = ['الصف الأول', 'الصف الثاني', 'الصف الثالث', 'الصف الرابع', 'الصف الخامس', 'الصف السادس'];
+        let sectionsList = ['الشعبة أ', 'الشعبة ب', 'الشعبة ج'];
+        let totalPeriods = 4;
+
+        const subjectsOptions = [
+            'اختر المادة',
+            'اللغة العربية',
+            'الرياضيات',
+            'العلوم',
+            'التربية الإسلامية',
+            'اللغة الإنجليزية',
+            'الاجتماعيات',
+            'التربية الفنية',
+            'الرياضة والبدنية'
+        ];
+
+        let remoteScheduleData = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+                if (currentUser) {
+                    const role = currentUser.role ? currentUser.role.trim().toLowerCase() : "";
+                    if (role === 'admin' || role === 'المدير') {
+                        isManager = true;
+                        document.getElementById('adminControlsPanel').style.display = 'block';
+                        document.getElementById('saveScheduleBtn').style.display = 'block';
+                    } else if (role === 'teacher' || role === 'الأستاذ') {
+                        isTeacher = true;
+                    }
+                }
+            } catch(e) {}
+
+            buildDropdowns();
+            fetchScheduleData();
+        });
+
+        function buildDropdowns() {
+            const gSelect = document.getElementById('filterGrade');
+            const sSelect = document.getElementById('filterSection');
+            
+            gSelect.innerHTML = "";
+            gradesList.forEach(g => {
+                gSelect.innerHTML += `<option value="${g}">${g}</option>`;
+            });
+
+            sSelect.innerHTML = "";
+            sectionsList.forEach(s => {
+                sSelect.innerHTML += `<option value="${s}">${s}</option>`;
+            });
+        }
+
+        function fetchScheduleData() {
+            window.database.ref('schedule/').on('value', snap => {
+                remoteScheduleData = snap.val() || {};
+                renderScheduleTable();
+            });
+        }
+
+        window.renderScheduleTable = function() {
+            const grade = document.getElementById('filterGrade').value;
+            const section = document.getElementById('filterSection').value;
+            const tbody = document.getElementById('scheduleTableBody');
+            tbody.innerHTML = "";
+
+            // تحديث عناوين أعمدة الجدول حسب عدد الحصص
+            const theadTr = document.querySelector('.schedule-table-container thead tr');
+            let headersHTML = `<th>اليوم / الحصة</th>`;
+            for(let p = 1; p <= totalPeriods; p++) {
+                headersHTML += `<th>الحصة ${p}</th>`;
+            }
+            theadTr.innerHTML = headersHTML;
+
+            daysOfWeek.forEach((day, dIndex) => {
+                const tr = document.createElement('tr');
+                let tdHTML = `<td style="font-weight: bold; background: #f7fafc;">${day}</td>`;
+
+                for(let p = 1; p <= totalPeriods; p++) {
+                    const cellKey = `${grade}_${section}_day${dIndex}_p${p}`;
+                    const savedCell = (remoteScheduleData[grade] && remoteScheduleData[grade][section] && remoteScheduleData[grade][section][`day${dIndex}_p${p}`]) || { subject: '', teacher: '' };
+
+                    if (isManager) {
+                        // المدير يمكنه التعديل
+                        let optionsHTML = "";
+                        subjectsOptions.forEach(sub => {
+                            const sel = savedCell.subject === sub ? 'selected' : '';
+                            optionsHTML += `<option value="${sub === 'اختر المادة' ? '' : sub}" ${sel}>${sub}</option>`;
+                        });
+
+                        tdHTML += `
+                            <td>
+                                <div class="cell-content">
+                                    <select class="cell-select" data-day="${dIndex}" data-period="${p}">
+                                        ${optionsHTML}
+                                    </select>
+                                    <input type="text" class="cell-input" data-day="${dIndex}" data-period="${p}" value="${savedCell.teacher || ''}" placeholder="اسم الأستاذ...">
+                                </div>
+                            </td>
+                        `;
+                    } else if (isTeacher) {
+                        // الأستاذ يرى المادة واسم المعلم
+                        tdHTML += `
+                            <td>
+                                <div class="cell-content">
+                                    <span class="cell-view-subject">${savedCell.subject || '-'}</span>
+                                    <span class="cell-view-teacher">👨‍🏫 ${savedCell.teacher || 'غير محدد'}</span>
+                                </div>
+                            </td>
+                        `;
+                    } else {
+                        // الطالب يرى المادة فقط بدون اسم الأستاذ
+                        tdHTML += `
+                            <td>
+                                <div class="cell-content">
+                                    <span class="cell-view-subject">${savedCell.subject || '-'}</span>
+                                </div>
+                            </td>
+                        `;
+                    }
+                }
+                tr.innerHTML = tdHTML;
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.saveScheduleData = function() {
+            if (!isManager) return;
+            const grade = document.getElementById('filterGrade').value;
+            const section = document.getElementById('filterSection').value;
+
+            const selects = document.querySelectorAll('.cell-select');
+            const inputs = document.querySelectorAll('.cell-input');
+
+            let gradeData = remoteScheduleData[grade] || {};
+            let sectionData = gradeData[section] || {};
+
+            selects.forEach((sel, idx) => {
+                const day = sel.getAttribute('data-day');
+                const period = sel.getAttribute('data-period');
+                const key = `day${day}_p${period}`;
+                
+                if(!sectionData[key]) sectionData[key] = {};
+                sectionData[key].subject = sel.value;
+                sectionData[key].teacher = inputs[idx].value.trim();
+            });
+
+            if(!remoteScheduleData[grade]) remoteScheduleData[grade] = {};
+            remoteScheduleData[grade][section] = sectionData;
+
+            window.database.ref('schedule/' + grade + '/' + section).set(sectionData).then(() => {
+                alert("تم حفظ الجدول الدراسي بنجاح!");
+            }).catch(err => {
+                alert("فشل الحفظ: " + err.message);
+            });
+        };
+
+        // --- أدوات التحكم للمدير (زيادة ونقصان الصفوف والشعب والحصص) ---
+        window.addGrade = function() {
+            const newG = prompt("أدخل اسم الصف الدراسي الجديد:");
+            if(newG && !gradesList.includes(newG)) {
+                gradesList.push(newG);
+                buildDropdowns();
+                alert("تمت إضافة الصف بنجاح.");
+            }
+        };
+
+        window.removeGrade = function() {
+            if(gradesList.length <= 1) return alert("يجب أن يبقى صف واحد على الأقل.");
+            const g = document.getElementById('filterGrade').value;
+            gradesList = gradesList.filter(item => item !== g);
+            buildDropdowns();
+            renderScheduleTable();
+            alert("تم حذف الصف.");
+        };
+
+        window.addSection = function() {
+            const newS = prompt("أدخل اسم الشعبة الجديدة:");
+            if(newS && !sectionsList.includes(newS)) {
+                sectionsList.push(newS);
+                buildDropdowns();
+                alert("تمت إضافة الشعبة بنجاح.");
+            }
+        };
+
+        window.removeSection = function() {
+            if(sectionsList.length <= 1) return alert("يجب أن تبقى شعبة واحدة على الأقل.");
+            const s = document.getElementById('filterSection').value;
+            sectionsList = sectionsList.filter(item => item !== s);
+            buildDropdowns();
+            renderScheduleTable();
+            alert("تم حذف الشعبة.");
+        };
+
+        window.addPeriod = function() {
+            totalPeriods++;
+            renderScheduleTable();
+        };
+
+        window.removePeriod = function() {
+            if(totalPeriods <= 1) return alert("يجب أن تبقى حصة واحدة على الأقل.");
+            totalPeriods--;
+            renderScheduleTable();
+        };
+    </script>
 </body>
 </html>
