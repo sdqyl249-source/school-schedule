@@ -9,71 +9,37 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f2f5; }
         
         /* تنسيق القائمة الجانبية */
-        .sidebar{height:100vh;width:0;position:fixed;top:0;right:0;background:linear-gradient(180deg,#ffffff,#dfe9f3);box-shadow:0 4px 25px rgba(0,0,0,0.1);transition:width 0.4s cubic-bezier(0.25,0.8,0.25,1);overflow:hidden;z-index:1000;display:flex;flex-direction:column;padding:20px 0;}
-        .sidebar-title{color:#2c3e50;font-size:20px;font-weight:bold;padding-bottom:20px;border-bottom:2px solid rgba(41,128,185,0.2);margin-bottom:20px;text-align:center;white-space:nowrap;}
-        .menu-item{color:#2c3e50;background:rgba(255,255,255,0.2);border-radius:12px;margin:10px 15px;padding:12px 18px;text-align:center;transition:0.3s;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;white-space:nowrap;}
-        .menu-item:hover{background:rgba(255,255,255,0.4);box-shadow:0 0 12px #74b9ff;transform:translateY(-3px);}
-        .active-nav{background:rgba(255,255,255,0.6)!important;font-weight:bold;color:#2980b9!important;box-shadow:0 0 15px #74b9ff;border-right:4px solid #2980b9;}
-        .logout-btn{margin-top:auto;padding:12px;background:rgba(231,76,60,0.1);color:#c0392b;border:1px solid rgba(231,76,60,0.2);border-radius:12px;cursor:pointer;transition:0.3s;font-weight:bold;width:80%;margin:20px auto;}
-        .logout-btn:hover{background:#e74c3c;color:white;}
-        .toggle-btn{position:fixed;top:20px;right:20px;z-index:1002;padding:12px 20px;cursor:pointer;background:#ffffff;color:#2c3e50;border:none;border-radius:50px;box-shadow:0 4px 15px rgba(0,0,0,0.1);font-weight:bold;transition:0.3s;}
-        .toggle-btn:hover{background:#74b9ff;color:white;transform:scale(1.1);}
-        .main-content{margin-right:0;padding:30px;transition:0.4s cubic-bezier(0.25,0.8,0.25,1);}
-        @media screen and (max-width:768px){.main-content{margin-right:0;}}
+        .sidebar { height: 100vh; width: 0; position: fixed; top: 0; right: 0; background: linear-gradient(180deg, #ffffff, #dfe9f3); box-shadow: 0 4px 25px rgba(0,0,0,0.1); transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); overflow: hidden; z-index: 1000; display: flex; flex-direction: column; padding: 20px 0; }
+        .sidebar-title { color: #2c3e50; font-size: 20px; font-weight: bold; padding-bottom: 20px; border-bottom: 2px solid rgba(41, 128, 185, 0.2); margin-bottom: 20px; text-align: center; white-space: nowrap; }
+        .menu-item { color: #2c3e50; background: rgba(255, 255, 255, 0.2); border-radius: 12px; margin: 10px 15px; padding: 12px 18px; text-align: center; transition: 0.3s; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; }
+        .menu-item:hover { background: rgba(255, 255, 255, 0.4); box-shadow: 0 0 12px #74b9ff; transform: translateY(-3px); }
+        .logout-btn { margin-top: auto; padding: 12px; background: rgba(231, 76, 60, 0.1); color: #c0392b; border: 1px solid rgba(231, 76, 60, 0.2); border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; width: 80%; margin: 20px auto; }
+        .logout-btn:hover { background: #e74c3c; color: white; }
+        .toggle-btn { position: fixed; top: 20px; right: 20px; z-index: 1002; padding: 12px 20px; cursor: pointer; background: #ffffff; color: #2c3e50; border: none; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-weight: bold; transition: 0.3s; }
+        .main-content { margin-right: 0; padding: 30px; transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
     </style>
 </head>
 <body>
 
-<!-- القائمة الجانبية -->
-<button class="toggle-btn" onclick="toggleSidebar()">☰ القائمة</button>
+    <button class="toggle-btn" onclick="document.getElementById('mySidebar').style.width = '250px';">☰ القائمة</button>
 
-<div class="sidebar" id="mySidebar">
-    <div class="sidebar-title">🏞️ منصة الوادي</div>
-    <div class="menu-item" onclick="location.href='index.html'" id="nav-index">🏠 الرئيسية</div>
-    <div class="menu-item" onclick="location.href='classes.html'" id="nav-classes">🏫 إدارة الصفوف</div>
-    <div class="menu-item" onclick="location.href='schedule.html'" id="nav-schedule">📅 جدول الدروس</div>
-    <div class="menu-item" onclick="location.href='library.html'" id="nav-library">📚 المكتبة الرقمية</div>
-    <div class="menu-item" onclick="location.href='games.html'" id="nav-games">🎮 الترفيه والألعاب</div>
-    <button onclick="logout()" class="logout-btn">تسجيل الخروج</button>
-</div>
+    <div class="sidebar" id="mySidebar">
+        <div class="sidebar-title">🏞️ منصة الوادي</div>
+        <div class="menu-item" onclick="location.href='index.html'">🏠 الرئيسية</div>
+        <div class="menu-item" onclick="location.href='classes.html'">🏫 إدارة الصفوف</div>
+        <button onclick="localStorage.removeItem('currentUser'); window.location.href='login.html';" class="logout-btn">تسجيل الخروج</button>
+    </div>
 
-<!-- المحتوى الرئيسي -->
-<div class="main-content">
-    <h1>مرحباً بك في منصة الوادي</h1>
-    <p>استخدم القائمة الجانبية للتنقل بين أقسام المنصة.</p>
-</div>
+    <div class="main-content">
+        <h1>مرحباً بك في منصة الوادي</h1>
+    </div>
 
-<!-- 1. تحميل مكتبات Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <!-- ترتيب تحميل المكتبات والملفات الإجباري -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="global.js"></script>
+    <script src="scriot.js"></script>
+    <script src="classes.js?v=999"></script>
 
-<!-- 2. التهيئة -->
-<script>
-    const config = {
-        apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
-        authDomain: "roya-platform-26860.firebaseapp.com",
-        databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
-        projectId: "roya-platform-26860",
-        storageBucket: "roya-platform-26860.firebasestorage.app",
-        messagingSenderId: "897544406776",
-        appId: "1:897544406776:web:aa112013dea672fb141d0d"
-    };
-    firebase.initializeApp(config);
-    window.database = firebase.database();
-    console.log("تم تعريف window.database بنجاح");
-</script>
-
-<!-- 3. ملفاتك الخاصة -->
-<script src="global.js"></script>
-<script src="scriot.js"></script>
-<script src="classes.js?v=999"></script>
-
-<!-- 4. سكربتات الصفحة الخاصة (تسجيل الخروج) -->
-<script>
-    function logout() {
-        localStorage.removeItem("currentUser");
-        window.location.href = "login.html";
-    }
-</script>
 </body>
 </html>
