@@ -1,5 +1,61 @@
 window.currentActiveChatClassId = "";
 
+document.addEventListener('DOMContentLoaded', () => {
+    let userString = localStorage.getItem("currentUser");
+    if (!userString) return;
+
+    const userProfile = JSON.parse(userString);
+    showUserWelcome(userProfile);
+
+    // التحقق المباشر من وجود قاعدة البيانات
+    if (typeof window.database === 'undefined' || !window.database) {
+        console.error("خطأ: window.database غير معرفة!");
+        return;
+    }
+
+    loadUserDataFromCloud(userProfile.phone);
+
+    const role = userProfile.role ? userProfile.role.trim().toLowerCase() : "";
+    if (role === 'student') {
+        if (typeof renderStudentClasses === 'function') renderStudentClasses();
+    } else if (role === 'teacher') {
+        if (typeof renderTeacherClasses === 'function') renderTeacherClasses();
+    }
+
+    const saveBtn = document.getElementById("saveClassBtn");
+    if (saveBtn) {
+        saveBtn.onclick = function() {
+            const name = document.getElementById("className").value;
+            const section = document.getElementById("classSection").value;
+            const id = Math.floor(1000 + Math.random() * 9000).toString();
+            
+            window.database.ref('classes/' + id).set({
+                id: id,
+                name: name,
+                section: section
+            }).then(() => {
+                alert("تم حفظ الصف بنجاح!");
+            }).catch((err) => {
+                alert("حدث خطأ أثناء الحفظ: " + err.message);
+            });
+        };
+    }
+});
+
+function showUserWelcome(user) {
+    const header = document.querySelector('h2') || document.body;
+    const infoBox = document.createElement('div');
+    infoBox.innerHTML = `<h3>مرحباً بك يا ${user.name}</h3>`;
+    header.parentNode.insertBefore(infoBox, header.nextSibling);
+}
+
+function loadUserDataFromCloud(phone) {
+    if (!window.database) return;
+    window.database.ref('users/' + phone).on('value', (s) => { 
+        if(s.val()) localStorage.setItem("currentUser", JSON.stringify(s.val())); 
+    });
+}
+
 // دالة مركزية للانتظار، تضمن تشغيل الكود فقط عند وجود قاعدة البيانات
 function runWhenDatabaseReady(callback) {
     if (typeof window.database !== 'undefined' && window.database !== null) {
