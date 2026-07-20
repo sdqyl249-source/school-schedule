@@ -1,7 +1,13 @@
-(function() {
-    const firebaseConfig = {
+(function initializeDatabase() {
+    // التحقق من أن مكتبة firebase تم تحميلها
+    if (typeof firebase === 'undefined') {
+        console.warn("مكتبة Firebase لم تُحمل بعد، انتظر 100ms...");
+        setTimeout(initializeDatabase, 100);
+        return;
+    }
+
+    const config = {
         apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
-        authDomain: "roya-platform-26860.firebaseapp.com",
         databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
         projectId: "roya-platform-26860",
         storageBucket: "roya-platform-26860.appspot.com",
@@ -10,12 +16,11 @@
     };
 
     if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(config);
     }
     
-    // إنشاء كائن قاعدة البيانات عالمياً ليكون متاحاً لجميع الملفات
     window.database = firebase.database();
-    console.log("تم تعريف window.database بنجاح في ملف global.js");
+    console.log("تم تهيئة window.database بنجاح وبشكل آمن.");
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
