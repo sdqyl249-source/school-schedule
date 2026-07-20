@@ -55,10 +55,15 @@ function renderTeacherClasses() {
     const container = document.getElementById("classesContainer");
     if (!container) return;
 
-    const db = window.getSafeDatabase();
-    if (!db) return;
+    // --- هذا هو التعديل: التحقق قبل البدء ---
+    if (typeof window.database === 'undefined' || window.database === null) {
+        console.warn("القاعدة لم تجهز بعد، سنحاول مرة أخرى بعد 500ms...");
+        setTimeout(renderTeacherClasses, 500); 
+        return;
+    }
+    // ----------------------------------------
 
-    db.ref('classes/').on('value', (snapshot) => {
+    window.database.ref('classes/').on('value', (snapshot) => {
         container.innerHTML = "<h2>صفوفي كأستاذ:</h2>";
         const data = snapshot.val();
         if (data) {
@@ -73,7 +78,6 @@ function renderTeacherClasses() {
         }
     });
 }
-
 function loadUserDataFromCloud(phone) {
     const db = window.getSafeDatabase();
     if (!db) return;
