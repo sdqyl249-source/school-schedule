@@ -23,6 +23,9 @@
         .page-header h1 { margin: 0 0 10px 0; font-size: 26px; }
         .page-header p { margin: 0; opacity: 0.95; font-size: 15px; }
 
+        /* مساحة إعلانات البانر التلقائية من الإنترنت للأرباح */
+        .ad-banner-box { background: #fff; border: 2px dashed #cbd5e0; padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 20px; color: #a0aec0; font-size: 13px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+
         /* شريط التحكم والفلترة */
         .controls-bar { background: white; padding: 20px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
         .control-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -35,7 +38,7 @@
         .home-btn { background: #718096; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-flex; align-items: center; }
         .home-btn:hover { background: #4a5568; }
 
-        /* أزرار الإدارة للمدير فقط */
+        /* لوحة تحكم المدير */
         .admin-controls { display: none; background: #fffaf0; border: 2px dashed #dd6b20; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
         .admin-controls button { background: #dd6b20; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; margin: 5px; }
         .admin-controls button:hover { background: #c05621; }
@@ -47,7 +50,6 @@
         th { background: #edf2f7; color: #2d3748; font-weight: bold; }
         tr:nth-child(even) { background: #f8fafc; }
 
-        /* خلية الجدول للتعديل أو العرض */
         .cell-content { display: flex; flex-direction: column; gap: 6px; }
         .cell-select, .cell-input { width: 100%; padding: 6px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
         .cell-view-subject { font-weight: bold; color: #2b6cb0; font-size: 15px; }
@@ -56,10 +58,14 @@
         .save-schedule-btn { background: #38a169; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; display: none; margin: 20px auto; display: block; }
         .save-schedule-btn:hover { background: #2f855a; }
 
-        /* تنسيق خاص للطباعة (PDF) */
+        /* نافذة إعلان بيني تلقائي من النت للأرباح */
+        .ad-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
+        .ad-modal-content { background: white; padding: 25px; border-radius: 12px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .ad-close-btn { background: #e53e3e; color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 15px; }
+
         @media print {
             body { background: white; }
-            .sidebar, .toggle-btn, .admin-controls, .controls-bar button, .save-schedule-btn, .cell-select, .cell-input { display: none !important; }
+            .sidebar, .toggle-btn, .admin-controls, .controls-bar button, .save-schedule-btn, .cell-select, .cell-input, .ad-banner-box { display: none !important; }
             .main-content { margin: 0; padding: 0; max-width: 100%; }
             .schedule-table-container { box-shadow: none; border: 1px solid #000; }
             th { background: #eee !important; color: #000 !important; -webkit-print-color-adjust: exact; }
@@ -85,13 +91,17 @@
 
     <div class="main-content">
         <!-- ترويسة الصفحة -->
-        .
         <div class="page-header">
             <h1>⏰ الجدول الدراسي الأسبوعي</h1>
             <p>عرض وتنظيم الحصص الدراسية اليومية حسب الصف والشعبة (من الأحد إلى الخميس)</p>
         </div>
 
-        <!-- لوحة تحكم المدير لإضافة الصفوف والشعب والحصص -->
+        <!-- 📢 مكان إعلان البانر التلقائي من الإنترنت للأرباح -->
+        <div class="ad-banner-box">
+            <span>[مساحة إعلانية تلقائية من الإنترنت للأرباح - Banner Ad]</span>
+        </div>
+
+        <!-- لوحة تحكم المدير -->
         <div class="admin-controls" id="adminControlsPanel">
             <h4 style="margin: 0 0 10px 0; color: #c05621;">⚙️ لوحة تحكم المدير (تعديل هيكل الجدول)</h4>
             <button onclick="window.addGrade()">+ إضافة صف دراسي</button>
@@ -102,7 +112,7 @@
             <button onclick="window.removePeriod()">- حذف حصة دراسية</button>
         </div>
 
-        <!-- شريط الفلترة وأزرار الطباعة والعودة -->
+        <!-- شريط التحكم والفلترة -->
         <div class="controls-bar">
             <div class="control-group">
                 <label>اختر الصف:</label>
@@ -118,7 +128,7 @@
 
             <div class="control-group">
                 <a href="index.html" class="home-btn" style="padding: 10px 15px; border-radius: 8px;">🏠 العودة للرئيسية</a>
-                <button onclick="window.print()" class="print-btn" style="padding: 10px 15px; border-radius: 8px;">🖨️ طباعة الجدول (PDF)</button>
+                <button onclick="triggerProfitAd(() => window.print())" class="print-btn" style="padding: 10px 15px; border-radius: 8px;">🖨️ طباعة الجدول (PDF)</button>
             </div>
         </div>
 
@@ -140,7 +150,18 @@
             </table>
         </div>
 
-        <button onclick="window.saveScheduleData()" class="save-schedule-btn" id="saveScheduleBtn">حفظ تعديلات الجدول 💾</button>
+        <button onclick="triggerProfitAd(window.saveScheduleData)" class="save-schedule-btn" id="saveScheduleBtn">حفظ تعديلات الجدول 💾</button>
+    </div>
+
+    <!-- نافذة إعلان بيني تلقائي من النت للأرباح -->
+    <div class="ad-modal" id="profitAdModal">
+        <div class="ad-modal-content">
+            <h3 style="color: #319795; margin-top:0;">🌟 إعلان داعم للمنصة</h3>
+            <div style="background: #edf2f7; padding: 20px; border-radius: 8px; margin: 15px 0; color: #4a5568; font-size: 14px;">
+                [جارِ عرض الإعلان من الإنترنت لتوليد الأرباح...]
+            </div>
+            <button onclick="closeProfitAd()" class="ad-close-btn">إغلاق ومتابعة العمل ✖</button>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -174,7 +195,6 @@
         let isManager = false;
         let isTeacher = false;
         
-        // الهيكل الافتراضي: 5 أيام، الصفوف 1-6، الشعب أ، ب، ج، 4 حصص
         const daysOfWeek = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
         let gradesList = ['الصف الأول', 'الصف الثاني', 'الصف الثالث', 'الصف الرابع', 'الصف الخامس', 'الصف السادس'];
         let sectionsList = ['الشعبة أ', 'الشعبة ب', 'الشعبة ج'];
@@ -195,23 +215,48 @@
         let remoteScheduleData = {};
 
         document.addEventListener('DOMContentLoaded', () => {
+            // التحقق من حالة تسجيل الدخول وتثبيتها تلقائياً
             try {
                 const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-                if (currentUser) {
-                    const role = currentUser.role ? currentUser.role.trim().toLowerCase() : "";
-                    if (role === 'admin' || role === 'المدير') {
-                        isManager = true;
-                        document.getElementById('adminControlsPanel').style.display = 'block';
-                        document.getElementById('saveScheduleBtn').style.display = 'block';
-                    } else if (role === 'teacher' || role === 'الأستاذ') {
-                        isTeacher = true;
-                    }
+                if (!currentUser) {
+                    window.location.href = 'login.html';
+                    return;
                 }
-            } catch(e) {}
+
+                // تحديد الصلاحية بناءً على رمز المدير ahmed2026 أو دور لوحة التسجيل
+                const secretCode = currentUser.code ? currentUser.code.trim() : "";
+                const registeredRole = currentUser.role ? currentUser.role.trim().toLowerCase() : "";
+
+                if (secretCode === 'ahmed2026' || registeredRole === 'admin' || registeredRole === 'المدير') {
+                    isManager = true;
+                    document.getElementById('adminControlsPanel').style.display = 'block';
+                    document.getElementById('saveScheduleBtn').style.display = 'block';
+                } else if (registeredRole === 'teacher' || registeredRole === 'الأستاذ') {
+                    isTeacher = true;
+                }
+            } catch(e) {
+                window.location.href = 'login.html';
+                return;
+            }
 
             buildDropdowns();
             fetchScheduleData();
         });
+
+        // نظام إظهار الإعلانات المربحة عند الأحداث المهمة
+        let pendingAction = null;
+        function triggerProfitAd(actionCallback) {
+            pendingAction = actionCallback;
+            document.getElementById('profitAdModal').style.display = 'flex';
+        }
+
+        function closeProfitAd() {
+            document.getElementById('profitAdModal').style.display = 'none';
+            if (pendingAction) {
+                pendingAction();
+                pendingAction = null;
+            }
+        }
 
         function buildDropdowns() {
             const gSelect = document.getElementById('filterGrade');
@@ -241,7 +286,6 @@
             const tbody = document.getElementById('scheduleTableBody');
             tbody.innerHTML = "";
 
-            // تحديث عناوين أعمدة الجدول حسب عدد الحصص
             const theadTr = document.querySelector('.schedule-table-container thead tr');
             let headersHTML = `<th>اليوم / الحصة</th>`;
             for(let p = 1; p <= totalPeriods; p++) {
@@ -254,11 +298,9 @@
                 let tdHTML = `<td style="font-weight: bold; background: #f7fafc;">${day}</td>`;
 
                 for(let p = 1; p <= totalPeriods; p++) {
-                    const cellKey = `${grade}_${section}_day${dIndex}_p${p}`;
                     const savedCell = (remoteScheduleData[grade] && remoteScheduleData[grade][section] && remoteScheduleData[grade][section][`day${dIndex}_p${p}`]) || { subject: '', teacher: '' };
 
                     if (isManager) {
-                        // المدير يمكنه التعديل
                         let optionsHTML = "";
                         subjectsOptions.forEach(sub => {
                             const sel = savedCell.subject === sub ? 'selected' : '';
@@ -276,7 +318,6 @@
                             </td>
                         `;
                     } else if (isTeacher) {
-                        // الأستاذ يرى المادة واسم المعلم
                         tdHTML += `
                             <td>
                                 <div class="cell-content">
@@ -286,7 +327,6 @@
                             </td>
                         `;
                     } else {
-                        // الطالب يرى المادة فقط بدون اسم الأستاذ
                         tdHTML += `
                             <td>
                                 <div class="cell-content">
@@ -332,7 +372,6 @@
             });
         };
 
-        // --- أدوات التحكم للمدير (زيادة ونقصان الصفوف والشعب والحصص) ---
         window.addGrade = function() {
             const newG = prompt("أدخل اسم الصف الدراسي الجديد:");
             if(newG && !gradesList.includes(newG)) {
