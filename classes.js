@@ -71,9 +71,15 @@ window.sendMessage = function(classId) {
 };
 
 // دوال إدارة الصفوف
+// تحديث دالة renderStudentClasses لتكون آمنة مثل زميلتها
 function renderStudentClasses() {
     const container = document.getElementById("classesContainer");
     if (!container) return;
+
+    if (typeof window.database === 'undefined') {
+        setTimeout(renderStudentClasses, 500);
+        return;
+    }
     
     container.innerHTML = `<button onclick="window.joinClass()">+ انضمام لصف جديد</button>`;
     window.database.ref('classes/').on('value', (snapshot) => {
@@ -95,6 +101,16 @@ function renderStudentClasses() {
     });
 }
 
+// تحديث دالة loadUserDataFromCloud لتكون آمنة
+function loadUserDataFromCloud(phone) {
+    if (typeof window.database === 'undefined') {
+        setTimeout(() => loadUserDataFromCloud(phone), 500);
+        return;
+    }
+    window.database.ref('users/' + phone).on('value', (s) => { 
+        if(s.val()) localStorage.setItem("currentUser", JSON.stringify(s.val())); 
+    });
+}
 function renderTeacherClasses() {
     const container = document.getElementById("classesContainer");
     if (!container) return;
@@ -132,13 +148,6 @@ window.saveClass = function() {
     window.database.ref('classes/' + id).set({ id, name, section, lessons: [{ title: "مقدمة" }] })
     .then(() => alert("تم الحفظ!"));
 };
-
-function loadUserDataFromCloud(phone) {
-    if (!window.database) return;
-    window.database.ref('users/' + phone).on('value', (s) => { 
-        if(s.val()) localStorage.setItem("currentUser", JSON.stringify(s.val())); 
-    });
-}
 
 function showUserWelcome(user) {
     const header = document.querySelector('h1') || document.body;
