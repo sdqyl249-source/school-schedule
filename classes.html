@@ -20,8 +20,8 @@
         .main-content { margin-right: 0; padding: 30px; transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
         
         /* البطاقات والدردشة */
-        .class-card { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); transition: 0.3s; }
-        .class-card:hover { transform: translateY(-3px); }
+        .class-card { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); transition: 0.3s; cursor: pointer; }
+        .class-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.12); }
         .class-card button { padding: 6px 12px; margin-left: 5px; margin-top: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
         
         #chatSection { display: none; margin-top: 30px; border-top: 2px solid #ccc; padding-top: 20px; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
@@ -30,6 +30,9 @@
         .chat-input-area { display: flex; gap: 10px; }
         .chat-input-area input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
         .msg-bubble { background: #e3f2fd; padding: 8px 12px; border-radius: 8px; max-width: 70%; word-break: break-word; }
+        
+        /* الفئة الخاصة بالمدير والأستاذ لإخفائها عن الطلاب افتراضياً */
+        .admin-only { display: none; }
     </style>
 </head>
 <body>
@@ -51,8 +54,8 @@
     <div class="main-content">
         <h2>إدارة الصفوف 🏫</h2>
 
-        <!-- بوكس إضافة صف جديد -->
-        <div id="adminPanel" style="border: 2px dashed #27ae60; padding: 20px; margin-bottom: 25px; border-radius: 10px; background: #fff;">
+        <!-- بوكس إضافة صف جديد (يظهر للأستاذ والمدير فقط) -->
+        <div id="adminPanel" class="admin-only" style="border: 2px dashed #27ae60; padding: 20px; margin-bottom: 25px; border-radius: 10px; background: #fff;">
             <h3>إضافة صف جديد 🏫</h3>
             <label>اسم الصف:</label>
             <select id="className" style="padding: 6px; margin-left: 10px;">
@@ -80,7 +83,7 @@
         <div class="dashboard-container" id="classesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
         </div>
 
-        <!-- قسم الدردشة الخاصة بالصف -->
+        <!-- قسم الدردشة الخاصة بالصف (تفتح مباشرة عند النقر على الصف) -->
         <div id="chatSection">
             <h3 id="currentChatTitle">غرفة الدردشة للصف: <span></span></h3>
             <div class="chat-wrapper">
@@ -90,7 +93,8 @@
                     <button id="send-btn" style="background: #2980b9; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer;">إرسال ✉️</button>
                 </div>
             </div>
-            <button onclick="document.getElementById('chatSection').style.display='none'" style="margin-top: 12px; background: #7f8c8d; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer;">إغلاق الدردشة</button>
+            <!-- زر إغلاق الدردشة والعودة للقائمة (يظهر للاستاذ والمدير فقط) -->
+            <button id="closeChatBtn" class="admin-only" onclick="document.getElementById('chatSection').style.display='none'; document.getElementById('classesContainer').style.display='grid'; if(isAdmin) document.getElementById('adminPanel').style.display='block';" style="margin-top: 12px; background: #7f8c8d; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer;">إغلاق الدردشة والعودة للقائمة</button>
         </div>
     </div>
 
@@ -126,20 +130,30 @@
         window.database = firebase.database();
         let activeChatId = "";
         let chatListener = null;
+        let isAdmin = false; // متغير عام لتحديد هل المستخدم الحالي أستاذ أو مدير
 
         document.addEventListener('DOMContentLoaded', () => {
             let currentUser = null;
+
             try {
                 currentUser = JSON.parse(localStorage.getItem("currentUser"));
                 if (currentUser) {
+                    const userRole = currentUser.role ? currentUser.role.trim().toLowerCase() : "";
+                    
+                    // التحقق من صلاحيات الأستاذ أو المدير
+                    if (userRole === 'teacher' || userRole === 'admin' || userRole === 'المدير' || userRole === 'الأستاذ') {
+                        isAdmin = true;
+                        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+                    }
+                    
                     const header = document.querySelector('h2');
                     const infoBox = document.createElement('div');
-                    infoBox.innerHTML = `<h4 style="color: #2980b9; margin-bottom: 20px;">مرحباً بك يا ${currentUser.name}</h4>`;
+                    infoBox.innerHTML = `<h4 style="color: #2980b9; margin-bottom: 20px;">مرحباً بك يا ${currentUser.name} (${currentUser.role || 'مستخدم'})</h4>`;
                     header.parentNode.insertBefore(infoBox, header.nextSibling);
                 }
             } catch(e) {}
 
-            // جلب وعرض الصفوف مع أزرار (الخصائص، التعديل، الدردشة، الحذف)
+            // جلب وعرض الصفوف
             const container = document.getElementById("classesContainer");
             if (container && window.database) {
                 window.database.ref('classes/').on('value', (snapshot) => {
@@ -149,15 +163,27 @@
                         Object.values(data).forEach(cls => {
                             const card = document.createElement("div");
                             card.className = "class-card";
+                            
+                            // أزرار الحذف والتعديل تظهر للأستاذ والمدير فقط داخل البطاقة
+                            let adminButtonsHTML = "";
+                            if (isAdmin) {
+                                adminButtonsHTML = `
+                                    <div style="margin-top: 10px;" onclick="event.stopPropagation();">
+                                        <button onclick="window.editClass('${cls.id}', '${cls.name}', '${cls.section}')" style="background: #f39c12; color: white;">✏️ تعديل</button>
+                                        <button onclick="window.deleteClass('${cls.id}')" style="background: #e74c3c; color: white;">🗑️ حذف</button>
+                                    </div>`;
+                            }
+
                             card.innerHTML = `
                                 <h3>${cls.name} - شعبة ${cls.section}</h3>
-                                <small style="color: #7f8c8d;">رمز الصف: ${cls.id}</small><br>
-                                <div style="margin-top: 10px;">
-                                    <button onclick="window.viewLessons('${cls.id}', '${cls.name}')" style="background: #3498db; color: white;">الخصائص والدروس</button>
-                                    <button onclick="window.openChat('${cls.id}', '${cls.name} - شعبة ${cls.section}')" style="background: #9b59b6; color: white;">💬 الدردشة</button>
-                                    <button onclick="window.editClass('${cls.id}', '${cls.name}', '${cls.section}')" style="background: #f39c12; color: white;">✏️ تعديل</button>
-                                    <button onclick="window.deleteClass('${cls.id}')" style="background: #e74c3c; color: white;">🗑️ حذف</button>
-                                </div>`;
+                                <small style="color: #7f8c8d;">رمز الصف: ${cls.id}</small>
+                                ${adminButtonsHTML}`;
+                            
+                            // عند النقر على بطاقة الصف يتم الدخول مباشرة لغرفة الدردشة الخاصة به
+                            card.onclick = () => {
+                                window.openChat(cls.id, `${cls.name} - شعبة ${cls.section}`);
+                            };
+
                             container.appendChild(card);
                         });
                     }
@@ -194,23 +220,7 @@
             }
         });
 
-        // 1. وظيفة عرض خصائص الصف والدروس
-        window.viewLessons = function(id, name) {
-            window.database.ref('classes/' + id + '/lessons').once('value').then(snapshot => {
-                const lessons = snapshot.val();
-                let msg = `خصائص الصف: ${name}\nالرمز: ${id}\n\nالدروس المتاحة:\n`;
-                if (lessons) {
-                    lessons.forEach((l, idx) => {
-                        msg += `- ${idx + 1}: ${l.title}\n`;
-                    });
-                } else {
-                    msg += "لا توجد دروس مضافة بعد.";
-                }
-                alert(msg);
-            });
-        };
-
-        // 2. وظيفة تعديل اسم الصف أو الشعبة
+        // 1. وظيفة تعديل اسم الصف أو الشعبة
         window.editClass = function(id, oldName, oldSection) {
             const newName = prompt("تعديل اسم الصف:", oldName);
             if (!newName) return;
@@ -225,7 +235,7 @@
             }).catch(err => alert("خطأ في التعديل: " + err.message));
         };
 
-        // 3. وظيفة حذف الصف
+        // 2. وظيفة حذف الصف
         window.deleteClass = function(id) {
             if (confirm("هل أنت متأكد من حذف هذا الصف نهائياً؟")) {
                 window.database.ref('classes/' + id).remove()
@@ -234,21 +244,24 @@
             }
         };
 
-        // 4. فتح دردشة الصف
+        // 3. فتح دردشة الصف مباشرة عند النقر عليه وإخفاء القائمة الرئيسية
         window.openChat = function(classId, className) {
             activeChatId = classId;
             document.getElementById('currentChatTitle').querySelector('span').innerText = className;
+            
+            // إخفاء قائمة الصفوف وإظهار نافذة الدردشة فوراً
+            document.getElementById('classesContainer').style.display = 'none';
+            const adminPanel = document.getElementById('adminPanel');
+            if(adminPanel) adminPanel.style.display = 'none';
             document.getElementById('chatSection').style.display = 'block';
             
             const messagesContainer = document.getElementById('chat-messages');
             messagesContainer.innerHTML = "جاري تحميل الرسائل...";
 
-            // إلغاء الاستماع للدردشة السابقة إن وجدت لمنع التداخل
             if (chatListener) {
                 window.database.ref('chats/' + activeChatId).off('value', chatListener);
             }
 
-            // الاستماع لرسائل هذا الصف حصرياً
             chatListener = window.database.ref('chats/' + classId).on('value', snapshot => {
                 messagesContainer.innerHTML = "";
                 const msgs = snapshot.val();
