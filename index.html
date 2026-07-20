@@ -8,10 +8,10 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f2f5; }
         
         /* القائمة الجانبية */
-        .sidebar { height: 100vh; width: 0; position: fixed; top: 0; right: 0; background: linear-gradient(180deg, #ffffff, #dfe9f3); box-shadow: 0 4px 25px rgba(0,0,0,0.1); transition: width 0.4s; overflow: hidden; z-index: 1000; display: flex; flex-direction: column; padding: 20px 0; }
-        .sidebar-title { color: #2c3e50; font-size: 20px; font-weight: bold; padding-bottom: 20px; border-bottom: 2px solid rgba(41, 128, 185, 0.2); margin-bottom: 20px; text-align: center; white-space: nowrap; }
-        .menu-item { color: #2c3e50; background: rgba(255, 255, 255, 0.2); border-radius: 12px; margin: 10px 15px; padding: 12px 18px; text-align: center; transition: 0.3s; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; }
-        .menu-item:hover { background: rgba(255, 255, 255, 0.4); box-shadow: 0 0 12px #74b9ff; transform: translateY(-3px); }
+        .sidebar { height: 100vh; width: 0; position: fixed; top: 0; right: 0; background: linear-gradient(180deg, #ffffff, #dfe9f3); box-shadow: 0 4px 25px rgba(0,0,0,0.1); transition: width 0.4s; overflow-x: hidden; z-index: 1000; display: flex; flex-direction: column; padding: 20px 0; }
+        .sidebar-title { color: #2c3e50; font-size: 20px; font-weight: bold; padding-bottom: 20px; border-bottom: 2px solid rgba(41, 128, 185, 0.2); margin-bottom: 10px; text-align: center; white-space: nowrap; }
+        .menu-item { color: #2c3e50; background: rgba(255, 255, 255, 0.2); border-radius: 12px; margin: 8px 15px; padding: 12px 18px; text-align: center; transition: 0.3s; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-weight: 500; }
+        .menu-item:hover { background: rgba(255, 255, 255, 0.6); box-shadow: 0 0 12px #74b9ff; transform: translateY(-2px); }
         .logout-btn { margin-top: auto; padding: 12px; background: rgba(231, 76, 60, 0.1); color: #c0392b; border: 1px solid rgba(231, 76, 60, 0.2); border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; width: 80%; margin: 20px auto; }
         .logout-btn:hover { background: #e74c3c; color: white; }
         .toggle-btn { position: fixed; top: 20px; right: 20px; z-index: 1002; padding: 12px 20px; cursor: pointer; background: #ffffff; color: #2c3e50; border: none; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-weight: bold; }
@@ -27,7 +27,7 @@
         .card-box:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
         .card-box h3 { margin-top: 0; color: #2d3748; border-bottom: 2px solid #f0f2f5; padding-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 
-        /* عرض الأخبار والإعلانات بالصور والفيديو */
+        /* الأقسام والأخبار */
         .announcement-item { background: #f8fafc; border: 1px solid #e2e8f0; border-right: 4px solid #3182ce; padding: 15px; border-radius: 8px; margin-bottom: 12px; }
         .announcement-item.urgent { background: #fff5f5; border-right-color: #e53e3e; border-color: #fed7d7; }
         .news-media { max-width: 100%; border-radius: 8px; margin-top: 10px; max-height: 250px; object-fit: cover; display: block; cursor: pointer; }
@@ -46,12 +46,16 @@
 </head>
 <body>
 
-    <button class="toggle-btn" onclick="document.getElementById('mySidebar').style.width = '250px';">☰ القائمة</button>
+    <button class="toggle-btn" onclick="document.getElementById('mySidebar').style.width = '260px';">☰ القائمة</button>
 
+    <!-- القائمة الجانبية المحدثة -->
     <div class="sidebar" id="mySidebar">
         <div class="sidebar-title">🏞️ منصة الوادي</div>
         <div class="menu-item" onclick="location.href='index.html'">🏠 الرئيسية</div>
-        <div class="menu-item" onclick="location.href='classes.html'">🏫 إدارة الصفوف</div>
+        <div class="menu-item" onclick="location.href='classes.html'">🏫 إدارة الصفوف والدردشة</div>
+        <div class="menu-item" onclick="location.href='schedule.html'">⏰ الحصص والجداول</div>
+        <div class="menu-item" onclick="location.href='games.html'">🎮 الألعاب والترفيه</div>
+        <div class="menu-item" onclick="location.href='library.html'">📚 المكتبة الرقمية</div>
         <button onclick="localStorage.removeItem('currentUser'); window.location.href='login.html';" class="logout-btn">تسجيل الخروج</button>
     </div>
     
@@ -72,7 +76,7 @@
                 <h3>👋 الترحيب والمستخدم</h3>
                 <p id="welcomeUserText" style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-top: 5px;">جاري تحميل بيانات المستخدم...</p>
                 <div style="margin-top: auto; padding-top: 15px;">
-                    <button onclick="location.href='classes.html'" style="background: #3182ce; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold;">الانتقال المباشر لصفوف الدراسية 🏫</button>
+                    <button onclick="location.href='classes.html'" style="background: #3182ce; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold;">الانتقال لصفوف الدراسية والدردشة 🏫</button>
                 </div>
             </div>
 
@@ -81,7 +85,7 @@
                 <h3>🎯 رؤية وأهداف المنصة</h3>
                 <div style="color: #4a5568; font-size: 14px; line-height: 1.6;">
                     <p style="margin: 0 0 8px 0;"><strong>الرؤية:</strong> بناء بيئة تعليمية رقمية متكاملة، تفاعلية، وآمنة تربط بين المعلم والطلاب والإدارة بمرونة عالية.</p>
-                    <p style="margin: 0;"><strong>الأهداف:</strong> توفير إشراف تربوي لحظي، تنظيم الصفوف والدردشة بضوابط صلاحيات صارمة، وتسهيل التواصل الفوري.</p>
+                    <p style="margin: 0;"><strong>الأهداف:</strong> توفير إشراف تربوي لحظي، تنظيم الصفوف والدردشة، وتسهيل التواصل الفوري.</p>
                 </div>
             </div>
 
@@ -100,7 +104,34 @@
                 </div>
             </div>
 
-            <!-- 4. بطاقة لوحة الإعلانات والأخبار (مع دعم الصور والفيديوهات) -->
+            <!-- 4. بطاقة قسم الحصص والجداول -->
+            <div class="card-box" style="border-right: 5px solid #319795;">
+                <h3>⏰ الحصص والجداول اليومية</h3>
+                <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin-top: 5px;">تابع جدول الحصص المدرسية والمواعيد الرسمية للدروس التفاعلية لحظة بلحظة.</p>
+                <div style="margin-top: auto; padding-top: 15px;">
+                    <button onclick="location.href='schedule.html'" style="background: #319795; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold;">الانتقال للجدول الدراسي 📅</button>
+                </div>
+            </div>
+
+            <!-- 5. بطاقة قسم الترفيه والألعاب -->
+            <div class="card-box" style="border-right: 5px solid #d69e2e;">
+                <h3>🎮 الترفيه والألعاب التعليمية</h3>
+                <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin-top: 5px;">ألعاب لتعليم الحروف والقراءة، مسابقات العلوم والرياضيات، ولعبة البازل الذكية للمرحلة الابتدائية.</p>
+                <div style="margin-top: auto; padding-top: 15px;">
+                    <button onclick="location.href='games.html'" style="background: #d69e2e; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold;">الانتقال لقسم الألعاب 🎲</button>
+                </div>
+            </div>
+
+            <!-- 6. بطاقة المكتبة الرقمية -->
+            <div class="card-box" style="border-right: 5px solid #2b6cb0;">
+                <h3>📚 المكتبة الرقمية والملفات</h3>
+                <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin-top: 5px;">بنك الكتب والملازم والملخصات بصيغة PDF لكل صف دراسي، مع إمكانية الرفع المباشر للإدارة.</p>
+                <div style="margin-top: auto; padding-top: 15px;">
+                    <button onclick="location.href='library.html'" style="background: #2b6cb0; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold;">الانتقال للمكتبة الرقمية 📁</button>
+                </div>
+            </div>
+
+            <!-- 7. بطاقة لوحة الإعلانات وآخر الأخبار (مع دعم الصور والفيديوهات) -->
             <div class="card-box" style="border-right: 5px solid #dd6b20; grid-column: span 1 / -1;">
                 <h3>📢 لوحة الإعلانات وآخر الأخبار</h3>
                 
@@ -139,7 +170,7 @@
     <script>
         document.querySelector('.toggle-btn').addEventListener('click', (e) => {
             e.stopPropagation();
-            document.getElementById('mySidebar').style.width = '250px';
+            document.getElementById('mySidebar').style.width = '260px';
             document.getElementById('sidebarOverlay').style.display = 'block';
         });
         document.getElementById('sidebarOverlay').addEventListener('click', () => {
