@@ -1,8 +1,4 @@
-
-// نستخدم Event Listener لضمان أن Firebase جاهز تماماً
-window.database = null;
-
-function setupFirebase() {
+(function() {
     const config = {
         apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
         databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
@@ -15,17 +11,8 @@ function setupFirebase() {
     if (!firebase.apps.length) {
         firebase.initializeApp(config);
     }
-    window.database = firebase.database();
     
-    // إرسال إشارة لكل ملفاتك أن القاعدة أصبحت جاهزة الآن
-    window.dispatchEvent(new Event('databaseReady'));
-    console.log("تمت التهيئة بنجاح.");
-}
-
-// محاولة التهيئة فوراً
-if (typeof firebase !== 'undefined') {
-    setupFirebase();
-} else {
-    // إذا لم تحمل المكتبة بعد، انتظرها
-    window.addEventListener('load', setupFirebase);
-}
+    // تعريف قاعدة البيانات عالمياً بشكل فوري ومباشر
+    window.database = firebase.database();
+    console.log("تم تعريف window.database بنجاح في global.js");
+})();
