@@ -18,7 +18,7 @@
         
         .main-content { margin-right: 0; padding: 30px; transition: 0.4s; }
         
-        /* عداد الزائرين (خارج نظام البطاقات) */
+        /* عداد الزائرين المستقل */
         .visitor-counter-bar { background: linear-gradient(135deg, #2b6cb0, #3182ce); color: white; padding: 12px 20px; border-radius: 10px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(49, 130, 206, 0.2); font-weight: bold; }
 
         /* هيكل البطاقات */
@@ -27,10 +27,13 @@
         .card-box:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
         .card-box h3 { margin-top: 0; color: #2d3748; border-bottom: 2px solid #f0f2f5; padding-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 
-        /* تفاصيل الإعلانات والتقويم داخل البطاقات */
-        .announcement-item { background: #f8fafc; border: 1px solid #e2e8f0; border-right: 4px solid #3182ce; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+        /* عرض الأخبار والإعلانات بالصور والفيديو */
+        .announcement-item { background: #f8fafc; border: 1px solid #e2e8f0; border-right: 4px solid #3182ce; padding: 15px; border-radius: 8px; margin-bottom: 12px; }
         .announcement-item.urgent { background: #fff5f5; border-right-color: #e53e3e; border-color: #fed7d7; }
+        .news-media { max-width: 100%; border-radius: 8px; margin-top: 10px; max-height: 250px; object-fit: cover; display: block; cursor: pointer; }
+        .news-video { width: 100%; height: 200px; border-radius: 8px; margin-top: 10px; border: none; }
         
+        /* التقويم الحي */
         .calendar-widget { text-align: center; }
         .calendar-header { font-weight: bold; color: #2d3748; margin-bottom: 12px; font-size: 16px; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; font-size: 13px; }
@@ -97,22 +100,34 @@
                 </div>
             </div>
 
-            <!-- 4. بطاقة لوحة الإعلانات والتعاميم المدرسية -->
+            <!-- 4. بطاقة لوحة الإعلانات والأخبار (مع دعم الصور والفيديوهات) -->
             <div class="card-box" style="border-right: 5px solid #dd6b20; grid-column: span 1 / -1;">
-                <h3>📢 لوحة الإعلانات والتعاميم المدرسية</h3>
+                <h3>📢 لوحة الإعلانات وآخر الأخبار</h3>
                 
-                <!-- نموذج إضافة إعلان (يظهر للأستاذ والمدير فقط) -->
+                <!-- نموذج إضافة خبر أو إعلان (يظهر للأستاذ والمدير فقط) -->
                 <div id="adminAnnounceBox" class="admin-only" style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 2px dashed #38a169;">
-                    <h4 style="margin: 0 0 10px 0; color: #38a169;">نشر تعميم أو إعلان جديد</h4>
-                    <input type="text" id="annTitle" placeholder="عنوان الإعلان..." style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box;">
-                    <textarea id="annText" placeholder="نص التعميم..." style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #cbd5e0; border-radius: 6px; height: 60px; box-sizing: border-box;"></textarea>
+                    <h4 style="margin: 0 0 10px 0; color: #38a169;">نشر خبر أو تعميم جديد (مع صورة أو فيديو)</h4>
+                    <input type="text" id="annTitle" placeholder="عنوان الخبر أو الإعلان..." style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box;">
+                    <textarea id="annText" placeholder="تفاصيل الخبر..." style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #cbd5e0; border-radius: 6px; height: 60px; box-sizing: border-box;"></textarea>
+                    
+                    <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;">إرفاق صورة:</label>
+                            <input type="file" id="annImageFile" accept="image/*" style="font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;">أو رابط فيديو يوتيوب (Embed):</label>
+                            <input type="text" id="annVideoUrl" placeholder="https://www.youtube.com/embed/..." style="padding: 6px; width: 220px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px;">
+                        </div>
+                    </div>
+
                     <label style="font-size: 14px; display: inline-block; margin-bottom: 10px;"><input type="checkbox" id="annUrgent"> إعلان عاجل ومهم 🔴</label>
-                    <button onclick="window.postAnnouncement()" style="background: #38a169; color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; float: left; font-weight: bold;">نشر الإعلان</button>
+                    <button onclick="window.postAnnouncement()" style="background: #38a169; color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; float: left; font-weight: bold;">نشر الخبر</button>
                     <div style="clear: both;"></div>
                 </div>
 
-                <!-- قائمة عرض الإعلانات -->
-                <div id="announcementsList" style="max-height: 250px; overflow-y: auto;">جاري تحميل الإعلانات...</div>
+                <!-- قائمة عرض الأخبار والإعلانات -->
+                <div id="announcementsList" style="max-height: 400px; overflow-y: auto;">جاري تحميل الأخبار...</div>
             </div>
 
         </div>
@@ -172,7 +187,7 @@
                 document.getElementById('visitorCount').innerText = snap.val() || 1;
             });
 
-            // جلب الإعلانات
+            // جلب الإعلانات والأخبار
             window.database.ref('announcements/').on('value', snap => {
                 const list = document.getElementById('announcementsList');
                 list.innerHTML = "";
@@ -182,13 +197,21 @@
                         const div = document.createElement('div');
                         div.className = ann.urgent ? 'announcement-item urgent' : 'announcement-item';
                         
-                        let deleteBtn = isAdmin ? `<button onclick="window.deleteAnnouncement('${id}')" style="background:none; border:none; color:#e53e3e; cursor:pointer; float:left; font-size:12px; font-weight:bold;">حذف</button>` : '';
+                        let deleteBtn = isAdmin ? `<button onclick="window.deleteAnnouncement('${id}')" style="background:none; border:none; color:#e53e3e; cursor:pointer; float:left; font-size:12px; font-weight:bold;">حذف الخبر</button>` : '';
                         
-                        div.innerHTML = `<strong>${ann.title}</strong> ${deleteBtn}<p style="margin: 5px 0 0 0; color:#4a5568; font-size:14px;">${ann.text}</p>`;
+                        let mediaHTML = "";
+                        if (ann.image) {
+                            mediaHTML += `<img src="${ann.image}" class="news-media" onclick="window.open('${ann.image}')" title="انقر لتكبير الصورة">`;
+                        }
+                        if (ann.video) {
+                            mediaHTML += `<iframe src="${ann.video}" class="news-video" allowfullscreen></iframe>`;
+                        }
+
+                        div.innerHTML = `<strong>${ann.title}</strong> ${deleteBtn}<p style="margin: 5px 0 8px 0; color:#4a5568; font-size:14px; line-height: 1.5;">${ann.text}</p>${mediaHTML}`;
                         list.appendChild(div);
                     });
                 } else {
-                    list.innerHTML = "<p style='color:#718096; text-align:center;'>لا توجد إعلانات حالياً.</p>";
+                    list.innerHTML = "<p style='color:#718096; text-align:center;'>لا توجد أخبار أو إعلانات حالياً.</p>";
                 }
             });
 
@@ -199,20 +222,47 @@
             const title = document.getElementById('annTitle').value.trim();
             const text = document.getElementById('annText').value.trim();
             const urgent = document.getElementById('annUrgent').checked;
-            if(!title || !text) { alert("يرجى ملء الحقول"); return; }
+            const videoUrl = document.getElementById('annVideoUrl').value.trim();
+            const imageFile = document.getElementById('annImageFile').files[0];
 
+            if(!title || !text) { 
+                alert("يرجى كتابة عنوان ونص الخبر على الأقل."); 
+                return; 
+            }
+
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onloadend = function() {
+                    saveNewsToDatabase(title, text, urgent, reader.result, videoUrl);
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                saveNewsToDatabase(title, text, urgent, null, videoUrl);
+            }
+        };
+
+        function saveNewsToDatabase(title, text, urgent, imageUrl, videoUrl) {
             window.database.ref('announcements/').push({
-                title, text, urgent, timestamp: Date.now()
+                title, 
+                text, 
+                urgent, 
+                image: imageUrl || null, 
+                video: videoUrl || null, 
+                timestamp: Date.now()
             }).then(() => {
                 document.getElementById('annTitle').value = "";
                 document.getElementById('annText').value = "";
+                document.getElementById('annVideoUrl').value = "";
+                document.getElementById('annImageFile').value = "";
                 document.getElementById('annUrgent').checked = false;
-                alert("تم نشر الإعلان بنجاح!");
+                alert("تم نشر الخبر بنجاح!");
+            }).catch(err => {
+                alert("فشل النشر: " + err.message);
             });
-        };
+        }
 
         window.deleteAnnouncement = function(id) {
-            if(confirm("هل تريد حذف هذا الإعلان؟")) {
+            if(confirm("هل تريد حذف هذا الخبر نهائياً؟")) {
                 window.database.ref('announcements/' + id).remove();
             }
         };
