@@ -1,34 +1,29 @@
-(function initializeDatabase() {
-    // التحقق من أن مكتبة firebase تم تحميلها
-    if (typeof firebase === 'undefined') {
-        console.warn("مكتبة Firebase لم تُحمل بعد، انتظر 100ms...");
-        setTimeout(initializeDatabase, 100);
-        return;
+(function() {
+    function initialize() {
+        // نتحقق إذا كانت مكتبة Firebase قد وصلت للمتصفح
+        if (typeof firebase === 'undefined') {
+            console.log("انتظار تحميل مكتبة Firebase...");
+            setTimeout(initialize, 50); // جرب كل 50 ملي ثانية
+            return;
+        }
+
+        const config = {
+            apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
+            databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
+            projectId: "roya-platform-26860",
+            storageBucket: "roya-platform-26860.appspot.com",
+            messagingSenderId: "897544406776",
+            appId: "1:897544406776:web:aa112013dea672fb141d0d"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(config);
+        }
+        
+        // الآن نضمن أنها موجودة
+        window.database = firebase.database();
+        console.log("تم تعريف window.database بنجاح وبشكل آمن.");
     }
 
-    const config = {
-        apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
-        databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
-        projectId: "roya-platform-26860",
-        storageBucket: "roya-platform-26860.appspot.com",
-        messagingSenderId: "897544406776",
-        appId: "1:897544406776:web:aa112013dea672fb141d0d"
-    };
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(config);
-    }
-    
-    window.database = firebase.database();
-    console.log("تم تهيئة window.database بنجاح وبشكل آمن.");
+    initialize();
 })();
-
-document.addEventListener('DOMContentLoaded', function() {
-    const isLoginPage = window.location.pathname.endsWith("login.html");
-    if (isLoginPage) return; 
-
-    const userString = localStorage.getItem("currentUser");
-    if (!userString) {
-        window.location.href = "login.html";
-    }
-});
