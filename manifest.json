@@ -1,18 +1,13 @@
 {
-  "name": "منصة رؤية التعليمية - لوحة التحكم",
-  "short_name": "رؤية",
+  "name": "منصة الوادي التعليمية",
+  "short_name": "منصة الوادي",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4a90e2",
+  "background_color": "#121824",
+  "theme_color": "#3182ce",
   "icons": [
     {
-      "src": "icon-roya.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-roya.png",
+      "src": "icona99.png",
       "sizes": "512x512",
       "type": "image/png"
     }
