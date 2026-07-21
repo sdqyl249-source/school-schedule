@@ -23,7 +23,6 @@
             overflow: hidden;
         }
 
-        /* الحاوية الدائرية المتحركة للخلفية */
         .login-container {
             position: relative;
             width: 380px;
@@ -33,7 +32,6 @@
             align-items: center;
         }
 
-        /* الإطار الدائري المتحرك للشرطات */
         .circle-animation {
             position: absolute;
             width: 440px;
@@ -54,7 +52,6 @@
             border-radius: 2px;
         }
 
-        /* تلوين بعض الشرطات بشكل مضيء متحرك */
         .circle-animation span:nth-child(-n+8) {
             background: #f6ad55;
             box-shadow: 0 0 10px #f6ad55, 0 0 20px #f6ad55;
@@ -65,7 +62,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* بطاقة تسجيل الدخول الداخلية */
         .login-card {
             position: relative;
             background: #182232;
@@ -179,29 +175,24 @@
 <body>
 
     <div class="login-container">
-        <!-- الإطار المتحرك بالشرطات المضيئة -->
         <div class="circle-animation" id="circleRing"></div>
 
-        <!-- بطاقة تسجيل الدخول -->
         <div class="login-card">
             <h2 id="formTitle">LOGIN</h2>
             
             <div class="error-msg" id="errorMsg">يرجى ملء الحقول المطلوبة</div>
 
             <form onsubmit="handleAuth(event)">
-                <!-- حقل الاسم (يظهر عند التسجيل) -->
                 <div class="input-group" id="nameGroup" style="display:none;">
                     <i class="fa-solid fa-user"></i>
                     <input type="text" id="fullName" class="input-field" placeholder="الاسم الكامل...">
                 </div>
 
-                <!-- البريد أو الهاتف -->
                 <div class="input-group">
                     <i class="fa-solid fa-envelope"></i>
                     <input type="text" id="identifier" class="input-field" placeholder="البريد أو رقم الهاتف..." required>
                 </div>
 
-                <!-- اختيار الصفة (يظهر عند التسجيل) -->
                 <div id="roleGroup" style="display:none;">
                     <select id="userRole" class="select-field">
                         <option value="طالب">طالب</option>
@@ -210,10 +201,9 @@
                     </select>
                 </div>
 
-                <!-- الرمز السري أو كود المدير ahmed2026 -->
                 <div class="input-group">
                     <i class="fa-solid fa-lock"></i>
-                    <input type="password" id="secretCode" class="input-field" placeholder="الرمز السري (ahmed2026 للمدير)..." required>
+                    <input type="password" id="secretCode" class="input-field" placeholder="الرمز السري..." required>
                 </div>
 
                 <button type="submit" class="submit-btn" id="submitBtn">LOGIN</button>
@@ -227,7 +217,6 @@
     </div>
 
     <script>
-        // توليد الشرطات الدائرية برمجياً لإعطاء حركة الإطار المضيء
         const ring = document.getElementById('circleRing');
         const totalSpokes = 36;
         for (let i = 0; i < totalSpokes; i++) {
@@ -281,14 +270,21 @@
             let finalRole = roleSelect;
             let finalName = fullName || identifier;
 
-            // تحديد تلقائي لصلاحية المدير عبر الرمز الحصري ahmed2026
+            // تحديد الصلاحيات بناءً على الرموز الموحدة
             if (secretCode === 'ahmed2026') {
                 finalRole = 'المدير';
-            } else if (isRegister && !fullName) {
-                errorMsg.style.display = 'block';
-                errorMsg.innerText = 'يرجى إدخال الاسم الكامل';
-                return;
-            } else if (!isRegister) {
+            } else if (secretCode === 'teacher2026') {
+                finalRole = 'الأستاذ';
+            } else if (isRegister) {
+                if (!fullName) {
+                    errorMsg.style.display = 'block';
+                    errorMsg.innerText = 'يرجى إدخال الاسم الكامل';
+                    return;
+                }
+                // إذا سجل بكلمة مرور عادية يتم اعتماد الصفة التي اخترتها في القائمة (طالب أو أستاذ)
+                finalRole = roleSelect;
+            } else {
+                // عند تسجيل الدخول العادي، استرجاع الدور المحفوظ مسبقاً إذا وجد
                 const existing = localStorage.getItem("currentUser");
                 if (existing) {
                     try {
@@ -301,7 +297,6 @@
                 }
             }
 
-            // حفظ الجلسة لتبقى نشطة ولا تظهر شاشة التسجيل مرة أخرى
             const userData = {
                 name: finalName,
                 identifier: identifier,
@@ -313,7 +308,6 @@
             window.location.href = 'index.html';
         }
 
-        // تخطي شاشة الدخول التلقائي إذا كان المستخدم مسجلاً مسبقاً
         window.addEventListener('DOMContentLoaded', () => {
             const currentUser = localStorage.getItem("currentUser");
             if (currentUser) {
