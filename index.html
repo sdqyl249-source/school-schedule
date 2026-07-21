@@ -3,389 +3,375 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الوادي التعليمية</title>
+    <!-- أيقونة المنصة -->
     <link rel="icon" type="image/png" href="icona99.png">
-    <link rel="apple-touch-icon" href="icona99.png">    
-    <title>الرئيسية - منصة الوادي</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icona99.png">
+    <!-- FontAwesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f2f5; }
-        
-        /* القائمة الجانبية */
-        .sidebar { height: 100vh; width: 0; position: fixed; top: 0; right: 0; background: linear-gradient(180deg, #ffffff, #dfe9f3); box-shadow: 0 4px 25px rgba(0,0,0,0.1); transition: width 0.4s; overflow-x: hidden; z-index: 1000; display: flex; flex-direction: column; padding: 20px 0; }
-        .sidebar-title { color: #2c3e50; font-size: 20px; font-weight: bold; padding-bottom: 20px; border-bottom: 2px solid rgba(41, 128, 185, 0.2); margin-bottom: 10px; text-align: center; white-space: nowrap; }
-        .menu-item { color: #2c3e50; background: rgba(255, 255, 255, 0.2); border-radius: 12px; margin: 8px 15px; padding: 12px 18px; text-align: center; transition: 0.3s; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-weight: 500; }
-        .menu-item:hover { background: rgba(255, 255, 255, 0.6); box-shadow: 0 0 12px #74b9ff; transform: translateY(-2px); }
-        
-        /* زر تثبيت التطبيق داخل القائمة الجانبية */
-        #installAppBtn {
-            display: none;
-            background: linear-gradient(135deg, #3182ce, #2b6cb0);
+        :root {
+            --primary: #f6ad55;
+            --primary-dark: #dd6b20;
+            --bg-dark: #121824;
+            --card-bg: #182232;
+            --text-color: #ffffff;
+            --text-muted: #a0aec0;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            color: var(--text-color);
+        }
+
+        /* شريط التنقل العلوي */
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-area img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .logo-area h1 {
+            font-size: 20px;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-badge {
+            background: rgba(246, 173, 85, 0.15);
+            color: var(--primary);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: #e53e3e;
             color: white;
             border: none;
-            padding: 12px 18px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 15px;
+            padding: 8px 15px;
+            border-radius: 8px;
             cursor: pointer;
-            margin: 10px 15px;
-            box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3);
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c53030;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, #182232, #1e293b);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .welcome-banner h2 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 28px;
+        }
+
+        .welcome-banner p {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 0;
+        }
+
+        /* شبكة الأقسام والبطاقات */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            transition: 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .card-box:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px rgba(246, 173, 85, 0.2);
+        }
+
+        .card-box i {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .card-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        .card-box p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        /* تنسيقات الساعة الرقمية الزجاجية الجديدة */
+        .clock-card-box {
+            position: relative;
+            border-right: 5px solid #00f2fe; 
+            padding: 0 !important; 
+            overflow: hidden; 
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
+            min-height: 220px;
+        }
+
+        .stars-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(white 1px, transparent 0);
+            background-size: 30px 30px;
+            opacity: 0.3;
+        }
+
+        .glass-clock-container {
+            position: relative;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px 30px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+            width: 85%;
+        }
+
+        .digital-time {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 36px;
+            font-weight: bold;
+            color: #ffffff;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(0, 242, 254, 0.6);
+            margin-bottom: 8px;
+        }
+
+        .digital-date {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* زر تثبيت التطبيق PWA */
+        .install-pwa-bar {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .install-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(221, 107, 32, 0.4);
             transition: 0.3s;
-            white-space: nowrap;
         }
-        #installAppBtn:hover {
+
+        .install-btn:hover {
             transform: translateY(-2px);
-            background: linear-gradient(135deg, #2b6cb0, #2c5282);
         }
-
-        .logout-btn { margin-top: auto; padding: 12px; background: rgba(231, 76, 60, 0.1); color: #c0392b; border: 1px solid rgba(231, 76, 60, 0.2); border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; width: 80%; margin: 20px auto; }
-        .logout-btn:hover { background: #e74c3c; color: white; }
-        .toggle-btn { position: fixed; top: 20px; right: 20px; z-index: 1002; padding: 12px 20px; cursor: pointer; background: #ffffff; color: #2c3e50; border: none; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-weight: bold; }
-        
-        .main-content { margin-right: 0; padding: 30px; transition: 0.4s; }
-        
-        /* عداد الزائرين المستقل */
-        .visitor-counter-bar { background: linear-gradient(135deg, #2b6cb0, #3182ce); color: white; padding: 12px 20px; border-radius: 10px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(49, 130, 206, 0.2); font-weight: bold; }
-
-        /* هيكل البطاقات */
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
-        .card-box { background: white; padding: 25px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; transition: 0.3s; }
-        .card-box:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
-        .card-box h3 { margin-top: 0; color: #2d3748; border-bottom: 2px solid #f0f2f5; padding-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-
-        /* الأقسام والأخبار */
-        .announcement-item { background: #f8fafc; border: 1px solid #e2e8f0; border-right: 4px solid #3182ce; padding: 15px; border-radius: 8px; margin-bottom: 12px; }
-        .announcement-item.urgent { background: #fff5f5; border-right-color: #e53e3e; border-color: #fed7d7; }
-        .news-media { max-width: 100%; border-radius: 8px; margin-top: 10px; max-height: 250px; object-fit: cover; display: block; cursor: pointer; }
-        .news-video { width: 100%; height: 200px; border-radius: 8px; margin-top: 10px; border: none; }
-        
-        /* التقويم الحي */
-        .calendar-widget { text-align: center; }
-        .calendar-header { font-weight: bold; color: #2d3748; margin-bottom: 12px; font-size: 16px; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; font-size: 13px; }
-        .calendar-grid div { padding: 8px; background: #f7fafc; border-radius: 4px; color: #4a5568; }
-        .calendar-grid .day-name { font-weight: bold; background: #edf2f7; color: #2d3748; }
-        .calendar-grid .today { background: #3182ce; color: white; font-weight: bold; }
-
-        .admin-only { display: none; }
     </style>
 </head>
 <body>
 
-    <button class="toggle-btn" onclick="document.getElementById('mySidebar').style.width = '260px'; document.getElementById('sidebarOverlay').style.display = 'block';">☰ القائمة</button>
+    <!-- الشريط العلوي -->
+    <header>
+        <div class="logo-area">
+            <img src="icona99.png" alt="شعار المنصة">
+            <h1>منصة الوادي التعليمية</h1>
+        </div>
+        <div class="user-info">
+            <span class="user-badge" id="displayRole">طالب</span>
+            <span id="displayName" style="font-weight: 500;">جاري التحميل...</span>
+            <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+        </div>
+    </header>
 
-    <!-- القائمة الجانبية المحدثة -->
-    <div class="sidebar" id="mySidebar">
-        <div class="sidebar-title">🏞️ منصة الوادي</div>
+    <!-- المحتوى الرئيسي -->
+    <div class="main-container">
         
-        <!-- زر تثبيت التطبيق (يظهر تلقائياً عندما يدعم المتصفح التثبيت) -->
-        <button id="installAppBtn">
-            📱 تثبيت التطبيق
-        </button>
-
-        <div class="menu-item" onclick="location.href='index.html'">🏠 الرئيسية</div>
-        <div class="menu-item" onclick="location.href='classes.html'">🏫 إدارة الصفوف والدردشة</div>
-        <div class="menu-item" onclick="location.href='schedule.html'">⏰ الحصص والجداول</div>
-        <div class="menu-item" onclick="location.href='games.html'">🎮 الألعاب والترفيه</div>
-        <div class="menu-item" onclick="location.href='library.html'">📚 المكتبة الرقمية</div>
-        <button onclick="localStorage.removeItem('currentUser'); window.location.href='login.html';" class="logout-btn">تسجيل الخروج</button>
-    </div>
-    
-    <div onclick="document.getElementById('mySidebar').style.width = '0'; document.getElementById('sidebarOverlay').style.display = 'none';" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999; display:none;" id="sidebarOverlay"></div>
-
-    <div class="main-content">
-        <!-- عداد الزائرين المستقل خارج البطاقات -->
-        <div class="visitor-counter-bar">
-            <span>👁️ إحصائية زائرين المنصة</span>
-            <span id="visitorCount" style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 6px;">0</span>
+        <!-- بانر الترحيب -->
+        <div class="welcome-banner">
+            <h2 id="welcomeTitle">مرحباً بك في المنصة</h2>
+            <p>منصتك التعليمية المتكاملة لإدارة الصفوف، جداول المحاضرات، المكتبة الرقمية، والأنشطة التفاعلية.</p>
         </div>
 
-        <!-- شبكة البطاقات الشاملة -->
-        <div class="cards-grid">
+        <!-- الأقسام والبطاقات الرئيسية -->
+        <div class="grid-cards">
             
-            <!-- 1. بطاقة الترحيب بالمستخدم ودوره -->
-            <div class="card-box" style="border-right: 5px solid #3182ce;">
-                <h3>👋 الترحيب والمستخدم</h3>
-                <p id="welcomeUserText" style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-top: 5px;">جاري تحميل بيانات المستخدم...</p>
-                <div style="margin-top: auto; padding-top: 15px;">
-                    <button onclick="location.href='classes.html'" style="background: #3182ce; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold;">الانتقال لصفوف الدراسية والدردشة 🏫</button>
+            <!-- صفحة الصفوف والدردشة -->
+            <a href="classes.html" class="card-box" style="border-right: 5px solid #3182ce;">
+                <i class="fa-solid fa-chalkboard-user"></i>
+                <h3>إدارة الصفوف والدردشة</h3>
+                <p>متابعة الدروس والتواصل المباشر مع الأساتذة والطلاب</p>
+            </a>
+
+            <!-- صفحة الجدول الدراسي -->
+            <a href="schedule.html" class="card-box" style="border-right: 5px solid #38a169;">
+                <i class="fa-solid fa-calendar-days"></i>
+                <h3>الجدول الدراسي</h3>
+                <p>عرض المواعيد والمحاضرات والامتحانات الأسبوعية</p>
+            </a>
+
+            <!-- صفحة المكتبة الرقمية -->
+            <a href="library.html" class="card-box" style="border-right: 5px solid #d69e2e;">
+                <i class="fa-solid fa-book-open"></i>
+                <h3>المكتبة الرقمية</h3>
+                <p>تصفح وتحميل الكتب والملخصات والملفات التعليمية</p>
+            </a>
+
+            <!-- صفحة الألعاب والترفيه التعليمي -->
+            <a href="games.html" class="card-box" style="border-right: 5px solid #e53e3e;">
+                <i class="fa-solid fa-gamepad"></i>
+                <h3>الألعاب والمسابقات</h3>
+                <p>اختبر معلوماتك بطريقة تفاعلية وممتعة</p>
+            </a>
+
+            <!-- الساعة الرقمية الزجاجية الجديدة (بدل التقويم) -->
+            <div class="card-box clock-card-box">
+                <div class="stars-bg"></div>
+                <div class="glass-clock-container">
+                    <div class="digital-time" id="digitalClock">00:00:00</div>
+                    <div class="digital-date" id="digitalDate">Sunday, 19 April 2026</div>
                 </div>
-            </div>
-
-            <!-- 2. بطاقة رؤية المنصة وأهدافها -->
-            <div class="card-box" style="border-right: 5px solid #805ad5;">
-                <h3>🎯 رؤية وأهداف المنصة</h3>
-                <div style="color: #4a5568; font-size: 14px; line-height: 1.6;">
-                    <p style="margin: 0 0 8px 0;"><strong>الرؤية:</strong> بناء بيئة تعليمية رقمية متكاملة، تفاعلية، وآمنة تربط بين المعلم والطلاب والإدارة بمرونة عالية.</p>
-                    <p style="margin: 0;"><strong>الأهداف:</strong> توفير إشراف تربوي لحظي، تنظيم الصفوف والدردشة، وتسهيل التواصل الفوري.</p>
-                </div>
-            </div>
-
-            <!-- 3. بطاقة التقويم الحي -->
-            <div class="card-box calendar-widget" style="border-right: 5px solid #38a169;">
-                <h3>📅 التقويم الحي المدمج</h3>
-                <div class="calendar-header" id="calendarTitle">التقويم</div>
-                <div class="calendar-grid" id="calendarDays">
-                    <div class="day-name">س</div>
-                    <div class="day-name">ج</div>
-                    <div class="day-name">خ</div>
-                    <div class="day-name">ر</div>
-                    <div class="day-name">ث</div>
-                    <div class="day-name">ن</div>
-                    <div class="day-name">ح</div>
-                </div>
-            </div>
-
-            <!-- 4. بطاقة قسم الحصص والجداول -->
-            <div class="card-box" style="border-right: 5px solid #319795;">
-                <h3>⏰ الحصص والجداول اليومية</h3>
-                <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin-top: 5px;">تابع جدول الحصص المدرسية والمواعيد الرسمية للدروس التفاعلية لحظة بلحظة.</p>
-                <div style="margin-top: auto; padding-top: 15px;">
-                    <button onclick="location.href='schedule.html'" style="background: #319795; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold;">الانتقال للجدول الدراسي 📅</button>
-                </div>
-            </div>
-
-            <!-- 5. بطاقة قسم الترفيه والألعاب -->
-            <div class="card-box" style="border-right: 5px solid #d69e2e;">
-                <h3>🎮 الترفيه والألعاب التعليمية</h3>
-                <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin-top: 5px;">ألعاب لتعليم الحروف والقراءة، مسابقات العلوم والرياضيات، ولعبة البازل الذكية للمرحلة الابتدائية.</p>
-                <div style="margin-top: auto; padding-top: 15px;">
-                    <button onclick="location.href='games.html'" style="background: #d69e2e; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold;">الانتقال لقسم الألعاب 🎲</button>
-                </div>
-            </div>
-
-            <!-- 6. بطاقة المكتبة الرقمية -->
-            <div class="card-box" style="border-right: 5px solid #2b6cb0;">
-                <h3>📚 المكتبة الرقمية والملفات</h3>
-                <p style="color: #4a5568; font-size: 14px; line-height: 1.6; margin-top: 5px;">بنك الكتب والملازم والملخصات بصيغة PDF لكل صف دراسي، مع إمكانية الرفع المباشر للإدارة.</p>
-                <div style="margin-top: auto; padding-top: 15px;">
-                    <button onclick="location.href='library.html'" style="background: #2b6cb0; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold;">الانتقال للمكتبة الرقمية 📁</button>
-                </div>
-            </div>
-
-            <!-- 7. بطاقة لوحة الإعلانات وآخر الأخبار (مع دعم الصور والفيديوهات) -->
-            <div class="card-box" style="border-right: 5px solid #dd6b20; grid-column: span 1 / -1;">
-                <h3>📢 لوحة الإعلانات وآخر الأخبار</h3>
-                
-                <!-- نموذج إضافة خبر أو إعلان (يظهر للأستاذ والمدير فقط) -->
-                <div id="adminAnnounceBox" class="admin-only" style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 2px dashed #38a169;">
-                    <h4 style="margin: 0 0 10px 0; color: #38a169;">نشر خبر أو تعميم جديد (مع صورة أو فيديو)</h4>
-                    <input type="text" id="annTitle" placeholder="عنوان الخبر أو الإعلان..." style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box;">
-                    <textarea id="annText" placeholder="تفاصيل الخبر..." style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #cbd5e0; border-radius: 6px; height: 60px; box-sizing: border-box;"></textarea>
-                    
-                    <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
-                        <div>
-                            <label style="font-size: 13px; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;">إرفاق صورة:</label>
-                            <input type="file" id="annImageFile" accept="image/*" style="font-size: 13px;">
-                        </div>
-                        <div>
-                            <label style="font-size: 13px; font-weight: bold; color: #4a5568; display: block; margin-bottom: 4px;">أو رابط فيديو يوتيوب (Embed):</label>
-                            <input type="text" id="annVideoUrl" placeholder="https://www.youtube.com/embed/..." style="padding: 6px; width: 220px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px;">
-                        </div>
-                    </div>
-
-                    <label style="font-size: 14px; display: inline-block; margin-bottom: 10px;"><input type="checkbox" id="annUrgent"> إعلان عاجل ومهم 🔴</label>
-                    <button onclick="window.postAnnouncement()" style="background: #38a169; color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; float: left; font-weight: bold;">نشر الخبر</button>
-                    <div style="clear: both;"></div>
-                </div>
-
-                <!-- قائمة عرض الأخبار والإعلانات -->
-                <div id="announcementsList" style="max-height: 400px; overflow-y: auto;">جاري تحميل الأخبار...</div>
             </div>
 
         </div>
-    </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+        <!-- زر تثبيت التطبيق -->
+        <div class="install-pwa-bar" id="installBar" style="display: none;">
+            <button class="install-btn" id="installPwaBtn"><i class="fa-solid fa-mobile-screen-button"></i> تثبيت التطبيق على الجهاز</button>
+        </div>
+
+    </div>
 
     <script>
-        document.querySelector('.toggle-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.getElementById('mySidebar').style.width = '260px';
-            document.getElementById('sidebarOverlay').style.display = 'block';
-        });
-        document.getElementById('sidebarOverlay').addEventListener('click', () => {
-            document.getElementById('mySidebar').style.width = '0';
-            document.getElementById('sidebarOverlay').style.display = 'none';
-        });
+        // التحقق من تسجيل الدخول وجلب بيانات المستخدم
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentUser = localStorage.getItem("currentUser");
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAuWDpBoR31ZjPzaUrAe4lppufSHuMLFyI",
-            databaseURL: "https://roya-platform-26860-default-rtdb.firebaseio.com",
-            projectId: "roya-platform-26860",
-            storageBucket: "roya-platform-26860.appspot.com",
-            messagingSenderId: "897544406776",
-            appId: "1:897544406776:web:aa112013dea672fb141d0d"
-        };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        window.database = firebase.database();
-        let isAdmin = false;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            let currentUser = null;
             try {
-                currentUser = JSON.parse(localStorage.getItem("currentUser"));
-                if (currentUser) {
-                    const userRole = currentUser.role ? currentUser.role.trim().toLowerCase() : "";
-                    if (userRole === 'teacher' || userRole === 'admin' || userRole === 'المدير' || userRole === 'الأستاذ') {
-                        isAdmin = true;
-                        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-                    }
-                    document.getElementById('welcomeUserText').innerHTML = `أهلاً بك يا <strong>${currentUser.name}</strong>.<br>دورك في المنصة: <span style="color: #3182ce; font-weight: bold;">${currentUser.role || 'مستخدم'}</span>`;
-                } else {
-                    document.getElementById('welcomeUserText').innerHTML = `مرحباً بك يا زائر المنصة. يرجى تسجيل الدخول للحصول على صلاحياتك الكاملة.`;
-                }
-            } catch(e) {
-                document.getElementById('welcomeUserText').innerHTML = `مرحباً بك في منصة الوادي التعليمية.`;
+                const userData = JSON.parse(currentUser);
+                document.getElementById('displayName').innerText = userData.name || userData.identifier;
+                document.getElementById('displayRole').innerText = userData.role || 'طالب';
+                document.getElementById('welcomeTitle').innerText = `أهلاً بك، ${userData.name || 'عزيزي المستخدم'} 👋`;
+            } catch (e) {
+                window.location.href = 'login.html';
             }
-
-            // عداد الزائرين
-            const visitorRef = window.database.ref('stats/visitors');
-            visitorRef.transaction(current => (current || 0) + 1);
-            visitorRef.on('value', snap => {
-                document.getElementById('visitorCount').innerText = snap.val() || 1;
-            });
-
-            // جلب الإعلانات والأخبار
-            window.database.ref('announcements/').on('value', snap => {
-                const list = document.getElementById('announcementsList');
-                list.innerHTML = "";
-                const data = snap.val();
-                if (data) {
-                    Object.entries(data).reverse().forEach(([id, ann]) => {
-                        const div = document.createElement('div');
-                        div.className = ann.urgent ? 'announcement-item urgent' : 'announcement-item';
-                        
-                        let deleteBtn = isAdmin ? `<button onclick="window.deleteAnnouncement('${id}')" style="background:none; border:none; color:#e53e3e; cursor:pointer; float:left; font-size:12px; font-weight:bold;">حذف الخبر</button>` : '';
-                        
-                        let mediaHTML = "";
-                        if (ann.image) {
-                            mediaHTML += `<img src="${ann.image}" class="news-media" onclick="window.open('${ann.image}')" title="انقر لتكبير الصورة">`;
-                        }
-                        if (ann.video) {
-                            mediaHTML += `<iframe src="${ann.video}" class="news-video" allowfullscreen></iframe>`;
-                        }
-
-                        div.innerHTML = `<strong>${ann.title}</strong> ${deleteBtn}<p style="margin: 5px 0 8px 0; color:#4a5568; font-size:14px; line-height: 1.5;">${ann.text}</p>${mediaHTML}`;
-                        list.appendChild(div);
-                    });
-                } else {
-                    list.innerHTML = "<p style='color:#718096; text-align:center;'>لا توجد أخبار أو إعلانات حالياً.</p>";
-                }
-            });
-
-            buildCalendar();
         });
 
-        window.postAnnouncement = function() {
-            const title = document.getElementById('annTitle').value.trim();
-            const text = document.getElementById('annText').value.trim();
-            const urgent = document.getElementById('annUrgent').checked;
-            const videoUrl = document.getElementById('annVideoUrl').value.trim();
-            const imageFile = document.getElementById('annImageFile').files[0];
-
-            if(!title || !text) { 
-                alert("يرجى كتابة عنوان ونص الخبر على الأقل."); 
-                return; 
-            }
-
-            if (imageFile) {
-                const reader = new FileReader();
-                reader.onloadend = function() {
-                    saveNewsToDatabase(title, text, urgent, reader.result, videoUrl);
-                };
-                reader.readAsDataURL(imageFile);
-            } else {
-                saveNewsToDatabase(title, text, urgent, null, videoUrl);
-            }
-        };
-
-        function saveNewsToDatabase(title, text, urgent, imageUrl, videoUrl) {
-            window.database.ref('announcements/').push({
-                title, 
-                text, 
-                urgent, 
-                image: imageUrl || null, 
-                video: videoUrl || null, 
-                timestamp: Date.now()
-            }).then(() => {
-                document.getElementById('annTitle').value = "";
-                document.getElementById('annText').value = "";
-                document.getElementById('annVideoUrl').value = "";
-                document.getElementById('annImageFile').value = "";
-                document.getElementById('annUrgent').checked = false;
-                alert("تم نشر الخبر بنجاح!");
-            }).catch(err => {
-                alert("فشل النشر: " + err.message);
-            });
+        // تسجيل الخروج
+        function logout() {
+            localStorage.removeItem("currentUser");
+            window.location.href = 'login.html';
         }
 
-        window.deleteAnnouncement = function(id) {
-            if(confirm("هل تريد حذف هذا الخبر نهائياً؟")) {
-                window.database.ref('announcements/' + id).remove();
-            }
-        };
-
-        function buildCalendar() {
+        // تشغيل الساعة الرقمية الزجاجية بدقة وتحديثها كل ثانية
+        function updateGlassClock() {
             const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
-            const todayDate = now.getDate();
-
-            const monthsNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-            document.getElementById('calendarTitle').innerText = `${monthsNames[month]} ${year}`;
-
-            const firstDayIndex = new Date(year, month, 1).getDay();
-            const totalDays = new Date(year, month + 1, 0).getDate();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
             
-            const grid = document.getElementById('calendarDays');
-            const headersHTML = grid.innerHTML; 
-            grid.innerHTML = headersHTML;
+            document.getElementById('digitalClock').innerText = `${hours}:${minutes}:${seconds}`;
 
-            for(let i = 0; i < firstDayIndex; i++) {
-                const empty = document.createElement('div');
-                grid.appendChild(empty);
-            }
-
-            for(let d = 1; d <= totalDays; d++) {
-                const dayDiv = document.createElement('div');
-                dayDiv.innerText = d;
-                if(d === todayDate) dayDiv.className = 'today';
-                grid.appendChild(dayDiv);
-            }
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('digitalDate').innerText = now.toLocaleDateString('en-US', options);
         }
 
-        // كود تشغيل وتثبيت تطبيق الـ PWA
-        let deferredPrompt;
-        const installBtn = document.getElementById('installAppBtn');
+        setInterval(updateGlassClock, 1000);
+        updateGlassClock();
 
+        // تفعيل خاصية تثبيت التطبيق (PWA)
+        let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installBtn.style.display = 'inline-flex';
+            document.getElementById('installBar').style.display = 'block';
         });
 
-        installBtn.addEventListener('click', async () => {
+        document.getElementById('installPwaBtn').addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    console.log('تم تثبيت التطبيق بنجاح');
+                    document.getElementById('installBar').style.display = 'none';
                 }
                 deferredPrompt = null;
-                installBtn.style.display = 'none';
             }
-        });
-
-        window.addEventListener('appinstalled', () => {
-            installBtn.style.display = 'none';
-            console.log('التطبيق مثبت بالفعل');
         });
     </script>
 </body>
