@@ -15,6 +15,31 @@
         .sidebar-title { color: #2c3e50; font-size: 20px; font-weight: bold; padding-bottom: 20px; border-bottom: 2px solid rgba(41, 128, 185, 0.2); margin-bottom: 10px; text-align: center; white-space: nowrap; }
         .menu-item { color: #2c3e50; background: rgba(255, 255, 255, 0.2); border-radius: 12px; margin: 8px 15px; padding: 12px 18px; text-align: center; transition: 0.3s; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap; font-weight: 500; }
         .menu-item:hover { background: rgba(255, 255, 255, 0.6); box-shadow: 0 0 12px #74b9ff; transform: translateY(-2px); }
+        
+        /* زر تثبيت التطبيق داخل القائمة الجانبية */
+        #installAppBtn {
+            display: none;
+            background: linear-gradient(135deg, #3182ce, #2b6cb0);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            margin: 10px 15px;
+            box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3);
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+        #installAppBtn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #2b6cb0, #2c5282);
+        }
+
         .logout-btn { margin-top: auto; padding: 12px; background: rgba(231, 76, 60, 0.1); color: #c0392b; border: 1px solid rgba(231, 76, 60, 0.2); border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; width: 80%; margin: 20px auto; }
         .logout-btn:hover { background: #e74c3c; color: white; }
         .toggle-btn { position: fixed; top: 20px; right: 20px; z-index: 1002; padding: 12px 20px; cursor: pointer; background: #ffffff; color: #2c3e50; border: none; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-weight: bold; }
@@ -49,11 +74,17 @@
 </head>
 <body>
 
-    <button class="toggle-btn" onclick="document.getElementById('mySidebar').style.width = '260px';">☰ القائمة</button>
+    <button class="toggle-btn" onclick="document.getElementById('mySidebar').style.width = '260px'; document.getElementById('sidebarOverlay').style.display = 'block';">☰ القائمة</button>
 
     <!-- القائمة الجانبية المحدثة -->
     <div class="sidebar" id="mySidebar">
         <div class="sidebar-title">🏞️ منصة الوادي</div>
+        
+        <!-- زر تثبيت التطبيق (يظهر تلقائياً عندما يدعم المتصفح التثبيت) -->
+        <button id="installAppBtn">
+            📱 تثبيت التطبيق
+        </button>
+
         <div class="menu-item" onclick="location.href='index.html'">🏠 الرئيسية</div>
         <div class="menu-item" onclick="location.href='classes.html'">🏫 إدارة الصفوف والدردشة</div>
         <div class="menu-item" onclick="location.href='schedule.html'">⏰ الحصص والجداول</div>
@@ -62,7 +93,7 @@
         <button onclick="localStorage.removeItem('currentUser'); window.location.href='login.html';" class="logout-btn">تسجيل الخروج</button>
     </div>
     
-    <div onclick="document.getElementById('mySidebar').style.width = '0';" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999; display:none;" id="sidebarOverlay"></div>
+    <div onclick="document.getElementById('mySidebar').style.width = '0'; document.getElementById('sidebarOverlay').style.display = 'none';" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999; display:none;" id="sidebarOverlay"></div>
 
     <div class="main-content">
         <!-- عداد الزائرين المستقل خارج البطاقات -->
@@ -329,6 +360,33 @@
                 grid.appendChild(dayDiv);
             }
         }
+
+        // كود تشغيل وتثبيت تطبيق الـ PWA
+        let deferredPrompt;
+        const installBtn = document.getElementById('installAppBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'inline-flex';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('تم تثبيت التطبيق بنجاح');
+                }
+                deferredPrompt = null;
+                installBtn.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installBtn.style.display = 'none';
+            console.log('التطبيق مثبت بالفعل');
+        });
     </script>
 </body>
 </html>
