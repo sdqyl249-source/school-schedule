@@ -3,99 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول والإنضمام - منصة الوادي التعليمية</title>
+    <title>تسجيل الدخول - منصة الوادي التعليمية</title>
+    <!-- أيقونة المنصة -->
+    <link rel="icon" type="image/png" href="icona99.png">
+    <link rel="apple-touch-icon" href="icona99.png">
+    <!-- FontAwesome الأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background-color: #121824;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
+
+        /* الحاوية الدائرية المتحركة للخلفية */
+        .login-container {
+            position: relative;
+            width: 380px;
+            height: 520px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* الإطار الدائري المتحرك للشرطات */
+        .circle-animation {
+            position: absolute;
+            width: 440px;
+            height: 440px;
+            border-radius: 50%;
+            animation: rotateRing 15s linear infinite;
+            pointer-events: none;
+        }
+
+        .circle-animation span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 4px;
+            background: #2a3b5c;
+            transform-origin: -210px center;
+            border-radius: 2px;
+        }
+
+        /* تلوين بعض الشرطات بشكل مضيء متحرك */
+        .circle-animation span:nth-child(-n+8) {
+            background: #f6ad55;
+            box-shadow: 0 0 10px #f6ad55, 0 0 20px #f6ad55;
+        }
+
+        @keyframes rotateRing {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* بطاقة تسجيل الدخول الداخلية */
         .login-card {
-            background: white;
-            padding: 35px 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 420px;
-            box-sizing: border-box;
+            position: relative;
+            background: #182232;
+            width: 340px;
+            padding: 40px 30px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            z-index: 10;
             text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-        .logo-area {
-            font-size: 28px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 8px;
-        }
-        .subtitle {
-            color: #718096;
-            font-size: 14px;
+
+        .login-card h2 {
+            color: #f6ad55;
             margin-bottom: 25px;
+            font-size: 26px;
+            letter-spacing: 1px;
         }
-        .form-group {
-            margin-bottom: 18px;
-            text-align: right;
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
         }
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #4a5568;
-            font-size: 14px;
-        }
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
+
+        .input-group i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #718096;
             font-size: 15px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 13px 45px 13px 15px;
+            background: #121824;
+            border: 1px solid #2a3b5c;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
             box-sizing: border-box;
             outline: none;
             transition: 0.3s;
         }
-        .form-control:focus {
-            border-color: #3182ce;
-            box-shadow: 0 0 8px rgba(49, 130, 206, 0.2);
+
+        .input-field:focus {
+            border-color: #f6ad55;
+            box-shadow: 0 0 8px rgba(246, 173, 85, 0.3);
         }
-        .submit-btn {
-            background: linear-gradient(135deg, #3182ce, #2b6cb0);
-            color: white;
-            border: none;
-            padding: 14px;
+
+        .select-field {
             width: 100%;
-            border-radius: 10px;
+            padding: 13px 45px 13px 15px;
+            background: #121824;
+            border: 1px solid #2a3b5c;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #f6ad55, #dd6b20);
+            color: #fff;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(221, 107, 32, 0.4);
             margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3);
         }
+
         .submit-btn:hover {
-            background: linear-gradient(135deg, #2b6cb0, #2c5282);
             transform: translateY(-2px);
+            background: linear-gradient(135deg, #dd6b20, #c05621);
         }
-        .toggle-mode {
+
+        .toggle-text {
             margin-top: 20px;
-            font-size: 14px;
-            color: #718096;
+            font-size: 13px;
+            color: #a0aec0;
         }
-        .toggle-mode a {
-            color: #3182ce;
+
+        .toggle-text a {
+            color: #f6ad55;
             text-decoration: none;
             font-weight: bold;
             cursor: pointer;
         }
-        .toggle-mode a:hover {
+
+        .toggle-text a:hover {
             text-decoration: underline;
         }
+
         .error-msg {
             color: #e53e3e;
-            font-size: 13px;
+            font-size: 12px;
             margin-bottom: 15px;
             display: none;
         }
@@ -103,82 +178,94 @@
 </head>
 <body>
 
-    <div class="login-card">
-        <div class="logo-area">🏞️ منصة الوادي</div>
-        <div class="subtitle" id="formSubtitle">تسجيل الدخول إلى حسابك المدرسي</div>
+    <div class="login-container">
+        <!-- الإطار المتحرك بالشرطات المضيئة -->
+        <div class="circle-animation" id="circleRing"></div>
 
-        <div class="error-msg" id="errorMsg">يرجى ملء جميع الحقول المطلوبة بشكل صحيح</div>
+        <!-- بطاقة تسجيل الدخول -->
+        <div class="login-card">
+            <h2 id="formTitle">LOGIN</h2>
+            
+            <div class="error-msg" id="errorMsg">يرجى ملء الحقول المطلوبة</div>
 
-        <form id="authForm" onsubmit="handleAuth(event)">
-            <!-- حقل الاسم (يظهر عند التسجيل الجديد) -->
-            <div class="form-group" id="nameGroup" style="display:none;">
-                <label>الاسم الكامل:</label>
-                <input type="text" id="fullName" class="form-control" placeholder="أدخل اسمك الثلاثي">
+            <form onsubmit="handleAuth(event)">
+                <!-- حقل الاسم (يظهر عند التسجيل) -->
+                <div class="input-group" id="nameGroup" style="display:none;">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="fullName" class="input-field" placeholder="الاسم الكامل...">
+                </div>
+
+                <!-- البريد أو الهاتف -->
+                <div class="input-group">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="text" id="identifier" class="input-field" placeholder="البريد أو رقم الهاتف..." required>
+                </div>
+
+                <!-- اختيار الصفة (يظهر عند التسجيل) -->
+                <div id="roleGroup" style="display:none;">
+                    <select id="userRole" class="select-field">
+                        <option value="طالب">طالب</option>
+                        <option value="الأستاذ">أستاذ / معلم</option>
+                        <option value="المدير">مدير المنصة</option>
+                    </select>
+                </div>
+
+                <!-- الرمز السري أو كود المدير ahmed2026 -->
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="secretCode" class="input-field" placeholder="الرمز السري (ahmed2026 للمدير)..." required>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">LOGIN</button>
+            </form>
+
+            <div class="toggle-text">
+                <span id="toggleTextInfo">ليس لديك حساب؟</span> 
+                <a onclick="switchMode()" id="toggleLink">Sign Up</a>
             </div>
-
-            <!-- حقل البريد الإلكتروني أو رقم الهاتف -->
-            <div class="form-group">
-                <label>البريد الإلكتروني أو رقم الهاتف:</label>
-                <input type="text" id="identifier" class="form-control" placeholder="example@gmail.com أو 07700000000" required>
-            </div>
-
-            <!-- اختيار الصفة (طالب أو أستاذ أو مدير) -->
-            <div class="form-group" id="roleGroup" style="display:none;">
-                <label>حدد صفتك في المنصة:</label>
-                <select id="userRole" class="form-control">
-                    <option value="طالب">طالب</option>
-                    <option value="الأستاذ">أستاذ / معلم</option>
-                    <option value="المدير">مدير المنصة</option>
-                </select>
-            </div>
-
-            <!-- حقل الرمز السري (ahmed2026 للمدير أو كلمة المرور العادية) -->
-            <div class="form-group">
-                <label>الرمز السري (كلمة المرور / ahmed2026 للمدير):</label>
-                <input type="password" id="secretCode" class="form-control" placeholder="أدخل الرمز السري..." required>
-            </div>
-
-            <button type="submit" class="submit-btn" id="submitBtnText">تسجيل الدخول</button>
-        </form>
-
-        <div class="toggle-mode">
-            <span id="toggleText">ليس لديك حساب؟</span> 
-            <a onclick="switchMode()" id="toggleLink">إنشاء حساب جديد</a>
         </div>
     </div>
 
     <script>
-        let isRegisterMode = false;
+        // توليد الشرطات الدائرية برمجياً لإعطاء حركة الإطار المضيء
+        const ring = document.getElementById('circleRing');
+        const totalSpokes = 36;
+        for (let i = 0; i < totalSpokes; i++) {
+            const span = document.createElement('span');
+            span.style.transform = `rotate(${i * (360 / totalSpokes)}deg)`;
+            ring.appendChild(span);
+        }
+
+        let isRegister = false;
 
         function switchMode() {
-            isRegisterMode = !isRegisterMode;
+            isRegister = !isRegister;
             const nameGroup = document.getElementById('nameGroup');
             const roleGroup = document.getElementById('roleGroup');
-            const formSubtitle = document.getElementById('formSubtitle');
-            const submitBtnText = document.getElementById('submitBtnText');
-            const toggleText = document.getElementById('toggleText');
+            const formTitle = document.getElementById('formTitle');
+            const submitBtn = document.getElementById('submitBtn');
+            const toggleTextInfo = document.getElementById('toggleTextInfo');
             const toggleLink = document.getElementById('toggleLink');
-            
-            if (isRegisterMode) {
+
+            if (isRegister) {
                 nameGroup.style.display = 'block';
                 roleGroup.style.display = 'block';
-                formSubtitle.innerText = 'إنشاء حساب جديد في منصة الوادي';
-                submitBtnText.innerText = 'إنشاء الحساب والانضمام';
-                toggleText.innerText = 'لديك حساب بالفعل؟';
-                toggleLink.innerText = 'تسجيل الدخول';
+                formTitle.innerText = 'SIGN UP';
+                submitBtn.innerText = 'SIGN UP';
+                toggleTextInfo.innerText = 'لديك حساب بالفعل؟';
+                toggleLink.innerText = 'Login';
             } else {
                 nameGroup.style.display = 'none';
                 roleGroup.style.display = 'none';
-                formSubtitle.innerText = 'تسجيل الدخول إلى حسابك المدرسي';
-                submitBtnText.innerText = 'تسجيل الدخول';
-                toggleText.innerText = 'ليس لديك حساب؟';
-                toggleLink.innerText = 'إنشاء حساب جديد';
+                formTitle.innerText = 'LOGIN';
+                submitBtn.innerText = 'LOGIN';
+                toggleTextInfo.innerText = 'ليس لديك حساب؟';
+                toggleLink.innerText = 'Sign Up';
             }
         }
 
         function handleAuth(event) {
             event.preventDefault();
-            
             const identifier = document.getElementById('identifier').value.trim();
             const secretCode = document.getElementById('secretCode').value.trim();
             const fullName = document.getElementById('fullName').value.trim();
@@ -187,22 +274,21 @@
 
             if (!identifier || !secretCode) {
                 errorMsg.style.display = 'block';
-                errorMsg.innerText = 'يرجى إدخال البريد/الهاتف والرمز السري';
+                errorMsg.innerText = 'يرجى إدخال البيانات المطلوبة';
                 return;
             }
 
             let finalRole = roleSelect;
             let finalName = fullName || identifier;
 
-            // التحقق من الرمز الحصري للمدير
+            // تحديد تلقائي لصلاحية المدير عبر الرمز الحصري ahmed2026
             if (secretCode === 'ahmed2026') {
                 finalRole = 'المدير';
-            } else if (isRegisterMode && !fullName) {
+            } else if (isRegister && !fullName) {
                 errorMsg.style.display = 'block';
-                errorMsg.innerText = 'يرجى إدخال الاسم الكامل للتسجيل';
+                errorMsg.innerText = 'يرجى إدخال الاسم الكامل';
                 return;
-            } else if (!isRegisterMode) {
-                // استرجاع الصفة المحفوظة مسبقاً إذا كان المستخدم مسجلاً من قبل بهذا البريد/الهاتف
+            } else if (!isRegister) {
                 const existing = localStorage.getItem("currentUser");
                 if (existing) {
                     try {
@@ -215,7 +301,7 @@
                 }
             }
 
-            // حفظ بيانات الجلسة في المتصفح للاحتفاظ بتسجيل الدخول تلقائياً
+            // حفظ الجلسة لتبقى نشطة ولا تظهر شاشة التسجيل مرة أخرى
             const userData = {
                 name: finalName,
                 identifier: identifier,
@@ -224,12 +310,10 @@
             };
 
             localStorage.setItem("currentUser", JSON.stringify(userData));
-
-            alert(`مرحباً بك يا ${finalName}! تم تسجيل الدخول بنجاح بصفتك (${finalRole})`);
             window.location.href = 'index.html';
         }
 
-        // الانتقال التلقائي للرئيسية إذا كان مسجلاً مسبقاً ولم تظهر شاشة التسجيل
+        // تخطي شاشة الدخول التلقائي إذا كان المستخدم مسجلاً مسبقاً
         window.addEventListener('DOMContentLoaded', () => {
             const currentUser = localStorage.getItem("currentUser");
             if (currentUser) {
