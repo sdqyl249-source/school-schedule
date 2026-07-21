@@ -2,52 +2,240 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>تسجيل الدخول - منصة الوادي</title>
-    <link rel="stylesheet" href="classes_style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول والإنضمام - منصة الوادي التعليمية</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-card {
+            background: white;
+            padding: 35px 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 420px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .logo-area {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+            text-align: right;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
+        }
+        .form-control:focus {
+            border-color: #3182ce;
+            box-shadow: 0 0 8px rgba(49, 130, 206, 0.2);
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, #3182ce, #2b6cb0);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(49, 130, 206, 0.3);
+        }
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #2b6cb0, #2c5282);
+            transform: translateY(-2px);
+        }
+        .toggle-mode {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #718096;
+        }
+        .toggle-mode a {
+            color: #3182ce;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .toggle-mode a:hover {
+            text-decoration: underline;
+        }
+        .error-msg {
+            color: #e53e3e;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
 </head>
-<body class="login-page">
+<body>
 
-    <div class="login-container">
-        <h2>مرحباً بك في منصة الوادي</h2>
-        <input type="text" id="userName" placeholder="الاسم الثلاثي">
-        <input type="tel" id="userPhone" placeholder="رقم الهاتف">
-        
-        <select id="userRole">
-            <option value="student">طالب</option>
-            <option value="teacher">أستاذ</option>
-        </select>
+    <div class="login-card">
+        <div class="logo-area">🏞️ منصة الوادي</div>
+        <div class="subtitle" id="formSubtitle">تسجيل الدخول إلى حسابك المدرسي</div>
 
-        <button onclick="performLogin()">تسجيل الدخول</button>
+        <div class="error-msg" id="errorMsg">يرجى ملء جميع الحقول المطلوبة بشكل صحيح</div>
+
+        <form id="authForm" onsubmit="handleAuth(event)">
+            <!-- حقل الاسم (يظهر عند التسجيل الجديد) -->
+            <div class="form-group" id="nameGroup" style="display:none;">
+                <label>الاسم الكامل:</label>
+                <input type="text" id="fullName" class="form-control" placeholder="أدخل اسمك الثلاثي">
+            </div>
+
+            <!-- حقل البريد الإلكتروني أو رقم الهاتف -->
+            <div class="form-group">
+                <label>البريد الإلكتروني أو رقم الهاتف:</label>
+                <input type="text" id="identifier" class="form-control" placeholder="example@gmail.com أو 07700000000" required>
+            </div>
+
+            <!-- اختيار الصفة (طالب أو أستاذ أو مدير) -->
+            <div class="form-group" id="roleGroup" style="display:none;">
+                <label>حدد صفتك في المنصة:</label>
+                <select id="userRole" class="form-control">
+                    <option value="طالب">طالب</option>
+                    <option value="الأستاذ">أستاذ / معلم</option>
+                    <option value="المدير">مدير المنصة</option>
+                </select>
+            </div>
+
+            <!-- حقل الرمز السري (ahmed2026 للمدير أو كلمة المرور العادية) -->
+            <div class="form-group">
+                <label>الرمز السري (كلمة المرور / ahmed2026 للمدير):</label>
+                <input type="password" id="secretCode" class="form-control" placeholder="أدخل الرمز السري..." required>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtnText">تسجيل الدخول</button>
+        </form>
+
+        <div class="toggle-mode">
+            <span id="toggleText">ليس لديك حساب؟</span> 
+            <a onclick="switchMode()" id="toggleLink">إنشاء حساب جديد</a>
+        </div>
     </div>
 
     <script>
-        function performLogin() {
-            const name = document.getElementById("userName").value.trim();
-            const phone = document.getElementById("userPhone").value.trim();
-            const role = document.getElementById("userRole").value;
+        let isRegisterMode = false;
 
-            // التحقق من أن الحقول ليست فارغة
-            if (name === "" || phone === "") {
-                alert("يرجى إدخال الاسم ورقم الهاتف.");
+        function switchMode() {
+            isRegisterMode = !isRegisterMode;
+            const nameGroup = document.getElementById('nameGroup');
+            const roleGroup = document.getElementById('roleGroup');
+            const formSubtitle = document.getElementById('formSubtitle');
+            const submitBtnText = document.getElementById('submitBtnText');
+            const toggleText = document.getElementById('toggleText');
+            const toggleLink = document.getElementById('toggleLink');
+            
+            if (isRegisterMode) {
+                nameGroup.style.display = 'block';
+                roleGroup.style.display = 'block';
+                formSubtitle.innerText = 'إنشاء حساب جديد في منصة الوادي';
+                submitBtnText.innerText = 'إنشاء الحساب والانضمام';
+                toggleText.innerText = 'لديك حساب بالفعل؟';
+                toggleLink.innerText = 'تسجيل الدخول';
+            } else {
+                nameGroup.style.display = 'none';
+                roleGroup.style.display = 'none';
+                formSubtitle.innerText = 'تسجيل الدخول إلى حسابك المدرسي';
+                submitBtnText.innerText = 'تسجيل الدخول';
+                toggleText.innerText = 'ليس لديك حساب؟';
+                toggleLink.innerText = 'إنشاء حساب جديد';
+            }
+        }
+
+        function handleAuth(event) {
+            event.preventDefault();
+            
+            const identifier = document.getElementById('identifier').value.trim();
+            const secretCode = document.getElementById('secretCode').value.trim();
+            const fullName = document.getElementById('fullName').value.trim();
+            const roleSelect = document.getElementById('userRole').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (!identifier || !secretCode) {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = 'يرجى إدخال البريد/الهاتف والرمز السري';
                 return;
             }
 
-            // إنشاء ملف تعريف المستخدم (User Profile)
-            const userProfile = {
-                name: name,
-                phone: phone,
-                role: role,
-                joinedClasses: [] // مصفوفة فارغة جاهزة لاستقبال رموز الصفوف لاحقاً
+            let finalRole = roleSelect;
+            let finalName = fullName || identifier;
+
+            // التحقق من الرمز الحصري للمدير
+            if (secretCode === 'ahmed2026') {
+                finalRole = 'المدير';
+            } else if (isRegisterMode && !fullName) {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = 'يرجى إدخال الاسم الكامل للتسجيل';
+                return;
+            } else if (!isRegisterMode) {
+                // استرجاع الصفة المحفوظة مسبقاً إذا كان المستخدم مسجلاً من قبل بهذا البريد/الهاتف
+                const existing = localStorage.getItem("currentUser");
+                if (existing) {
+                    try {
+                        const parsed = JSON.parse(existing);
+                        if (parsed.identifier === identifier) {
+                            finalRole = parsed.role;
+                            finalName = parsed.name;
+                        }
+                    } catch(e) {}
+                }
+            }
+
+            // حفظ بيانات الجلسة في المتصفح للاحتفاظ بتسجيل الدخول تلقائياً
+            const userData = {
+                name: finalName,
+                identifier: identifier,
+                role: finalRole,
+                code: secretCode
             };
 
-            // حفظ المستخدم في الذاكرة الدائمة
-            localStorage.setItem("currentUser", JSON.stringify(userProfile));
+            localStorage.setItem("currentUser", JSON.stringify(userData));
 
-            alert("أهلاً بك يا " + name + "، تم تفعيل حسابك كـ " + (role === 'student' ? 'طالب' : 'أستاذ'));
-            
-            // التوجه للرئيسية
-            window.location.href = "index.html";
+            alert(`مرحباً بك يا ${finalName}! تم تسجيل الدخول بنجاح بصفتك (${finalRole})`);
+            window.location.href = 'index.html';
         }
+
+        // الانتقال التلقائي للرئيسية إذا كان مسجلاً مسبقاً ولم تظهر شاشة التسجيل
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentUser = localStorage.getItem("currentUser");
+            if (currentUser) {
+                window.location.href = 'index.html';
+            }
+        });
     </script>
 </body>
 </html>
