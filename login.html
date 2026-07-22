@@ -4,180 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول - منصة الوادي التعليمية</title>
-    <!-- أيقونة المنصة -->
     <link rel="icon" type="image/png" href="icona99.png">
     <link rel="apple-touch-icon" href="icona99.png">
-    <!-- FontAwesome الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #121824;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        .login-container {
-            position: relative;
-            width: 380px;
-            height: 520px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .circle-animation {
-            position: absolute;
-            width: 440px;
-            height: 440px;
-            border-radius: 50%;
-            animation: rotateRing 15s linear infinite;
-            pointer-events: none;
-        }
-
-        .circle-animation span {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 12px;
-            height: 4px;
-            background: #2a3b5c;
-            transform-origin: -210px center;
-            border-radius: 2px;
-        }
-
-        .circle-animation span:nth-child(-n+8) {
-            background: #f6ad55;
-            box-shadow: 0 0 10px #f6ad55, 0 0 20px #f6ad55;
-        }
-
-        @keyframes rotateRing {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .login-card {
-            position: relative;
-            background: #182232;
-            width: 340px;
-            padding: 40px 30px;
-            border-radius: 24px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            z-index: 10;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .login-card h2 {
-            color: #f6ad55;
-            margin-bottom: 25px;
-            font-size: 26px;
-            letter-spacing: 1px;
-        }
-
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .input-group i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #718096;
-            font-size: 15px;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 13px 45px 13px 15px;
-            background: #121824;
-            border: 1px solid #2a3b5c;
-            border-radius: 12px;
-            color: #fff;
-            font-size: 14px;
-            box-sizing: border-box;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        .input-field:focus {
-            border-color: #f6ad55;
-            box-shadow: 0 0 8px rgba(246, 173, 85, 0.3);
-        }
-
-        .select-field {
-            width: 100%;
-            padding: 13px 45px 13px 15px;
-            background: #121824;
-            border: 1px solid #2a3b5c;
-            border-radius: 12px;
-            color: #fff;
-            font-size: 14px;
-            box-sizing: border-box;
-            outline: none;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-
-        .submit-btn {
-            background: linear-gradient(135deg, #f6ad55, #dd6b20);
-            color: #fff;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(221, 107, 32, 0.4);
-            margin-top: 10px;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg, #dd6b20, #c05621);
-        }
-
-        .toggle-text {
-            margin-top: 20px;
-            font-size: 13px;
-            color: #a0aec0;
-        }
-
-        .toggle-text a {
-            color: #f6ad55;
-            text-decoration: none;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .toggle-text a:hover {
-            text-decoration: underline;
-        }
-
-        .error-msg {
-            color: #e53e3e;
-            font-size: 12px;
-            margin-bottom: 15px;
-            display: none;
-        }
+        *{padding:0;margin:0;box-sizing:border-box;font-family:"Poppins",sans-serif;}
+        section{position:relative;display:flex;justify-content:center;align-items:center;width:100%;height:100vh;overflow:hidden;background-color:#121824;}
+        section .bg{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;}
+        section .trees{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:100;pointer-events:none;}
+        section .girl{position:absolute;scale:0.65;pointer-events:none;animation:animateGirl 10s linear infinite;}
+        @keyframes animateGirl{0%{transform:translateX(calc(100% + 100vw));}50%{transform:translateX(calc(-100% - 100vw));}50.01%{transform:translateX(calc(-100% - 100vw)) rotateY(180deg);}100%{transform:translateX(calc(100% + 100vw)) rotateY(180deg);}}
+        .login{position:relative;padding:40px 30px;background:rgba(255,255,255,0.25);backdrop-filter:blur(15px);border:1px solid #fff;border-bottom:1px solid rgba(255,255,255,0.5);border-right:1px solid rgba(255,255,255,0.5);border-radius:24px;width:400px;display:flex;flex-direction:column;gap:20px;box-shadow:0 25px 50px rgba(0,0,0,0.2);z-index:101;}
+        .login h2{position:relative;width:100%;text-align:center;font-size:2.2rem;font-weight:600;color:#f6ad55;margin-bottom:5px;}
+        .input-group{position:relative;margin-bottom:5px;}
+        .input-group i{position:absolute;right:15px;top:50%;transform:translateY(-50%);color:#718096;font-size:15px;}
+        .input-field{width:100%;padding:13px 45px 13px 15px;background:#121824;border:1px solid #2a3b5c;border-radius:12px;color:#fff;font-size:14px;box-sizing:border-box;outline:none;transition:0.3s;}
+        .input-field:focus{border-color:#f6ad55;box-shadow:0 0 8px rgba(246, 173, 85, 0.3);}
+        .select-field{width:100%;padding:13px 45px 13px 15px;background:#121824;border:1px solid #2a3b5c;border-radius:12px;color:#fff;font-size:14px;box-sizing:border-box;outline:none;cursor:pointer;margin-bottom:5px;}
+        .submit-btn{background:linear-gradient(135deg,#f6ad55,#dd6b20);color:#fff;border:none;width:100%;padding:14px;border-radius:12px;font-size:16px;font-weight:bold;cursor:pointer;transition:0.3s;box-shadow:0 4px 15px rgba(221,107,32,0.4);margin-top:5px;}
+        .submit-btn:hover{transform:translateY(-2px);background:linear-gradient(135deg,#dd6b20,#c05621);}
+        .toggle-text{margin-top:10px;font-size:13px;color:#a0aec0;text-align:center;}
+        .toggle-text a{color:#f6ad55;text-decoration:none;font-weight:bold;cursor:pointer;}
+        .toggle-text a:hover{text-decoration:underline;}
+        .error-msg{color:#e53e3e;font-size:12px;margin-bottom:5px;display:none;text-align:center;}
+        .leaves{position:absolute;width:100%;height:100vh;overflow:hidden;display:flex;justify-content:center;align-items:center;z-index:1;pointer-events:none;}
+        .leaves .set{position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;}
+        .leaves .set div{position:absolute;display:block;}
+        .leaves .set div:nth-child(1){left:20%;animation:animate 20s linear infinite;}
+        .leaves .set div:nth-child(2){left:50%;animation:animate 14s linear infinite;}
+        .leaves .set div:nth-child(3){left:70%;animation:animate 12s linear infinite;}
+        .leaves .set div:nth-child(4){left:5%;animation:animate 15s linear infinite;}
+        .leaves .set div:nth-child(5){left:85%;animation:animate 18s linear infinite;}
+        .leaves .set div:nth-child(6){left:90%;animation:animate 12s linear infinite;}
+        .leaves .set div:nth-child(7){left:15%;animation:animate 14s linear infinite;}
+        .leaves .set div:nth-child(8){left:60%;animation:animate 15s linear infinite;}
+        @keyframes animate{0%{opacity:0;top:-10%;transform:translateX(20px) rotate(0deg);}10%{opacity:1;}20%{transform:translateX(-20px) rotate(45deg);}40%{transform:translateX(-20px) rotate(90deg);}60%{transform:translateX(20px) rotate(180deg);}80%{transform:translateX(-20px) rotate(45deg);}100%{top:110%;transform:translateX(20px) rotate(255deg);}}
     </style>
 </head>
 <body>
+    <section>
+        <div class="leaves">
+            <div class="set">
+                <div><img decoding="async" src="./images/leaf_01.png" alt="leaf 01"></div>
+                <div><img decoding="async" src="./images/leaf_02.png" alt="leaf 02"></div>
+                <div><img decoding="async" src="./images/leaf_03.png" alt="leaf 03"></div>
+                <div><img decoding="async" src="./images/leaf_04.png" alt="leaf 04"></div>
+                <div><img decoding="async" src="./images/leaf_01.png" alt="leaf 01"></div>
+                <div><img decoding="async" src="./images/leaf_02.png" alt="leaf 02"></div>
+                <div><img decoding="async" src="./images/leaf_03.png" alt="leaf 03"></div>
+                <div><img decoding="async" src="./images/leaf_04.png" alt="leaf 04"></div>
+            </div>
+        </div>
+        <img decoding="async" src="./images/bg.jpg" class="bg" alt="bg">
+        <img decoding="async" src="./images/girl.png" class="girl" alt="girl">
+        <img decoding="async" src="./images/trees.png" class="trees" alt="trees">
 
-    <div class="login-container">
-        <div class="circle-animation" id="circleRing"></div>
-
-        <div class="login-card">
+        <div class="login">
             <h2 id="formTitle">LOGIN</h2>
             
             <div class="error-msg" id="errorMsg">يرجى ملء الحقول المطلوبة</div>
@@ -214,17 +96,9 @@
                 <a onclick="switchMode()" id="toggleLink">Sign Up</a>
             </div>
         </div>
-    </div>
+    </section>
 
     <script>
-        const ring = document.getElementById('circleRing');
-        const totalSpokes = 36;
-        for (let i = 0; i < totalSpokes; i++) {
-            const span = document.createElement('span');
-            span.style.transform = `rotate(${i * (360 / totalSpokes)}deg)`;
-            ring.appendChild(span);
-        }
-
         let isRegister = false;
 
         function switchMode() {
@@ -270,7 +144,6 @@
             let finalRole = roleSelect;
             let finalName = fullName || identifier;
 
-            // تحديد الصلاحيات بناءً على الرموز الموحدة
             if (secretCode === 'ahmed2026') {
                 finalRole = 'المدير';
             } else if (secretCode === 'teacher2026') {
@@ -281,10 +154,8 @@
                     errorMsg.innerText = 'يرجى إدخال الاسم الكامل';
                     return;
                 }
-                // إذا سجل بكلمة مرور عادية يتم اعتماد الصفة التي اخترتها في القائمة (طالب أو أستاذ)
                 finalRole = roleSelect;
             } else {
-                // عند تسجيل الدخول العادي، استرجاع الدور المحفوظ مسبقاً إذا وجد
                 const existing = localStorage.getItem("currentUser");
                 if (existing) {
                     try {
